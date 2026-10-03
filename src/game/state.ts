@@ -29,6 +29,7 @@ export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: Per
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
 export type Toast = { txt: string; t: number };
+export type Particle = { x: number; y: number; vx: number; vy: number; t: number; life: number; kind: string; c: string; s: number };
 export type Sign = { title: string; lines: [string, string][]; t: number };
 export type Mode = 'story' | 'time';
 export type Scene = 'title' | 'play' | 'pick' | 'shop' | 'end' | 'result';
@@ -53,7 +54,8 @@ export interface Game {
   spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
   totalCatches: number; costume: number; mapIndex: number;
   /** Purchased cosmetic ids and the one being worn (null = earned look). */
-  wardrobe: string[]; wearing: string | null;
+  wardrobe: string[]; wearing: string | null; aura: string | null; trail: string | null;
+  particles: Particle[]; trailT: number;
   arena: boolean; arenaT: number; arenaTiles: Pt[];
   streak: number; bestStreak: number; pervSpawns: number;
   /** Highest level whose boss has already been caught (persisted) or spawned this session. */
@@ -79,7 +81,7 @@ export function newGame(): Game {
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: emptyInv(), floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
-    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, wardrobe: [], wearing: null, arena: false, arenaT: 0, arenaTiles: [],
+    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, wardrobe: [], wearing: null, aura: null, trail: null, particles: [], trailT: 0, arena: false, arenaT: 0, arenaTiles: [],
     streak: 0, bestStreak: 0, pervSpawns: 0, lastBossLevel: 0, bossDone: 0,
   };
 }

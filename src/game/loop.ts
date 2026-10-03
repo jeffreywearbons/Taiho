@@ -17,6 +17,7 @@ import { audioInit, music } from '../core/audio';
 import { loadProfile, applyProfile, saveProfile } from './profile';
 import { resetGoals, goals, bossName } from './goals';
 import { heroSprite } from './costume';
+import { emitTrail, updParticles } from '../ui/fx';
 import { sfx } from '../core/audio';
 
 export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
@@ -95,7 +96,8 @@ export function update(dt: number): void {
   updBalls(dt); if (G.scene !== 'play') return;
   if (G.sign && consumeA()) { G.sign = null; return; }
   if (consumeA()) playerAction();
-  updPlayer(dt);
+  updPlayer(dt); updParticles(dt);
+  if (G.player.moving && G.trail) { G.trailT = (G.trailT || 0) + dt; if (G.trailT > 70) { G.trailT = 0; emitTrail(G.player.px, G.player.py); } }
   for (const e of G.ents) { if (e.chasing) continue; updNpc(e, dt); if (e.bailT > 0) e.bailT -= dt; }
   if (G.chase) updChase(dt);
   G.ents = G.ents.filter((e) => !e.dead);

@@ -18,16 +18,26 @@ export const CATALOG: { key: ItemKey; price: number; kind: 'active' | 'passive' 
 export const ITEM_KEYS: ItemKey[] = CATALOG.map((c) => c.key);
 
 /** Wardrobe: purely cosmetic, priced to be a long-term goal. Ordered most to least expensive. */
-export const COSMETICS: { id: string; price: number }[] = [
-  { id: 'dark', price: 50000 },
-  { id: 'trainer', price: 30000 },
-  { id: 'police', price: 20000 },
-  { id: 'clerk_stripe', price: 12000 },
-  { id: 'clerk_blue', price: 12000 },
-  { id: 'clerk_green', price: 12000 },
-  { id: 'clerk_red', price: 12000 },
-  { id: 'clerk_yellow', price: 12000 },
+export type CosmeticKind = 'costume' | 'aura' | 'trail';
+export const COSMETICS: { id: string; price: number; kind: CosmeticKind }[] = [
+  { id: 'dark', price: 50000, kind: 'costume' },
+  { id: 'trainer', price: 30000, kind: 'costume' },
+  { id: 'police', price: 20000, kind: 'costume' },
+  { id: 'clerk_stripe', price: 12000, kind: 'costume' },
+  { id: 'clerk_blue', price: 12000, kind: 'costume' },
+  { id: 'clerk_green', price: 12000, kind: 'costume' },
+  { id: 'clerk_red', price: 12000, kind: 'costume' },
+  { id: 'clerk_yellow', price: 12000, kind: 'costume' },
+  { id: 'aura_shonen', price: 8000, kind: 'aura' },
+  { id: 'aura_lightning', price: 8000, kind: 'aura' },
+  { id: 'aura_smoke', price: 8000, kind: 'aura' },
+  { id: 'aura_sakura', price: 8000, kind: 'aura' },
+  { id: 'trail_sakura', price: 6000, kind: 'trail' },
+  { id: 'trail_bats', price: 6000, kind: 'trail' },
+  { id: 'trail_neon', price: 6000, kind: 'trail' },
+  { id: 'trail_fire', price: 6000, kind: 'trail' },
 ];
+export const cosmeticKind = (id: string): CosmeticKind => COSMETICS.find((c) => c.id === id)?.kind ?? 'costume';
 export function buyCosmetic(id: string): 'ok' | 'broke' | 'owned' {
   const c = COSMETICS.find((x) => x.id === id)!;
   if (G.wardrobe.includes(id)) return 'owned';

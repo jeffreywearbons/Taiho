@@ -9,6 +9,7 @@ import { L, lang } from '../i18n';
 import { rint } from '../core/rng';
 import { goals, goalText, dailyText, streakMult } from '../game/goals';
 import { bonsaiSprite } from '../game/costume';
+import { drawAura, drawParticles } from './fx';
 
 function iconVisible(e: Ent): 'full' | 'hint' | null {
   if (e.scripted || e.chasing) return 'full';
@@ -46,6 +47,8 @@ export function drawWorld(): void {
   for (const o of G.obstacles) spr('obs_' + o.type, o.x * TW, o.y * TW);
   for (const q of G.peels) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(q.x * TW + 3, q.y * TW + 8, 10, 5); ctx.fillStyle = '#ffe066'; ctx.fillRect(q.x * TW + 4, q.y * TW + 9, 8, 3); ctx.fillStyle = '#c8a000'; ctx.fillRect(q.x * TW + 4, q.y * TW + 11, 3, 1); }
   if (G.decoy) { spr('tile_mannequin', G.decoy.x * TW, G.decoy.y * TW - 4); if (Math.floor(G.time / 200) % 2) otext('!', G.decoy.x * TW + 8, G.decoy.y * TW - 14, '#ffe066', 'center'); }
+  drawParticles();
+  drawAura(G.player.px, G.player.py - 8);
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;

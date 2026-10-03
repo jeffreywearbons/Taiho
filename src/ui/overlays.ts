@@ -3,7 +3,7 @@ import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
-import { wear } from '../game/costume';
+import { wear, wornOf } from '../game/costume';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial, showBox } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
@@ -94,12 +94,18 @@ function renderWardrobe(): void {
   $('wd-yen').textContent = '¥' + G.yen;
   const list = $('wd-list'); list.innerHTML = '';
   const mkRow = (name: string, desc: string, right: HTMLElement) => { const row = document.createElement('div'); row.className = 'item'; const info = document.createElement('div'); info.className = 'info'; const b = document.createElement('b'); b.textContent = name; const sp = document.createElement('span'); sp.textContent = desc; info.append(b, sp); row.append(info, right); list.appendChild(row); };
-  const wearBtn = (id: string | null) => { const btn = document.createElement('button'); const on = G.wearing === id; btn.textContent = on ? L.wearing : L.wear; btn.disabled = on; btn.onclick = () => { wear(id); sfx('blip'); renderWardrobe(); }; return btn; };
-  mkRow(L.earned_look, fmt(L.earned_desc, { c: L.costumes[G.costume] }), wearBtn(null));
+  const wearBtn = (id: string | null, kind: 'costume' | 'aura' | 'trail') => { const btn = document.createElement('button'); const on = wornOf(kind) === id; btn.textContent = on ? L.wearing : L.wear; btn.disabled = on; btn.onclick = () => { wear(id, kind); sfx('blip'); renderWardrobe(); }; return btn; };
+  const head = (t: string) => { const h = document.createElement('p'); h.className = 'bt'; h.textContent = t; list.appendChild(h); };
+  let lastKind = '';
   for (const c of COSMETICS) {
+    if (c.kind !== lastKind) {
+      lastKind = c.kind; head(L.wd_sections[c.kind]);
+      if (c.kind === 'costume') mkRow(L.earned_look, fmt(L.earned_desc, { c: L.costumes[G.costume] }), wearBtn(null, 'costume'));
+      else mkRow(L.none, L.none_desc, wearBtn(null, c.kind));
+    }
     const [name, desc] = L.cosmetics[c.id];
-    if (G.wardrobe.includes(c.id)) mkRow(name, desc, wearBtn(c.id));
-    else { const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price; btn.onclick = () => { const r = buyCosmetic(c.id); $('wd-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); if (r === 'ok') wear(c.id); renderWardrobe(); }; mkRow(name, desc, btn); }
+    if (G.wardrobe.includes(c.id)) mkRow(name, desc, wearBtn(c.id, c.kind));
+    else { const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price; btn.onclick = () => { const r = buyCosmetic(c.id); $('wd-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); if (r === 'ok') wear(c.id, c.kind); renderWardrobe(); }; mkRow(name, desc, btn); }
   }
 }
 export function closeWardrobe(): void { $('wardrobe').hidden = true; if ((window as any).__wdFrom === 'shop') G.scene = 'shop'; else if (G.scene !== 'title') G.scene = 'play'; clearPresses(); renderProfileLine(); }
