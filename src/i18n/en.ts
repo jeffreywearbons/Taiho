@@ -2,7 +2,7 @@ export type Page = ['b' | 'h', string];
 export type ShopItem = [name: string, desc: string];
 
 const en = {
-  title: 'TAIHO!!', sub: 'Konbini Vigilante', start: 'START', lang: 'Language: English', tut: 'Tutorial: ', on: 'ON', off: 'OFF',
+  title: 'TAIHO!!', sub: 'Konbini Vigilante', start: 'PLAY', tap_start: 'TAP TO START', settings: 'SETTINGS', settings_title: 'Settings', floor_line: 'Continues at {n}. {m}', lang: 'Language: English', tut: 'Tutorial: ', on: 'ON', off: 'OFF',
   sound: 'Sound: ', install: 'INSTALL APP', install_ios: 'On iPhone: tap Share, then "Add to Home Screen" to play fullscreen.',
   streak: 'STREAK {n}  ×{m}', streak_lost: 'Streak lost...', boss_wanted: 'WANTED: {n} just walked in!', boss_caught: 'BOSS DOWN! Triple reward!',
   boss_names: ['Mr. Sweaty', 'The Briefcase', 'Glasses Guy', 'Salaryman Zero'],

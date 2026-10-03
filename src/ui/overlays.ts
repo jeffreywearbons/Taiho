@@ -20,13 +20,14 @@ export const $ = <T extends HTMLElement = HTMLElement>(id: string): T => documen
 
 export function applyStrings(): void {
   $('t-title').textContent = L.title; $('t-sub').textContent = L.sub; $('b-start').textContent = L.start;
-  $('b-time').textContent = L.mode_time; $('b-rank').textContent = L.rank; $('b-book').textContent = L.book; $('b-lang').textContent = L.lang;
+  $('b-time').textContent = L.mode_time; $('b-rank').querySelector('span')!.textContent = L.rank; $('b-book').querySelector('span')!.textContent = L.book; $('b-lang').textContent = L.lang;
   $('b-tut').textContent = L.tut + (G.tutorial ? L.on : L.off); $('t-keys').textContent = L.keys;
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
+  $('b-settings').textContent = L.settings; $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close; $('s-title').textContent = L.title; $('s-sub').textContent = L.sub; $('s-tap').textContent = L.tap_start;
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
-  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').textContent = L.cal_btn; $('b-pass').textContent = L.pass_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('b-wardrobe').querySelector('span')!.textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').querySelector('span')!.textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').querySelector('span')!.textContent = L.cal_btn; $('b-pass').querySelector('span')!.textContent = L.pass_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;

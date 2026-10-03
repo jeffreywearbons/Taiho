@@ -16,31 +16,51 @@
 <div id="app">
   <div id="stage">
     <canvas id="cv" width="320" height="240" aria-label="TAIHO!! game screen"></canvas>
-    <div id="title" class="overlay">
-      <div class="card">
-        <h1 id="t-title">TAIHO!!</h1>
-        <h2 id="t-sub">Konbini Vigilante</h2>
-        <div class="menu">
-          <button id="b-start">START</button>
+    <div id="splash" class="overlay splash">
+      <div class="splash-in">
+        <canvas id="splash-cv" width="176" height="80" aria-hidden="true"></canvas>
+        <h1 id="s-title" class="logo">TAIHO!!</h1>
+        <p id="s-sub" class="logo-sub">Konbini Vigilante</p>
+        <p id="s-tap" class="blink">TAP TO START</p>
+      </div>
+    </div>
+    <div id="title" class="overlay" hidden>
+      <div class="card menu-card">
+        <h1 id="t-title" class="small-logo">TAIHO!!</h1>
+        <h2 id="t-sub" hidden>Konbini Vigilante</h2>
+        <p id="t-profile" class="small profile"></p>
+        <div class="menu primary">
+          <button id="b-start">PLAY</button>
+          <p id="t-floor" class="floor-line"></p>
           <button id="b-time">TIME ATTACK 90s</button>
-          <button id="b-rank">RANKING</button>
-          <button id="b-wardrobe">WARDROBE</button>
-          <button id="b-mycard">MY CARD</button>
-          <button id="b-book">COLLECTION</button>
-          <button id="b-cal">DAILY CHECK-IN</button>
-          <button id="b-pass">SEASON PASS</button>
-          <button id="b-link">LINK SAVE</button>
+        </div>
+        <div class="tiles">
+          <button id="b-rank" class="tile"><canvas width="16" height="24"></canvas><span>RANKING</span></button>
+          <button id="b-book" class="tile"><canvas width="16" height="24"></canvas><span>COLLECTION</span></button>
+          <button id="b-wardrobe" class="tile"><canvas width="16" height="24"></canvas><span>WARDROBE</span></button>
+          <button id="b-mycard" class="tile"><canvas width="16" height="24"></canvas><span>MY CARD</span></button>
+          <button id="b-cal" class="tile"><canvas width="16" height="24"></canvas><span>DAILY CHECK-IN</span></button>
+          <button id="b-pass" class="tile"><canvas width="16" height="24"></canvas><span>SEASON PASS</span></button>
+        </div>
+        <p id="maps-title" class="bt">Jump to</p>
+        <div class="strip-wrap"><div id="maps" class="maps strip"></div></div>
+        <div class="menu foot"><button id="b-settings" class="ghost">SETTINGS</button></div>
+      </div>
+    </div>
+    <div id="settings" class="overlay" hidden>
+      <div class="card">
+        <h2 id="set-title">Settings</h2>
+        <div class="menu">
           <button id="b-lang">Language: English</button>
           <button id="b-tut">Tutorial: ON</button>
           <button id="b-mute">Sound: ON</button>
+          <button id="b-link">LINK SAVE</button>
         </div>
-        <p id="t-profile" class="small"></p>
-        <p id="maps-title" class="bt">Jump to</p>
-        <div class="strip-wrap"><div id="maps" class="maps strip"></div></div>
         <button id="b-install" hidden>INSTALL APP</button>
         <p id="t-install-hint" class="small" hidden></p>
-        <button id="b-reset" class="link">Reset save</button>
         <p id="t-keys" class="keys">Arrows / WASD to move. Z, Space, Enter = A. X or Shift = B.</p>
+        <button id="b-reset" class="link">Reset save</button>
+        <div class="menu"><button id="b-set-close">CLOSE</button></div>
       </div>
     </div>
     <div id="pick" class="overlay" hidden>

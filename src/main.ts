@@ -20,6 +20,8 @@ import { openCard, closeCard } from './ui/card';
 import { openLink, wireLink } from './ui/link';
 import { openCalendar, wireCalendar } from './ui/calendar';
 import { wireBook } from './ui/book';
+import { wireMenu, renderMenu, onceInMenu } from './ui/menu';
+import { unlockedMaps } from './game/maps';
 import { openPass, wirePass } from './ui/pass';
 import { wireOffer } from './ui/offer';
 import { syncEntitlements } from './game/purchases';
@@ -39,7 +41,7 @@ function wire(): void {
   try { G.tutorial = localStorage.getItem('taiho_tut') !== '1'; } catch { /* ignore */ }
   $('b-tut').dataset.on = G.tutorial ? '1' : '0';
   setLang(detectLang()); applyStrings();
-  $('b-start').onclick = () => startGame('story', 0);
+  $('b-start').onclick = () => startGame('story', unlockedMaps() - 1);
   setMapPick((i) => startGame('story', i));
   $('b-time').onclick = () => openTimePick((i) => startGame('time', i));
   $('b-tmap-close').onclick = () => { $('tmap').hidden = true; };
@@ -65,7 +67,7 @@ function wire(): void {
   $('b-shop-close').onclick = () => closeShop();
   $('b-submit').onclick = () => { void submitScore(); };
   $('b-again').onclick = () => startGame('time', G.lastRun?.map ?? 0);
-  $('b-back').onclick = () => { $('result').hidden = true; $('title').hidden = false; G.scene = 'title'; };
+  $('b-back').onclick = () => { $('result').hidden = true; $('title').hidden = false; G.scene = 'title'; renderMenu(); };
   initKeyboard(choosePick);
   // "Install app": Android/desktop Chrome fire beforeinstallprompt; iOS Safari needs the Share menu, so show a hint there.
   let installEvt: (Event & { prompt: () => Promise<void> }) | null = null;
@@ -94,8 +96,8 @@ function wire(): void {
 async function boot(): Promise<void> {
   setContext(cv.getContext('2d')!);
   loadLayout(); wire(); fit();
-  await loadAssets();
-  void syncProfile().then((p) => { applyProfile(p); renderProfileLine(); openCalendar(true); }).then(() => syncEntitlements()).then(() => { if (location.hash === '#purchased') { history.replaceState(null, '', location.pathname); renderProfileLine(); } });
+  await loadAssets(); wireMenu();
+  void syncProfile().then((p) => { applyProfile(p); renderProfileLine(); onceInMenu(() => { renderMenu(); openCalendar(true); }); }).then(() => syncEntitlements()).then(() => { if (location.hash === '#purchased') { history.replaceState(null, '', location.pathname); renderProfileLine(); } });
   let last = performance.now();
   const loop = (now: number) => {
     const dt = Math.min(50, now - last); last = now;
