@@ -57,4 +57,5 @@ button.pad.on { background: var(--line); }
 .maps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .maps button { font-family: var(--font-pixel); font-size: 13px; padding: 8px 10px; background: var(--paper); color: var(--panel); border: 2px solid var(--panel); cursor: pointer; }
 .maps button.locked { opacity: 0.45; cursor: default; }
+.card button.link { background: none; border: none; color: #2f6cb3; font-size: 11px; padding: 6px; margin-top: 6px; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

@@ -1,12 +1,13 @@
 import { G } from '../game/state';
 import { L, fmt, lang } from '../i18n';
-import { sfx } from '../core/audio';
+import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, type ScoreRow } from '../game/economy';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
 import { checkCostume } from '../game/costume';
+import { saveProfile, resetProfile, loadProfile } from '../game/profile';
 
 export const $ = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(id) as T;
 
@@ -16,9 +17,20 @@ export function applyStrings(): void {
   $('b-tut').textContent = L.tut + (G.tutorial ? L.on : L.off); $('t-keys').textContent = L.keys;
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
-  $('maps-title').textContent = L.maps_title;
+  $('maps-title').textContent = L.maps_title; renderProfileLine(); $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
+let resetArmed = false;
+export function renderProfileLine(): void {
+  const p = loadProfile();
+  $('t-profile').textContent = fmt(L.profile_line, { l: p.level, c: p.totalCatches, y: p.yen });
+  $('b-reset').textContent = resetArmed ? L.reset_confirm : L.reset;
+}
+export function pressReset(): void {
+  if (!resetArmed) { resetArmed = true; renderProfileLine(); setTimeout(() => { resetArmed = false; renderProfileLine(); }, 4000); return; }
+  resetArmed = false; resetProfile(); renderProfileLine(); renderMapSelect();
+}
+export function toggleMute(): void { setMuted(!isMuted()); $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on); }
 export let onMapPick: (i: number) => void = () => undefined;
 export function setMapPick(fn: (i: number) => void): void { onMapPick = fn; }
 function renderMapSelect(): void {
@@ -42,7 +54,7 @@ export function openPick(): void {
 export function choosePick(i: number): void {
   if (G.scene !== 'pick') return;
   (['speed', 'detect', 'strength'] as const).forEach((k, j) => { if (j === i) G.stats[k]++; });
-  $('pick').hidden = true; G.scene = 'play'; clearPresses();
+  $('pick').hidden = true; G.scene = 'play'; clearPresses(); saveProfile();
   if (G.tutorial && !G.tut.done && G.tut.step === 9) tutBox('t9', finishTutorial);
   checkCostume();
 }
@@ -64,7 +76,7 @@ function renderShop(): void {
     const own = document.createElement('i'); own.textContent = `${L.owned} ${G.inv[keys[i]]}`;
     info.append(b, sp, own);
     const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${it[2]}`; btn.disabled = G.yen < it[2];
-    btn.onclick = () => { const r = buy(i); $('shop-msg').textContent = r === 'ok' ? L.bought : L.broke; if (r === 'ok') sfx('catch'); renderShop(); };
+    btn.onclick = () => { const r = buy(i); $('shop-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); renderShop(); };
     row.append(info, btn); list.appendChild(row);
   });
 }

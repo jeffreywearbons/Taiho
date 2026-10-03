@@ -1,5 +1,6 @@
 import { G, type Ent, playerMs, xpNeed } from './state';
 import { checkCostume } from './costume';
+import { saveProfile } from './profile';
 import { CHASE_MS } from './const';
 import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
@@ -7,7 +8,7 @@ import { random, pick } from '../core/rng';
 import { ch, entAt, obstacleAt, updMove, stepTo, randFloor, toast, manh } from './world';
 import { bfs, distMap } from './path';
 import { L, fmt } from '../i18n';
-import { sfx } from '../core/audio';
+import { sfx, music } from '../core/audio';
 import { setState } from './ai';
 import { tutBox } from './tutorial';
 import { haptic } from '../core/input';
@@ -19,7 +20,7 @@ export function startChase(p: Ent): void {
   if (G.inv.juice > 0) { G.inv.juice--; G.chase.juice = true; toast(L.used_juice, 1500); }
   if (G.inv.vita > 0) { G.inv.vita--; G.chase.vita = true; toast(L.used_vita, 1500); }
   if (G.tutorial && p.scripted) tutBox('t7');
-  sfx('chase');
+  sfx('chase'); music.play('chase');
 }
 
 export function updChase(dt: number): void {
@@ -83,9 +84,9 @@ export function gainXp(n: number): void {
 export function endChase(caught: boolean): void {
   const c = G.chase; if (!c) return;
   const p = c.perv;
-  G.chase = null; G.obstacles = []; G.ball = null;
+  G.chase = null; G.obstacles = []; G.ball = null; music.play('store');
   if (caught) {
-    p.dead = true; G.catches++; G.totalCatches++; try { localStorage.setItem('taiho_total', String(G.totalCatches)); } catch { /* ignore */ }
+    p.dead = true; G.catches++; G.totalCatches++;
     sfx('catch'); haptic(60);
     G.freeze = 1100; G.stamp = { t: 0, txt: L.caught }; G.shake = 300;
     const secs = Math.round(c.t / 1000);
@@ -93,7 +94,7 @@ export function endChase(caught: boolean): void {
     const yen = 100 + secs * 20; G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
     if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }
     if (G.tutorial && p.scripted) G.tut.step = 8;
-    checkCostume();
+    checkCostume(); saveProfile();
   } else {
     G.escapes++; toast(L.escaped, 1800); sfx('escape');
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');

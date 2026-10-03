@@ -2,6 +2,9 @@ import './style.css';
 import { G } from './game/state';
 import { loadLayout } from './game/world';
 import { startGame, nextFloor, update } from './game/loop';
+import { startChase, endChase } from './game/chase';
+import { setState } from './game/ai';
+import { spawnNpc } from './game/world';
 import { loadAssets } from './core/loader';
 import { setContext } from './core/render';
 import { cam, chooseViewport, follow, hooks } from './core/camera';
@@ -9,7 +12,8 @@ import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/i
 import { setLang, detectLang, lang } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
-import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick } from './ui/overlays';
+import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine } from './ui/overlays';
+import { syncProfile } from './game/profile';
 
 const cv = $<HTMLCanvasElement>('cv');
 const stage = $('stage');
@@ -31,6 +35,9 @@ function wire(): void {
   $('b-rank').onclick = () => { void openBoard('rank'); };
   $('b-rank-close').onclick = () => { $('rank').hidden = true; };
   $('b-lang').onclick = () => { setLang(lang === 'en' ? 'ja' : 'en'); applyStrings(); };
+  $('b-mute').onclick = () => toggleMute();
+  $('b-reset').onclick = () => pressReset();
+  $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };
   for (let i = 0; i < 3; i++) $('p' + i).onclick = () => choosePick(i);
   $('b-end').onclick = () => { $('end').hidden = true; nextFloor(); };
@@ -51,6 +58,7 @@ async function boot(): Promise<void> {
   setContext(cv.getContext('2d')!);
   loadLayout(); wire(); fit();
   await loadAssets();
+  void syncProfile().then(renderProfileLine);
   let last = performance.now();
   const loop = (now: number) => {
     const dt = Math.min(50, now - last); last = now;
@@ -61,6 +69,6 @@ async function boot(): Promise<void> {
   };
   requestAnimationFrame(loop);
   // debug hook for automated tests
-  (window as any).__taiho = { G };
+  (window as any).__taiho = { G, startChase, endChase, setState, spawnNpc };
 }
 void boot();

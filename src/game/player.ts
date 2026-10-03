@@ -25,12 +25,12 @@ export function playerAction(): void {
   const near = G.ents.filter((e) => e.kind === 'perv' && manh(e, P) === 1);
   const chasing = near.find((e) => e.chasing); if (chasing) { endChase(true); return; }
   const live = near.find((e) => e.state === 'live'); if (live) { startChase(live); return; }
-  if (near.length) toast(L.notyet, 1400);
+  if (near.length) { toast(L.notyet, 1400); sfx('notyet'); }
 }
 
 export function throwBall(): void {
   if (!G.chase) return;
-  if (G.inv.ball > 0 && !G.ball) { G.inv.ball--; const P = G.player; G.ball = { x: P.px + 8, y: P.py + 4, dx: P.fx, dy: P.fy, d: 0 }; sfx('jump'); }
+  if (G.inv.ball > 0 && !G.ball) { G.inv.ball--; const P = G.player; G.ball = { x: P.px + 8, y: P.py + 4, dx: P.fx, dy: P.fy, d: 0 }; sfx('throw'); }
   else if (G.inv.ball <= 0) toast(L.no_ball, 1500);
 }
 

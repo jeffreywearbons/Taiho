@@ -5,6 +5,7 @@ import { pervParams } from './difficulty';
 import { rnd, pick } from '../core/rng';
 import { ch, cheb, manh, entAt, updMove, stepTo, goTo, atGoal, faceSpot, randSpot, toast } from './world';
 import { L } from '../i18n';
+import { sfx } from '../core/audio';
 import { startChase } from './chase';
 import { tutBox, tutFail } from './tutorial';
 
@@ -77,7 +78,7 @@ function updPerv(e: Ent, dt: number): void {
   }
   if (e.state === 'scoping') {
     const t = e.target; if (!t || t.dead || t.leaving) { setState(e, 'nothing'); return; }
-    if (!e.scripted && cheb(e, G.player) <= 1) { e.bailT = 1200; setState(e, 'nothing'); toast(L.bail); return; }
+    if (!e.scripted && cheb(e, G.player) <= 1) { e.bailT = 1200; setState(e, 'nothing'); toast(L.bail); sfx('bail'); return; }
     if (!e.moving && !e.path.length) {
       const cands = G.floorTiles.filter((f) => Math.abs(f.x - t.tx) + Math.abs(f.y - t.ty) === 2);
       if (cands.length) goTo(e, pick(cands));

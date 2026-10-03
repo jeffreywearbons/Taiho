@@ -1,0 +1,42 @@
+import { G, type Stats, type Inv } from './state';
+import { api } from './api';
+
+/** Career progress that outlives a run. Kept on the device and mirrored to the cloud when an API is configured. */
+export interface Profile { v: 1; level: number; xp: number; stats: Stats; yen: number; inv: Inv; totalCatches: number; ts: number }
+
+const KEY = 'taiho_profile';
+export const blank = (): Profile => ({ v: 1, level: 1, xp: 0, stats: { speed: 0, detect: 0, strength: 0 }, yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, totalCatches: 0, ts: 0 });
+
+export function loadProfile(): Profile {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { const p = JSON.parse(raw) as Profile; if (p && p.v === 1) return { ...blank(), ...p }; }
+    const legacy = Number(localStorage.getItem('taiho_total') || 0) || 0;
+    return { ...blank(), totalCatches: legacy };
+  } catch { return blank(); }
+}
+export function applyProfile(p: Profile): void {
+  G.level = p.level; G.xp = p.xp; G.stats = { ...p.stats }; G.yen = p.yen; G.inv = { ...p.inv }; G.totalCatches = p.totalCatches;
+}
+export function snapshot(): Profile {
+  return { v: 1, level: G.level, xp: G.xp, stats: { ...G.stats }, yen: G.yen, inv: { ...G.inv }, totalCatches: G.totalCatches, ts: Date.now() };
+}
+let pushTimer: number | null = null;
+export function saveProfile(): void {
+  const p = snapshot();
+  try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
+  if (api.enabled) { if (pushTimer !== null) clearTimeout(pushTimer); pushTimer = window.setTimeout(() => { void api.putSave(p); }, 1500); }
+}
+export function resetProfile(): void { try { localStorage.removeItem(KEY); localStorage.removeItem('taiho_total'); localStorage.removeItem('taiho_unlocked'); } catch { /* ignore */ } }
+
+/** On boot: if the cloud copy is newer than the local one, take it. */
+export async function syncProfile(): Promise<Profile> {
+  const local = loadProfile();
+  if (!api.enabled) return local;
+  const remote = await api.getSave<Profile>();
+  if (remote && remote.data && remote.data.v === 1 && (remote.ts || 0) > (local.ts || 0)) {
+    try { localStorage.setItem(KEY, JSON.stringify(remote.data)); } catch { /* ignore */ }
+    return { ...blank(), ...remote.data };
+  }
+  return local;
+}

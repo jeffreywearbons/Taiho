@@ -25,6 +25,12 @@ npm run check:kana # fails if ja.ts contains kanji
 
 Portrait first. On phones the viewport is a scrolling window of about 15 by 15 tiles with the camera on the player; on larger screens the whole 20 by 15 map shows. The d-pad is slide-over (hold and drag), A and B are big round buttons. Installable to the home screen and playable offline once cached. Wrap with Capacitor for the app stores.
 
+## Backend (optional)
+
+`worker/` holds a Cloudflare Worker + D1 for the shared Time Attack ranking and cloud saves. Without it the game keeps everything on the device. See `worker/README.md`; build the game with `VITE_API_URL=https://...` to enable it.
+
+Career progress (level, stats, yen, items, total catches, unlocked maps) persists on the device and syncs to the cloud when the API is configured. "Reset save" on the title screen erases it after a confirming tap.
+
 ## Fonts and art
 
 PixelMplus 10 (M+ FONT LICENSE, see `src/assets/fonts/`), subset to kana and Latin. All sprites and tiles are original pixel art generated from `tools/`.

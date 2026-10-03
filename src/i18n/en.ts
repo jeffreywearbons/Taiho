@@ -3,6 +3,7 @@ export type ShopItem = [name: string, desc: string, price: number];
 
 const en = {
   title: 'TAIHO!!', sub: 'Konbini Vigilante', start: 'START', lang: 'Language: English', tut: 'Tutorial: ', on: 'ON', off: 'OFF',
+  sound: 'Sound: ', profile_line: 'Lv{l}   {c} career catches   ¥{y}', reset: 'Reset save', reset_confirm: 'Tap again to erase everything',
   keys: 'Arrows / WASD to move.  Z, Space, Enter = A.  X or Shift = B (throw).',
   hud_caught: 'CAUGHT', hud_lv: 'Lv', hud_timer: 'ESCAPE IN', hud_time: 'TIME',
   notyet: 'Not yet. Wait for the red mark.', caught: 'TAIHO!!', escaped: 'He got away...', levelup: 'LEVEL UP!',

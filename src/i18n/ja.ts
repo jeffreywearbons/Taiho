@@ -3,6 +3,7 @@ import type { Strings, Page, ShopItem } from './en';
 // Kana only. scripts/check-kana.mjs fails the build if a kanji sneaks in.
 const ja: Strings = {
   title: 'タイホ!!', sub: 'コンビニ ヒーロー', start: 'スタート', lang: 'ことば: にほんご', tut: 'チュートリアル: ', on: 'ON', off: 'OFF',
+  sound: 'おと: ', profile_line: 'Lv{l}   つうさん {c}にん タイホ   ¥{y}', reset: 'セーブを けす', reset_confirm: 'もういちど おすと ぜんぶ きえる',
   keys: 'やじるし / WASD で いどう。 Z, スペース, Enter = A。 X か Shift = B (なげる)。',
   hud_caught: 'タイホ', hud_lv: 'Lv', hud_timer: 'のこり', hud_time: 'のこり',
   notyet: 'まだだ。あかい マークを まて。', caught: 'タイホ!!', escaped: 'ニゲラレタ…', levelup: 'レベルアップ!',

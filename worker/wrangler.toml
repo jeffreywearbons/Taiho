@@ -1,0 +1,11 @@
+name = "taiho-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "taiho"
+database_id = "REPLACE_WITH_YOUR_D1_ID"
+
+[vars]
+ALLOWED_ORIGIN = "*"

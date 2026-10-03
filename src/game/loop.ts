@@ -12,23 +12,24 @@ import { updPlayer, playerAction, throwBall, updBall } from './player';
 import { updTutorial, advanceBox, showBox } from './tutorial';
 import { openPick, openEnd, openResult, $ } from '../ui/overlays';
 import { L, fmt, lang } from '../i18n';
-import { audioInit } from '../core/audio';
+import { audioInit, music } from '../core/audio';
+import { loadProfile, applyProfile, saveProfile } from './profile';
 
 export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   loadLayout(Math.min(mapIndex, unlockedMaps() - 1)); refit();
   G.mode = mode; G.timeLeft = TIME_ATTACK_MS;
   G.tutorial = mode === 'time' ? false : $('b-tut').dataset.on === '1';
   G.scene = 'play'; $('title').hidden = true; $('result').hidden = true;
-  G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.level = 1; G.xp = 0; G.pendingLevel = 0;
-  G.stats = { speed: 0, detect: 0, strength: 0 }; G.elevOpen = false; G.chase = null; G.box = null; G.ball = null;
-  G.floor = 1; G.yen = 0; G.inv = { ball: 0, juice: 0, vita: 0 }; G.toasts = []; G.freeze = 0; G.stamp = null;
+  G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.pendingLevel = 0;
+  G.elevOpen = false; G.chase = null; G.box = null; G.ball = null;
+  G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
+  applyProfile(loadProfile());
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
-  try { G.totalCatches = Number(localStorage.getItem('taiho_total') || 0) || 0; } catch { G.totalCatches = 0; }
-  G.costume = costumeTier(1, G.totalCatches);
+  G.costume = costumeTier(G.level, G.totalCatches);
   G.player = mk('player', COSTUME_SPRITES[G.costume], cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
   G.bonsai = mk('bonsai', 'bonsai', cur.start.x - 1, cur.start.y);
   if (!G.tutorial) for (let i = 0; i < cur.targets; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
-  audioInit();
+  audioInit(); music.play('store');
 }
 
 export function nextFloor(): void {
@@ -36,7 +37,7 @@ export function nextFloor(): void {
   loadLayout(next); refit();
   G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.ball = null; G.floor++;
   const P = G.player; P.tx = cur.start.x; P.ty = cur.start.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
-  G.bonsai.px = P.px - 14; G.bonsai.py = P.py;
+  G.bonsai.px = P.px - 14; G.bonsai.py = P.py; saveProfile();
   G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor, m: cur.name[lang] }), 2000);
 }
 
@@ -69,7 +70,7 @@ export function update(dt: number): void {
   if (G.box) { if (consumeA()) advanceBox(); if (G.box) G.box.shown += dt * 0.04; updMove(G.player, dt); return; }
   if (G.mode === 'time') {
     G.timeLeft -= dt;
-    if (G.timeLeft <= 0) { G.timeLeft = 0; if (G.chase) { const p = G.chase.perv; G.chase = null; G.obstacles = []; G.ball = null; p.dead = true; } openResult(); return; }
+    if (G.timeLeft <= 0) { G.timeLeft = 0; if (G.chase) { const p = G.chase.perv; G.chase = null; G.obstacles = []; G.ball = null; p.dead = true; music.play('store'); } openResult(); return; }
   }
   if (G.player.onElev) { G.player.onElev = false; openEnd(); return; }
   if (consumeB()) throwBall();

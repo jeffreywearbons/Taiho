@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS scores (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  catches INTEGER NOT NULL,
+  level INTEGER NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'en',
+  device TEXT NOT NULL,
+  ts INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS scores_catches ON scores (catches DESC, ts ASC);
+CREATE INDEX IF NOT EXISTS scores_device_ts ON scores (device, ts);
+
+CREATE TABLE IF NOT EXISTS saves (
+  device TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  ts INTEGER NOT NULL
+);
