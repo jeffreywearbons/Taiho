@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # skips quietly until the CLOUDFLARE_* repository secrets exist
+    if: ${{ vars.CLOUDFLARE_DEPLOY == 'on' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
