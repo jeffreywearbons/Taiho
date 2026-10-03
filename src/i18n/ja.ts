@@ -40,6 +40,7 @@ const ja: Strings = {
     trail_neon: ['ネオン ストリーク', 'みずいろと ピンクの ひかりが ついてくる。'],
     trail_fire: ['ピクセル ファイア', 'あしあとから ひのこが あがる。'],
   } as Record<string, [string, string]>,
+  my_card: 'マイカード', player_card: 'プレイヤー カード', you: 'あなた', card_aura: 'オーラ', card_trail: 'トレイル', card_stats: 'Lv{l}  ·  つうさん {c}にん  ·  さいこう れんぞく {s}  ·  マップ {m}', card_run: 'この きろく: 90びょうで {c}にん', card_mine: 'ランキングの なまえを おすと その ひとの カードが みえる。',
   wd_sections: { costume: 'コスチューム', aura: 'オーラ', trail: 'ラン トレイル' } as Record<string, string>, none: 'なし', none_desc: 'この わくには なにも つけていない。',
   broke: 'おかねが たりない。', bought: 'まいど あり!', used_juice: 'ジャンプジュース はつどう!', used_vita: 'ビタダッシュ はつどう!',  ball_hit: 'ボール ヒット!', reward: '+¥{y}',
   items: {

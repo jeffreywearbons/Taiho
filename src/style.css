@@ -59,5 +59,12 @@ button.pad.on { background: var(--line); }
 .maps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .maps button { font-family: var(--font-pixel); font-size: 13px; padding: 8px 10px; background: var(--paper); color: var(--panel); border: 2px solid var(--panel); cursor: pointer; }
 .maps button.locked { opacity: 0.45; cursor: default; }
+.pcard { max-width: min(92vw, 360px); }
+#card-cv { width: 256px; height: 192px; max-width: 100%; image-rendering: pixelated; border: 3px solid var(--panel); background: #ecece8; margin: 6px auto; display: block; }
+.pcard h2 { margin: 6px 0 2px; }
+.pcard .look { margin: 0; color: #b03030; font-size: 15px; }
+.pcard .stats { font-size: 13px; color: var(--panel); }
+.board li.has-card { cursor: pointer; }
+.board li.has-card:hover { background: #f0f0f8; }
 .card button.link { background: none; border: none; color: #2f6cb3; font-size: 11px; padding: 6px; margin-top: 6px; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

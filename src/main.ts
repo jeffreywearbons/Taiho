@@ -10,12 +10,14 @@ import { loadAssets } from './core/loader';
 import { setContext } from './core/render';
 import { cam, chooseViewport, follow, hooks } from './core/camera';
 import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/input';
-import { setLang, detectLang, lang } from './i18n';
+import { setLang, detectLang, lang, L } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
 import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe } from './ui/overlays';
 import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
+import { openCard, closeCard } from './ui/card';
+import { myCard } from './ui/overlays';
 
 const cv = $<HTMLCanvasElement>('cv');
 const stage = $('stage');
@@ -41,6 +43,8 @@ function wire(): void {
   $('b-wardrobe').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); openWardrobe('title'); };
   $('b-shop-wd').onclick = () => openWardrobe('shop');
   $('b-wd-close').onclick = () => closeWardrobe();
+  $('b-mycard').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); let nm = ''; try { nm = localStorage.getItem('taiho_name') || ''; } catch { /* ignore */ } openCard(nm || L.you, myCard()); };
+  $('b-card-close').onclick = () => closeCard();
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };

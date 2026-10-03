@@ -97,7 +97,7 @@ export function update(dt: number): void {
   if (G.sign && consumeA()) { G.sign = null; return; }
   if (consumeA()) playerAction();
   updPlayer(dt); updParticles(dt);
-  if (G.player.moving && G.trail) { G.trailT = (G.trailT || 0) + dt; if (G.trailT > 70) { G.trailT = 0; emitTrail(G.player.px, G.player.py); } }
+  if (G.player.moving && G.trail) { G.trailT = (G.trailT || 0) + dt; if (G.trailT > 70) { G.trailT = 0; emitTrail(G.trail, G.player.px, G.player.py); } }
   for (const e of G.ents) { if (e.chasing) continue; updNpc(e, dt); if (e.bailT > 0) e.bailT -= dt; }
   if (G.chase) updChase(dt);
   G.ents = G.ents.filter((e) => !e.dead);

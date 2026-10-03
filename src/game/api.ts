@@ -23,8 +23,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T | null> {
 export const api = {
   enabled: !!BASE,
   device: deviceId,
-  topScores: (limit = 10) => call<{ rows: { name: string; catches: number; level: number; lang: string; ts: number }[] }>(`/api/scores?limit=${limit}`),
-  postScore: (row: { name: string; catches: number; level: number; lang: string }) => call<{ ok: true }>('/api/scores', { method: 'POST', body: JSON.stringify({ ...row, device: deviceId() }) }),
+  topScores: (limit = 10) => call<{ rows: { name: string; catches: number; level: number; lang: string; ts: number; card?: unknown }[] }>(`/api/scores?limit=${limit}`),
+  postScore: (row: { name: string; catches: number; level: number; lang: string; card?: unknown }) => call<{ ok: true }>('/api/scores', { method: 'POST', body: JSON.stringify({ ...row, device: deviceId() }) }),
   getSave: <T>() => call<{ data: T; ts: number }>(`/api/save/${deviceId()}`),
   putSave: (data: unknown) => call<{ ok: true; ts: number }>(`/api/save/${deviceId()}`, { method: 'PUT', body: JSON.stringify(data) }),
 };

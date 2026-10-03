@@ -11,6 +11,7 @@ npx wrangler login
 npm run db:create            # prints a database_id; paste it into wrangler.toml
 npm run db:init              # creates the tables
 npm run deploy               # prints https://taiho-api.<you>.workers.dev
+# existing databases created before player cards: npx wrangler d1 execute taiho --remote --file=./migrate-001-card.sql
 ```
 
 Then build the game with the API URL:

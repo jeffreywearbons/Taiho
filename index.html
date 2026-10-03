@@ -25,6 +25,7 @@
           <button id="b-time">TIME ATTACK 90s</button>
           <button id="b-rank">RANKING</button>
           <button id="b-wardrobe">WARDROBE</button>
+          <button id="b-mycard">MY CARD</button>
           <button id="b-lang">Language: English</button>
           <button id="b-tut">Tutorial: ON</button>
           <button id="b-mute">Sound: ON</button>
@@ -67,6 +68,19 @@
         <p id="wd-msg" class="small"></p>
         <p id="wd-hint" class="small"></p>
         <div class="menu"><button id="b-wd-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="card" class="overlay" hidden>
+      <div class="card pcard">
+        <p id="card-title" class="bt">Player card</p>
+        <canvas id="card-cv" width="64" height="48" aria-label="Player preview"></canvas>
+        <h2 id="card-name">—</h2>
+        <p id="card-look" class="look"></p>
+        <p id="card-fx" class="small"></p>
+        <p id="card-stats" class="stats"></p>
+        <p id="card-build" class="small"></p>
+        <p id="card-run" class="small"></p>
+        <div class="menu"><button id="b-card-close">CLOSE</button></div>
       </div>
     </div>
     <div id="result" class="overlay" hidden>

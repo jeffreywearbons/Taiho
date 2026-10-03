@@ -46,7 +46,9 @@ export function buyCosmetic(id: string): 'ok' | 'broke' | 'owned' {
 }
 export const priceOf = (k: ItemKey): number => CATALOG.find((c) => c.key === k)!.price;
 
-export type ScoreRow = { name: string; catches: number; level: number; lang: string; ts: number };
+/** The build a player shows off on the ranking. Sprite ids, not display names, so each viewer sees it in their language. */
+export type Card = { sprite: string; aura: string | null; trail: string | null; total: number; streak: number; maps: number; stats: [number, number, number] };
+export type ScoreRow = { name: string; catches: number; level: number; lang: string; ts: number; card?: Card };
 
 /** Leaderboard storage. Local for now; a remote backend drops in behind the same interface. */
 export interface Leaderboard { top(n: number): Promise<ScoreRow[]>; submit(row: ScoreRow): Promise<boolean>; readonly shared: boolean; }
@@ -65,7 +67,7 @@ export class RemoteLeaderboard implements Leaderboard {
   shared = api.enabled;
   async top(n: number): Promise<ScoreRow[]> {
     const r = await api.topScores(n);
-    if (r && r.rows) { this.shared = true; return r.rows.map((x) => ({ name: x.name, catches: x.catches, level: x.level, lang: x.lang, ts: x.ts })); }
+    if (r && r.rows) { this.shared = true; return r.rows.map((x) => ({ name: x.name, catches: x.catches, level: x.level, lang: x.lang, ts: x.ts, card: (x.card as Card | null) ?? undefined })); }
     this.shared = false; return this.local.top(n);
   }
   async submit(row: ScoreRow): Promise<boolean> {

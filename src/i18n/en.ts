@@ -40,6 +40,7 @@ const en = {
     trail_neon: ['Neon Streak', 'Cyan and magenta light follows you.'],
     trail_fire: ['Pixel Fire', 'Embers rise from your footsteps.'],
   } as Record<string, [string, string]>,
+  my_card: 'MY CARD', player_card: 'Player card', you: 'You', card_aura: 'Aura', card_trail: 'Trail', card_stats: 'Lv{l}  ·  {c} career catches  ·  best streak {s}  ·  {m} maps', card_run: 'This run: {c} catches in 90s', card_mine: 'Tap a name on the ranking to see their card.',
   wd_sections: { costume: 'Costumes', aura: 'Auras', trail: 'Run trails' } as Record<string, string>, none: 'None', none_desc: 'Nothing equipped in this slot.',
   broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
   items: {

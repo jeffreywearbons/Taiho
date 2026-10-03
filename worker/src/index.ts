@@ -22,8 +22,9 @@ export default {
     try {
       if (path === '/api/scores' && req.method === 'GET') {
         const limit = Math.max(1, Math.min(50, Number(url.searchParams.get('limit') || 10)));
-        const r = await env.DB.prepare('SELECT name, catches, level, lang, ts FROM scores ORDER BY catches DESC, ts ASC LIMIT ?').bind(limit).all();
-        return json({ rows: r.results }, 200, origin);
+        const r = await env.DB.prepare('SELECT name, catches, level, lang, ts, card FROM scores ORDER BY catches DESC, ts ASC LIMIT ?').bind(limit).all<{ card: string | null }>();
+        const rows = r.results.map((row) => { let card: unknown = null; try { card = row.card ? JSON.parse(row.card) : null; } catch { card = null; } return { ...row, card }; });
+        return json({ rows }, 200, origin);
       }
       if (path === '/api/scores' && req.method === 'POST') {
         const b = (await req.json().catch(() => null)) as Record<string, unknown> | null;
@@ -35,7 +36,9 @@ export default {
         const now = Date.now();
         const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM scores WHERE device = ? AND ts > ?').bind(device, now - 60_000).first<{ n: number }>();
         if ((recent?.n ?? 0) >= 5) return json({ error: 'slow down' }, 429, origin);
-        await env.DB.prepare('INSERT INTO scores (name, catches, level, lang, device, ts) VALUES (?, ?, ?, ?, ?, ?)').bind(name, catches, level, lang, device, now).run();
+        let card: string | null = null;
+        if (b.card && typeof b.card === 'object') { const c = b.card as Record<string, unknown>; const safe = { sprite: String(c.sprite ?? '').slice(0, 32), aura: c.aura ? String(c.aura).slice(0, 32) : null, trail: c.trail ? String(c.trail).slice(0, 32) : null, total: Math.max(0, Math.min(999999, Number(c.total) || 0)), streak: Math.max(0, Math.min(9999, Number(c.streak) || 0)), maps: Math.max(1, Math.min(99, Number(c.maps) || 1)), stats: Array.isArray(c.stats) ? c.stats.slice(0, 3).map((n) => Math.max(0, Math.min(999, Number(n) || 0))) : [0, 0, 0] }; card = JSON.stringify(safe); if (card.length > 400) card = null; }
+        await env.DB.prepare('INSERT INTO scores (name, catches, level, lang, device, ts, card) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(name, catches, level, lang, device, now, card).run();
         return json({ ok: true }, 201, origin);
       }
       const m = path.match(/^\/api\/save\/([A-Za-z0-9_-]{8,64})$/);

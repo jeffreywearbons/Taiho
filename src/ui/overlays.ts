@@ -3,7 +3,10 @@ import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
-import { wear, wornOf } from '../game/costume';
+import { wear, wornOf, heroSprite } from '../game/costume';
+import { unlockedMaps as unlocked } from '../game/maps';
+import { openCard } from './card';
+import type { Card } from '../game/economy';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial, showBox } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
@@ -20,7 +23,7 @@ export function applyStrings(): void {
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
-  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;
@@ -33,6 +36,7 @@ export function pressReset(): void {
   if (!resetArmed) { resetArmed = true; renderProfileLine(); setTimeout(() => { resetArmed = false; renderProfileLine(); }, 4000); return; }
   resetArmed = false; resetProfile(); renderProfileLine(); renderMapSelect();
 }
+export function myCard(): Card { return { sprite: heroSprite(), aura: G.aura, trail: G.trail, total: G.totalCatches, streak: G.bestStreak, maps: unlocked(), stats: [G.stats.speed, G.stats.detect, G.stats.strength] }; }
 export function toggleMute(): void { setMuted(!isMuted()); $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on); }
 export let onMapPick: (i: number) => void = () => undefined;
 export function setMapPick(fn: (i: number) => void): void { onMapPick = fn; }
@@ -124,7 +128,7 @@ export function openEnd(): void {
 function renderBoard(listEl: HTMLElement, titleEl: HTMLElement, rows: ScoreRow[]): void {
   titleEl.textContent = leaderboard.shared ? L.board_shared : L.board_local; listEl.innerHTML = '';
   if (!rows.length) { const li = document.createElement('li'); li.textContent = L.board_empty; li.className = 'empty'; listEl.appendChild(li); return; }
-  rows.forEach((r, i) => { const li = document.createElement('li'); const n = document.createElement('span'); n.textContent = `${i + 1}. ${String(r.name || '???').slice(0, 12)}`; const c = document.createElement('b'); c.textContent = String(r.catches); li.append(n, c); listEl.appendChild(li); });
+  rows.forEach((r, i) => { const li = document.createElement('li'); const n = document.createElement('span'); n.textContent = `${i + 1}. ${String(r.name || '???').slice(0, 12)}` + (r.card ? ' ▸' : ''); const c = document.createElement('b'); c.textContent = String(r.catches); li.append(n, c); if (r.card) { li.className = 'has-card'; li.onclick = () => openCard(String(r.name || '???'), r.card!, r); } listEl.appendChild(li); });
 }
 export async function openBoard(id: 'rank' | 'result'): Promise<void> { $(id).hidden = false; renderBoard($(id + '-list'), $(id + '-title'), await leaderboard.top(10)); }
 export function openResult(): void {
@@ -139,6 +143,6 @@ export async function submitScore(): Promise<void> {
   if (!name || !G.lastRun) { nm.focus(); return; }
   try { localStorage.setItem('taiho_name', name); } catch { /* ignore */ }
   $<HTMLButtonElement>('b-submit').disabled = true; nm.disabled = true;
-  await leaderboard.submit({ name, catches: G.lastRun.catches, level: G.lastRun.level, lang, ts: Date.now() });
+  await leaderboard.submit({ name, catches: G.lastRun.catches, level: G.lastRun.level, lang, ts: Date.now(), card: myCard() });
   $('res-msg').textContent = L.saved; sfx('catch'); renderBoard($('result-list'), $('result-title'), await leaderboard.top(10));
 }

@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS scores (
   level INTEGER NOT NULL,
   lang TEXT NOT NULL DEFAULT 'en',
   device TEXT NOT NULL,
-  ts INTEGER NOT NULL
+  ts INTEGER NOT NULL,
+  card TEXT
 );
 CREATE INDEX IF NOT EXISTS scores_catches ON scores (catches DESC, ts ASC);
 CREATE INDEX IF NOT EXISTS scores_device_ts ON scores (device, ts);
