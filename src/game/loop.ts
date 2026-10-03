@@ -1,0 +1,80 @@
+import { G, mk } from './state';
+import { TW, MAX_NPC, PLAYER_START, TIME_ATTACK_MS } from './const';
+import { pervParams } from './difficulty';
+import { rnd, pick } from '../core/rng';
+import { consumeA, consumeB, clearPresses } from '../core/input';
+import { loadLayout, spawnNpc, updMove, randSpot, toast } from './world';
+import { updNpc } from './ai';
+import { updChase } from './chase';
+import { updPlayer, playerAction, throwBall, updBall } from './player';
+import { updTutorial, advanceBox, showBox } from './tutorial';
+import { openPick, openEnd, openResult, $ } from '../ui/overlays';
+import { L, fmt } from '../i18n';
+import { audioInit } from '../core/audio';
+
+export function startGame(mode: 'story' | 'time'): void {
+  loadLayout();
+  G.mode = mode; G.timeLeft = TIME_ATTACK_MS;
+  G.tutorial = mode === 'time' ? false : $('b-tut').dataset.on === '1';
+  G.scene = 'play'; $('title').hidden = true; $('result').hidden = true;
+  G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.level = 1; G.xp = 0; G.pendingLevel = 0;
+  G.stats = { speed: 0, detect: 0, strength: 0 }; G.elevOpen = false; G.chase = null; G.box = null; G.ball = null;
+  G.floor = 1; G.yen = 0; G.inv = { ball: 0, juice: 0, vita: 0 }; G.toasts = []; G.freeze = 0; G.stamp = null;
+  G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
+  G.player = mk('player', 'hero', PLAYER_START.x, PLAYER_START.y); G.player.fy = -1;
+  G.bonsai = mk('bonsai', 'bonsai', PLAYER_START.x - 1, PLAYER_START.y);
+  if (!G.tutorial) for (let i = 0; i < 3; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
+  audioInit();
+}
+
+export function nextFloor(): void {
+  loadLayout();
+  G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.ball = null; G.floor++;
+  const P = G.player; P.tx = PLAYER_START.x; P.ty = PLAYER_START.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
+  G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor }), 2000);
+}
+
+function updSpawner(dt: number): void {
+  if (G.tutorial && !G.tut.done && G.tut.step < 3) return;
+  G.spawnT -= dt; if (G.spawnT > 0) return; G.spawnT = rnd(1200, 2600);
+  const P = pervParams(G.level);
+  const n = (k: string) => G.ents.filter((e) => e.kind === k && !e.leaving).length;
+  if (G.ents.length >= MAX_NPC) return;
+  if (n('target') < 3) { spawnNpc('target', pick(['target', 'shopper3'])); return; }
+  const wantPervs = Math.max(G.mode === 'time' ? 3 : 0, Math.round(P.pervs));
+  if (n('perv') < wantPervs && !(G.tutorial && !G.tut.done)) { const p = spawnNpc('perv', pick(['perv', 'perv2'])); p.dwell = rnd(45000, 90000); return; }
+  if (n('shopper') < 2) spawnNpc('shopper', pick(['shopper1', 'shopper2']));
+}
+
+export function update(dt: number): void {
+  G.time += dt;
+  if (G.scene !== 'play') return;
+  for (const t of G.toasts) t.t -= dt; G.toasts = G.toasts.filter((t) => t.t > 0);
+  if (G.shake > 0) G.shake -= dt;
+  if (G.freeze > 0) {
+    clearPresses(); G.freeze -= dt; if (G.stamp) G.stamp.t += dt;
+    if (G.freeze <= 0) {
+      G.stamp = null;
+      if (G.tutorial && !G.tut.done && G.tut.step === 8) { G.tut.step = 9; showBox(L.t8); }
+      else if (G.pendingLevel) openPick();
+    }
+    return;
+  }
+  if (G.box) { if (consumeA()) advanceBox(); if (G.box) G.box.shown += dt * 0.04; updMove(G.player, dt); return; }
+  if (G.mode === 'time') {
+    G.timeLeft -= dt;
+    if (G.timeLeft <= 0) { G.timeLeft = 0; if (G.chase) { const p = G.chase.perv; G.chase = null; G.obstacles = []; G.ball = null; p.dead = true; } openResult(); return; }
+  }
+  if (G.player.onElev) { G.player.onElev = false; openEnd(); return; }
+  if (consumeB()) throwBall();
+  updBall(dt); if (G.scene !== 'play') return;
+  if (consumeA()) playerAction();
+  updPlayer(dt);
+  for (const e of G.ents) { if (e.chasing) continue; updNpc(e, dt); if (e.bailT > 0) e.bailT -= dt; }
+  if (G.chase) updChase(dt);
+  G.ents = G.ents.filter((e) => !e.dead);
+  const B = G.bonsai, P = G.player, k = Math.min(1, dt / 140), side = P.flip ? 14 : -14;
+  B.px += (P.px + side - B.px) * k; B.py += (P.py - 6 - B.py) * k; B.flip = !P.flip;
+  updSpawner(dt); updTutorial();
+  if (G.pendingLevel && !G.chase && !G.freeze && G.scene === 'play') openPick();
+}

@@ -1,0 +1,14 @@
+{
+  "name": "TAIHO!!",
+  "short_name": "TAIHO!!",
+  "description": "Konbini vigilante. Catch the pervs, chase them down, level up.",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#141420",
+  "theme_color": "#141420",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

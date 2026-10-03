@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#141420">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>TAIHO!!</title>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <canvas id="cv" width="320" height="240" aria-label="TAIHO!! game screen"></canvas>
+    <div id="title" class="overlay">
+      <div class="card">
+        <h1 id="t-title">TAIHO!!</h1>
+        <h2 id="t-sub">Konbini Vigilante</h2>
+        <div class="menu">
+          <button id="b-start">START</button>
+          <button id="b-time">TIME ATTACK 90s</button>
+          <button id="b-rank">RANKING</button>
+          <button id="b-lang">Language: English</button>
+          <button id="b-tut">Tutorial: ON</button>
+        </div>
+        <p id="t-keys" class="keys">Arrows / WASD to move. Z, Space, Enter = A. X or Shift = B.</p>
+      </div>
+    </div>
+    <div id="pick" class="overlay" hidden>
+      <div class="card">
+        <h2 id="pick-title">Level up! Choose a stat</h2>
+        <div class="picks">
+          <button id="p0"><b>Speed</b><span>Move faster</span><i>-</i></button>
+          <button id="p1"><b>Detection</b><span>See marks from further</span><i>-</i></button>
+          <button id="p2"><b>Strength</b><span>Break boxes in a chase</span><i>-</i></button>
+        </div>
+        <p class="small keys">1 / 2 / 3 on keyboard</p>
+      </div>
+    </div>
+    <div id="shop" class="overlay" hidden>
+      <div class="card shop">
+        <h2 id="shop-title">Konbini Register</h2>
+        <p id="shop-yen" class="yen">¥0</p>
+        <div id="shop-list"></div>
+        <p id="shop-msg" class="small"></p>
+        <p id="shop-hint" class="small"></p>
+        <div class="menu"><button id="b-shop-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="result" class="overlay" hidden>
+      <div class="card">
+        <h2 id="res-title">Time's up!</h2>
+        <p id="res-body"></p>
+        <div class="row"><input id="name" maxlength="12" placeholder="Your name" autocomplete="off"><button id="b-submit">SUBMIT</button></div>
+        <p id="res-msg" class="small"></p>
+        <h3 id="result-title" class="bt">Ranking</h3>
+        <ol id="result-list" class="board"></ol>
+        <div class="menu"><button id="b-again">PLAY AGAIN</button><button id="b-back">TITLE</button></div>
+      </div>
+    </div>
+    <div id="rank" class="overlay" hidden>
+      <div class="card">
+        <h3 id="rank-title" class="bt">Ranking</h3>
+        <ol id="rank-list" class="board"></ol>
+        <div class="menu"><button id="b-rank-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="end" class="overlay" hidden>
+      <div class="card">
+        <h2 id="end-title">Konbini cleared!</h2>
+        <p id="end-body"></p>
+        <p id="end-stats"></p>
+        <div class="menu"><button id="b-end">NEXT FLOOR</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="controls">
+    <div id="dpad">
+      <button class="pad" id="d-up" aria-label="Up">▲</button>
+      <button class="pad" id="d-left" aria-label="Left">◀</button>
+      <button class="pad" id="d-right" aria-label="Right">▶</button>
+      <button class="pad" id="d-down" aria-label="Down">▼</button>
+    </div>
+    <div class="ab"><button class="pad" id="d-b" aria-label="B button">B</button><button class="pad" id="d-a" aria-label="A button">A</button></div>
+  </div>
+</div>
+<script type="module" src="./src/main.ts"></script>
+</body>
+</html>
