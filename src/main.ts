@@ -18,6 +18,7 @@ import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
 import { openLink, wireLink } from './ui/link';
+import { syncEntitlements } from './game/purchases';
 import { myCard } from './ui/overlays';
 
 const cv = $<HTMLCanvasElement>('cv');
@@ -86,7 +87,7 @@ async function boot(): Promise<void> {
   setContext(cv.getContext('2d')!);
   loadLayout(); wire(); fit();
   await loadAssets();
-  void syncProfile().then(renderProfileLine);
+  void syncProfile().then(renderProfileLine).then(() => syncEntitlements()).then(() => { if (location.hash === '#purchased') { history.replaceState(null, '', location.pathname); renderProfileLine(); } });
   let last = performance.now();
   const loop = (now: number) => {
     const dt = Math.min(50, now - last); last = now;

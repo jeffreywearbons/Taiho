@@ -12,3 +12,6 @@ ALLOWED_ORIGIN = "*"
 # Sign in with Apple: your app's bundle id (and the Services ID for web). Google: OAuth client ids. Comma-separated.
 APPLE_AUDIENCES = ""
 GOOGLE_AUDIENCES = ""
+# Stripe (web): set STRIPE_SECRET and STRIPE_WEBHOOK_SECRET with `wrangler secret put`. Price ids map set -> price:
+STRIPE_PRICES = "starter:price_xxx,konbini:price_xxx,police:price_xxx,shonen:price_xxx,trainer:price_xxx,darkknight:price_xxx,auras:price_xxx,trails:price_xxx,everything:price_xxx"
+# RevenueCat (App Store / Play): set REVENUECAT_WEBHOOK_SECRET with `wrangler secret put`.

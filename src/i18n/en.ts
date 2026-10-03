@@ -45,6 +45,18 @@ const en = {
   } as Record<string, [string, string]>,
   link_btn: 'LINK SAVE', link_title: 'Link your save', link_offline: 'Online features are off in this build.', link_unlinked: 'This save lives on this device only.', link_linked: 'Linked. {c} career catches are backed up.', link_code_title: 'Transfer code', link_code_help: 'Get a code here, then enter it on your other device within 24 hours. The stronger save wins.', link_get_code: 'GET A CODE', link_claim: 'LINK', link_code_made: 'Code ready. Type it on the other device.', link_claimed: 'Linked! Your save is now shared.', link_bad_code: 'That code was not found or has expired.', link_failed: 'Could not reach the server. Try again later.',
   my_card: 'MY CARD', player_card: 'Player card', you: 'You', card_aura: 'Aura', card_trail: 'Trail', card_stats: 'Lv{l}  ·  {c} career catches  ·  best streak {s}  ·  {m} maps', card_run: 'This run: {c} catches in 90s', card_mine: 'Tap a name on the ranking to see their card.',
+  wd_sets: 'Sets (real money)', sets_hint: 'Direct unlocks, no gems, no loot. Purchases restore by linking your save.', sets_offline: 'Purchases are not available in this build.', sets_opening: 'Opening checkout…', sets_unavailable: 'Purchase unavailable right now.', owned_set: 'OWNED', restore: 'Restore purchases', restored: 'Restored {n} set(s).',
+  sets: {
+    starter: ['Starter Pack', 'Clerk Blue vest, 2 Capture Balls, 2 Auto-Jump Juice, 2 Vita Dash, 1 Senzu Bean. Once per player.'],
+    konbini: ['Konbini Crew', 'All five clerk vests.'],
+    police: ['Omawari-san', 'The police uniform.'],
+    shonen: ['Shonen Pack', 'Orange Gi, Ninja Jumpsuit and Straw Hat Set.'],
+    trainer: ['Trainer Pack', 'Trainer Set with electric Bonsai, plus the Lightning aura.'],
+    darkknight: ['Dark Knight Pack', 'Dark Knight Suit, Dark Smoke aura and Bat Trail.'],
+    auras: ['Aura Pack', 'All four auras.'],
+    trails: ['Trail Pack', 'All four run trails.'],
+    everything: ['Everything', 'Every cosmetic in the game, including ones added later.'],
+  } as Record<string, [string, string]>,
   wd_sections: { costume: 'Costumes', aura: 'Auras', trail: 'Run trails' } as Record<string, string>, none: 'None', none_desc: 'Nothing equipped in this slot.',
   broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
   items: {

@@ -4,6 +4,8 @@ import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
 import { wear, wornOf, heroSprite } from '../game/costume';
+import { allSets, buySet, hasSet, restorePurchases } from '../game/purchases';
+import { api } from '../game/api';
 import { unlockedMaps as unlocked } from '../game/maps';
 import { openCard } from './card';
 import type { Card } from '../game/economy';
@@ -100,6 +102,16 @@ function renderWardrobe(): void {
   const mkRow = (name: string, desc: string, right: HTMLElement) => { const row = document.createElement('div'); row.className = 'item'; const info = document.createElement('div'); info.className = 'info'; const b = document.createElement('b'); b.textContent = name; const sp = document.createElement('span'); sp.textContent = desc; info.append(b, sp); row.append(info, right); list.appendChild(row); };
   const wearBtn = (id: string | null, kind: 'costume' | 'aura' | 'trail') => { const btn = document.createElement('button'); const on = wornOf(kind) === id; btn.textContent = on ? L.wearing : L.wear; btn.disabled = on; btn.onclick = () => { wear(id, kind); sfx('blip'); renderWardrobe(); }; return btn; };
   const head = (t: string) => { const h = document.createElement('p'); h.className = 'bt'; h.textContent = t; list.appendChild(h); };
+  // real-money sets first: direct unlocks, no currency
+  head(L.wd_sets); const note = document.createElement('p'); note.className = 'small'; note.textContent = api.enabled || (window as any).Capacitor?.Plugins?.Purchases ? L.sets_hint : L.sets_offline; list.appendChild(note);
+  for (const s of allSets) {
+    const [name, desc] = L.sets[s.id];
+    const btn = document.createElement('button');
+    if (hasSet(s.id)) { btn.textContent = L.owned_set; btn.disabled = true; }
+    else { btn.textContent = lang === 'ja' ? `¥${s.yen}` : `$${s.usd.toFixed(2)}`; btn.disabled = !(api.enabled || (window as any).Capacitor?.Plugins?.Purchases); btn.onclick = async () => { $('wd-msg').textContent = '…'; const r = await buySet(s.id); $('wd-msg').textContent = r === 'done' ? L.bought : r === 'opened' ? L.sets_opening : L.sets_unavailable; if (r === 'done') { sfx('catch'); renderWardrobe(); } }; }
+    mkRow(name, desc, btn);
+  }
+  const restore = document.createElement('button'); restore.className = 'link'; restore.textContent = L.restore; restore.onclick = async () => { $('wd-msg').textContent = '…'; const n = await restorePurchases(); $('wd-msg').textContent = fmt(L.restored, { n }); renderWardrobe(); }; list.appendChild(restore);
   let lastKind = '';
   for (const c of COSMETICS) {
     if (c.kind !== lastKind) {

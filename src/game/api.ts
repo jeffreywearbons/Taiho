@@ -35,5 +35,7 @@ export const api = {
   newCode: () => call<{ code: string; expires_in: number }>('/api/auth/code', { method: 'POST', body: JSON.stringify({ device: deviceId() }) }),
   claimCode: <T>(code: string) => call<{ token: string; account: string; save: { data: T; ts: number } | null }>('/api/auth/claim', { method: 'POST', body: JSON.stringify({ code, device: deviceId() }) }),
   me: () => call<{ account: string; provider: string; devices: number }>('/api/me'),
+  entitlements: () => call<{ sets: string[] }>(`/api/entitlements?device=${deviceId()}`),
+  checkout: (set: string, back: string) => call<{ url: string }>('/api/checkout', { method: 'POST', body: JSON.stringify({ set, device: deviceId(), back }) }),
   logout: () => call<{ ok: true }>('/api/auth/logout', { method: 'POST', body: '{}' }),
 };

@@ -45,6 +45,18 @@ const ja: Strings = {
   } as Record<string, [string, string]>,
   link_btn: 'セーブを リンク', link_title: 'セーブを リンク', link_offline: 'この ビルドでは オンライン きのうは オフ。', link_unlinked: 'この セーブは この たんまつ だけに ある。', link_linked: 'リンクずみ。つうさん {c}にんの きろくを バックアップ ちゅう。', link_code_title: 'ひきつぎ コード', link_code_help: 'ここで コードを とって、24じかん いないに もうひとつの たんまつで にゅうりょく。つよい セーブが のこる。', link_get_code: 'コードを とる', link_claim: 'リンク', link_code_made: 'コードが できた。もうひとつの たんまつで うちこんで。', link_claimed: 'リンク かんりょう! セーブが きょうゆう された。', link_bad_code: 'その コードは みつからないか、きげんぎれ。', link_failed: 'サーバーに つながらない。あとで もういちど。',
   my_card: 'マイカード', player_card: 'プレイヤー カード', you: 'あなた', card_aura: 'オーラ', card_trail: 'トレイル', card_stats: 'Lv{l}  ·  つうさん {c}にん  ·  さいこう れんぞく {s}  ·  マップ {m}', card_run: 'この きろく: 90びょうで {c}にん', card_mine: 'ランキングの なまえを おすと その ひとの カードが みえる。',
+  wd_sets: 'セット (かきん)', sets_hint: 'ちょくせつ かいきん。ジェムも ガチャも なし。セーブを リンクすれば かいもどせる。', sets_offline: 'この ビルドでは こうにゅう できない。', sets_opening: 'けっさいを ひらく…', sets_unavailable: 'いまは こうにゅう できない。', owned_set: 'もっている', restore: 'こうにゅうを ふくげん', restored: '{n}この セットを ふくげん した。',
+  sets: {
+    starter: ['スターター パック', 'てんいん ブルー、ホカクボール 2、ジャンプジュース 2、ビタダッシュ 2、せんずの まめ 1。ひとり 1かい。'],
+    konbini: ['コンビニ クルー', 'てんいん ベスト 5しゅ ぜんぶ。'],
+    police: ['おまわりさん', 'けいさつの せいふく。'],
+    shonen: ['しょうねん パック', 'オレンジの どうぎ、ニンジャ ジャンプスーツ、むぎわら セット。'],
+    trainer: ['トレーナー パック', 'トレーナー セットと でんき ボンサイ、いなずま オーラ。'],
+    darkknight: ['ダークナイト パック', 'ダークナイト スーツ、くろい けむり オーラ、コウモリ トレイル。'],
+    auras: ['オーラ パック', 'オーラ 4しゅ ぜんぶ。'],
+    trails: ['トレイル パック', 'ラン トレイル 4しゅ ぜんぶ。'],
+    everything: ['ぜんぶ いり', 'いまと これからの コスチューム ぜんぶ。'],
+  } as Record<string, [string, string]>,
   wd_sections: { costume: 'コスチューム', aura: 'オーラ', trail: 'ラン トレイル' } as Record<string, string>, none: 'なし', none_desc: 'この わくには なにも つけていない。',
   broke: 'おかねが たりない。', bought: 'まいど あり!', used_juice: 'ジャンプジュース はつどう!', used_vita: 'ビタダッシュ はつどう!',  ball_hit: 'ボール ヒット!', reward: '+¥{y}',
   items: {

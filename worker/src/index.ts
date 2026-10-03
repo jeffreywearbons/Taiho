@@ -15,8 +15,10 @@
  * device save onto the account with the merge rule, so nothing is lost in either direction.
  */
 import { verifyIdToken, APPLE, GOOGLE } from './jwt';
+import { createCheckout, verifyStripeSignature } from './stripe';
 
-export interface Env { DB: D1Database; ALLOWED_ORIGIN: string; APPLE_AUDIENCES?: string; GOOGLE_AUDIENCES?: string }
+export interface Env { DB: D1Database; ALLOWED_ORIGIN: string; APPLE_AUDIENCES?: string; GOOGLE_AUDIENCES?: string; STRIPE_SECRET?: string; STRIPE_WEBHOOK_SECRET?: string; STRIPE_PRICES?: string; REVENUECAT_WEBHOOK_SECRET?: string }
+const SET_IDS = ['starter', 'konbini', 'police', 'shonen', 'trainer', 'darkknight', 'auras', 'trails', 'everything'];
 
 const DEVICE = /^[A-Za-z0-9_-]{8,64}$/;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L
@@ -69,6 +71,14 @@ async function auth(env: Env, req: Request): Promise<string | null> {
   const h = req.headers.get('authorization') || ''; const m = h.match(/^Bearer ([a-f0-9]{64})$/); if (!m) return null;
   const r = await env.DB.prepare('SELECT account FROM sessions WHERE token = ?').bind(m[1]).first<{ account: string }>();
   return r?.account ?? null;
+}
+/** Who owns things: the account when the device is linked, else the device. */
+async function ownerFor(env: Env, req: Request, device: string): Promise<string> {
+  const acc = (await auth(env, req)) ?? (await env.DB.prepare('SELECT account FROM devices WHERE device = ?').bind(device).first<{ account: string }>())?.account ?? null;
+  return acc ? 'a:' + acc : 'd:' + device;
+}
+async function grant(env: Env, owner: string, set: string, platform: string, ref: string): Promise<void> {
+  await env.DB.prepare('INSERT OR IGNORE INTO purchases (owner, sku, platform, ref, ts) VALUES (?, ?, ?, ?, ?)').bind(owner, set, platform, ref, Date.now()).run();
 }
 function sanitizeCard(c: unknown): string | null {
   if (!c || typeof c !== 'object') return null;
@@ -159,6 +169,47 @@ export default {
         await linkDevice(env, r.account, device);
         const save = await readSave(env, 'a:' + r.account);
         return json({ token: await session(env, r.account), account: r.account, save }, 200, origin);
+      }
+      // ---- purchases ----
+      if (path === '/api/entitlements' && req.method === 'GET') {
+        const device = url.searchParams.get('device') || ''; if (!DEVICE.test(device)) return json({ error: 'invalid' }, 400, origin);
+        const owner = await ownerFor(env, req, device);
+        // a linked account also inherits anything bought on this device before linking
+        const r = await env.DB.prepare('SELECT DISTINCT sku FROM purchases WHERE owner = ? OR owner = ?').bind(owner, 'd:' + device).all<{ sku: string }>();
+        return json({ sets: r.results.map((x) => x.sku) }, 200, origin);
+      }
+      if (path === '/api/checkout' && req.method === 'POST') {
+        const b = await body(); const set = String(b.set ?? ''), device = String(b.device ?? ''), back = String(b.back ?? '');
+        if (!SET_IDS.includes(set) || !DEVICE.test(device) || !/^https?:\/\//.test(back)) return json({ error: 'invalid' }, 400, origin);
+        if (!env.STRIPE_SECRET || !env.STRIPE_PRICES) return json({ error: 'payments not configured' }, 503, origin);
+        const prices = Object.fromEntries(env.STRIPE_PRICES.split(',').map((p) => p.trim().split(':') as [string, string]));
+        if (!prices[set]) return json({ error: 'no price for set' }, 503, origin);
+        const owner = await ownerFor(env, req, device);
+        const base = back.replace(/#.*$/, '');
+        const r = await createCheckout(env.STRIPE_SECRET, prices[set], `${owner}|${set}`, base + '#purchased', base);
+        return r ? json(r, 200, origin) : json({ error: 'stripe error' }, 502, origin);
+      }
+      if (path === '/api/webhooks/stripe' && req.method === 'POST') {
+        if (!env.STRIPE_WEBHOOK_SECRET) return json({ error: 'not configured' }, 503, origin);
+        const payload = await req.text();
+        if (!(await verifyStripeSignature(payload, req.headers.get('stripe-signature') || '', env.STRIPE_WEBHOOK_SECRET))) return json({ error: 'bad signature' }, 400, origin);
+        const ev = JSON.parse(payload) as { type: string; data: { object: { id: string; client_reference_id?: string; payment_status?: string } } };
+        if (ev.type === 'checkout.session.completed' && ev.data.object.payment_status === 'paid') {
+          const [owner, set] = String(ev.data.object.client_reference_id || '').split('|');
+          if (owner && SET_IDS.includes(set)) await grant(env, owner, set, 'stripe', ev.data.object.id);
+        }
+        return json({ received: true }, 200, origin);
+      }
+      if (path === '/api/webhooks/revenuecat' && req.method === 'POST') {
+        // RevenueCat relays App Store and Play purchases. app_user_id is set by the client to the owner key.
+        if (!env.REVENUECAT_WEBHOOK_SECRET || req.headers.get('authorization') !== 'Bearer ' + env.REVENUECAT_WEBHOOK_SECRET) return json({ error: 'unauthorized' }, 401, origin);
+        const ev = (await body()) as { event?: { type: string; app_user_id: string; product_id: string; id: string; store: string } };
+        const e = ev.event;
+        if (e && ['INITIAL_PURCHASE', 'NON_RENEWING_PURCHASE', 'RENEWAL', 'UNCANCELLATION'].includes(e.type)) {
+          const set = String(e.product_id || '').replace(/^taiho_/, '');
+          if (SET_IDS.includes(set) && /^[ad]:[A-Za-z0-9_-]+$/.test(e.app_user_id)) await grant(env, e.app_user_id, set, e.store || 'revenuecat', e.id);
+        }
+        return json({ ok: true }, 200, origin);
       }
       // ---- account routes ----
       const account = await auth(env, req);

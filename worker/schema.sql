@@ -38,6 +38,14 @@ CREATE TABLE IF NOT EXISTS sessions (
   account TEXT NOT NULL,
   created INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS purchases (
+  owner TEXT NOT NULL,          -- a:<account> or d:<device>
+  sku TEXT NOT NULL,
+  platform TEXT NOT NULL,       -- stripe | app_store | play_store
+  ref TEXT NOT NULL,            -- session / transaction id
+  ts INTEGER NOT NULL,
+  PRIMARY KEY (owner, sku)
+);
 CREATE TABLE IF NOT EXISTS codes (
   code TEXT PRIMARY KEY,
   account TEXT NOT NULL,
