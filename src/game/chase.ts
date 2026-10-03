@@ -119,13 +119,14 @@ export function endChase(caught: boolean): void {
     gainXp(Math.round((100 + secs * 5) * mult));
     const yen = Math.round((100 + secs * 20) * mult); G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
     if (G.streak >= 2) toast(fmt(L.streak, { n: G.streak, m: streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '') }), 1800);
-    if (p.boss) toast(L.boss_caught, 2200);
+    if (p.boss) { toast(L.boss_caught, 2200); G.bossDone = Math.max(G.bossDone, p.bossId * 5 + 5); G.lastBossLevel = G.bossDone; }
     report({ kind: 'catch', data: { secsLeft: secs, boss: p.boss, byBall: c.byBall, hops: c.hops, inArena, streak: G.streak } }, (y, x) => { G.yen += y; gainXp(x); });
     if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }
     if (G.tutorial && p.scripted) G.tut.step = 8;
     checkCostume(); saveProfile();
   } else {
     G.escapes++; toast(L.escaped, 1800); sfx('escape');
+    if (p.boss) G.lastBossLevel = 0; // let him come back
     if (G.streak >= 2) toast(L.streak_lost, 1600);
     G.streak = 0;
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');

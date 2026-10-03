@@ -47,6 +47,8 @@ export interface Game {
   totalCatches: number; costume: number; mapIndex: number;
   arena: boolean; arenaT: number; arenaTiles: Pt[];
   streak: number; bestStreak: number; pervSpawns: number;
+  /** Highest level whose boss has already been caught (persisted) or spawned this session. */
+  lastBossLevel: number; bossDone: number;
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -68,7 +70,7 @@ export function newGame(): Game {
     yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
     spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, arena: false, arenaT: 0, arenaTiles: [],
-    streak: 0, bestStreak: 0, pervSpawns: 0,
+    streak: 0, bestStreak: 0, pervSpawns: 0, lastBossLevel: 0, bossDone: 0,
   };
 }
 

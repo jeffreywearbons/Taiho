@@ -25,7 +25,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.pendingLevel = 0;
   G.elevOpen = false; G.chase = null; G.box = null; G.ball = null; G.arena = false;
   G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
-  const prof = loadProfile(); applyProfile(prof); if (prof.daily) goals.daily = prof.daily;
+  const prof = loadProfile(); applyProfile(prof); if (prof.daily) goals.daily = prof.daily; G.lastBossLevel = prof.bossDone ?? 0;
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
   G.streak = 0; G.pervSpawns = 0; resetGoals();
   G.costume = costumeTier(G.level, G.totalCatches);
@@ -54,9 +54,10 @@ function updSpawner(dt: number): void {
   const wantPervs = Math.max(G.mode === 'time' ? 3 : 0, Math.round(P.pervs));
   if (n('perv') < wantPervs && !(G.tutorial && !G.tut.done)) {
     G.pervSpawns++;
-    const boss = G.pervSpawns % 10 === 0;
+    // a boss walks in once at every fifth level, until he is caught
+    const boss = G.level % 5 === 0 && G.lastBossLevel < G.level && !G.ents.some((e) => e.boss);
     const p = spawnNpc('perv', boss ? 'boss' : pick(['perv', 'perv2'])); p.dwell = rnd(45000, 90000);
-    if (boss) { p.boss = true; p.bossId = Math.floor(G.pervSpawns / 10) - 1; toast(fmt(L.boss_wanted, { n: bossName(p.bossId) }), 3000); sfx('chase'); }
+    if (boss) { p.boss = true; p.bossId = G.level / 5 - 1; p.dwell = 1e9; G.lastBossLevel = G.level; toast(fmt(L.boss_wanted, { n: bossName(p.bossId) }), 3000); sfx('chase'); }
     return;
   }
   if (n('shopper') < 2) spawnNpc('shopper', pick(['shopper1', 'shopper2']));
