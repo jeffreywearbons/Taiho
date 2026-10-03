@@ -7,6 +7,12 @@
 @font-face { font-family: 'PM10'; src: url('./assets/fonts/PixelMplus10-subset.ttf') format('truetype'); font-display: block; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
+/* No pinch or double-tap zoom anywhere: every surface opts out, and only the scrollers allow a pan. */
+*, *::before, *::after { touch-action: none; }
+.card { touch-action: pan-y; }
+.strip { touch-action: pan-x; }
+.board, #wd-list, #shop-list, #book-list, #attr-list, #pass-list { touch-action: pan-y; }
+input { touch-action: manipulation; }
 body { margin: 0; background: #1b1430; color: var(--paper); font-family: var(--font-pixel); overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: none; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
 #app { height: 100%; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0px) 8px env(safe-area-inset-bottom, 0px); box-sizing: border-box; }
 /* The purple handheld shell around the screen. */

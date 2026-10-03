@@ -95,6 +95,17 @@ function wire(): void {
     if (Math.max(Math.abs(tx - P.tx), Math.abs(ty - P.ty)) <= 2) showSign(tx, ty);
   });
   window.addEventListener('resize', fit); hooks.afterRefit = fit;
+  // Browsers that ignore touch-action (older iOS Safari) still zoom on a quick second tap or a pinch; eat both.
+  let lastTap = 0, lastX = 0, lastY = 0;
+  document.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0]; const now = Date.now(); const el = e.target as HTMLElement;
+    const onControl = !!el.closest('button, input, a');   // real buttons never zoom and must keep every tap
+    if (!onControl && now - lastTap < 350 && Math.hypot(t.clientX - lastX, t.clientY - lastY) < 30) e.preventDefault();
+    lastTap = now; lastX = t.clientX; lastY = t.clientY;
+  }, { passive: false });
+  document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
   if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => undefined);
 }
 
