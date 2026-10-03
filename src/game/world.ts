@@ -42,6 +42,11 @@ export function stepTo(e: Ent, x: number, y: number, ms?: number): void {
   e.from = { x: e.tx, y: e.ty }; e.to = { x, y }; e.t = 0; e.moving = true; if (ms) e.ms = ms;
   if (x < e.tx) e.flip = true; if (x > e.tx) e.flip = false;
   e.fx = Math.sign(x - e.tx); e.fy = Math.sign(y - e.ty);
+  e.dir = y < e.ty ? 'up' : y > e.ty ? 'down' : 'side';
+}
+export function face(e: Ent, dx: number, dy: number): void {
+  e.fx = dx; e.fy = dy; if (dx < 0) e.flip = true; if (dx > 0) e.flip = false;
+  e.dir = dy < 0 ? 'up' : dy > 0 ? 'down' : 'side';
 }
 export function updMove(e: Ent, dt: number): void {
   if (e.moving) {
@@ -50,8 +55,8 @@ export function updMove(e: Ent, dt: number): void {
     const t = e.t;
     e.px = e.from.x * TW + (e.to.x - e.from.x) * TW * t;
     e.py = e.from.y * TW + (e.to.y - e.from.y) * TW * t;
-    e.animT += dt; if (e.animT > 120) { e.animT = 0; e.frame ^= 1; }
-  } else { e.px = e.tx * TW; e.py = e.ty * TW; e.frame = 0; }
+    e.animT += dt; if (e.animT > 110) { e.animT = 0; e.frame = (e.frame + 1) % 4; }
+  } else { e.px = e.tx * TW; e.py = e.ty * TW; }
 }
 export function npcWalk(e: Ent, strict: boolean) {
   return (x: number, y: number): boolean =>
@@ -64,7 +69,7 @@ export function goTo(e: Ent, goal: Spot): void {
 }
 export const atGoal = (e: Ent): boolean => !!e.goal && e.tx === e.goal.x && e.ty === e.goal.y;
 export function faceSpot(e: Ent): void {
-  if (e.goal && e.goal.fx !== undefined) { e.fx = e.goal.fx; e.fy = e.goal.fy!; if (e.fx < 0) e.flip = true; if (e.fx > 0) e.flip = false; }
+  if (e.goal && e.goal.fx !== undefined) face(e, e.goal.fx, e.goal.fy!);
 }
 export function spawnNpc(kind: Kind, sprite: string): Ent {
   const e = mk(kind, sprite, SPAWN.x, SPAWN.y);

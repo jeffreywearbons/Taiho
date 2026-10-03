@@ -1,4 +1,4 @@
-import { G, mk } from './state';
+import { G, mk, COSTUME_SPRITES, costumeTier } from './state';
 import { TW, MAX_NPC, PLAYER_START, TIME_ATTACK_MS } from './const';
 import { pervParams } from './difficulty';
 import { rnd, pick } from '../core/rng';
@@ -21,7 +21,9 @@ export function startGame(mode: 'story' | 'time'): void {
   G.stats = { speed: 0, detect: 0, strength: 0 }; G.elevOpen = false; G.chase = null; G.box = null; G.ball = null;
   G.floor = 1; G.yen = 0; G.inv = { ball: 0, juice: 0, vita: 0 }; G.toasts = []; G.freeze = 0; G.stamp = null;
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
-  G.player = mk('player', 'hero', PLAYER_START.x, PLAYER_START.y); G.player.fy = -1;
+  try { G.totalCatches = Number(localStorage.getItem('taiho_total') || 0) || 0; } catch { G.totalCatches = 0; }
+  G.costume = costumeTier(1, G.totalCatches);
+  G.player = mk('player', COSTUME_SPRITES[G.costume], PLAYER_START.x, PLAYER_START.y); G.player.fy = -1; G.player.dir = 'up';
   G.bonsai = mk('bonsai', 'bonsai', PLAYER_START.x - 1, PLAYER_START.y);
   if (!G.tutorial) for (let i = 0; i < 3; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
   audioInit();

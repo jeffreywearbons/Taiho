@@ -15,6 +15,7 @@ const en = {
   mode_time: 'TIME ATTACK  90s', rank: 'RANKING', res_title: "Time's up!", res_body: 'Caught {c} in 90 seconds', name_ph: 'Your name', submit: 'SUBMIT',
   board_local: 'Ranking on this device', board_shared: 'Shared ranking', board_empty: 'No scores yet. Be the first.', saved: 'Saved!', again: 'PLAY AGAIN', back: 'TITLE', close: 'CLOSE',
   shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Items are used automatically on your next chase. Throw a Capture Ball with B.',
+  costumes: ['Civilian', 'Masked', 'Caped', 'Vigilante', 'Gold Vigilante'], costume_toast: 'New look: {c}!',
   broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!', no_ball: 'No Capture Balls. Buy them at the register.', ball_hit: 'BALL HIT!', reward: '+¥{y}',
   items: [
     ['Capture Ball', 'Throw it with B during a chase. A hit is an instant catch.', 1000],

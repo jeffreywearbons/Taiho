@@ -1,4 +1,5 @@
 import { G, type Ent, playerMs, xpNeed } from './state';
+import { checkCostume } from './costume';
 import { CHASE_MS, GATE_CATCHES } from './const';
 import { pervParams } from './difficulty';
 import { random, pick } from '../core/rng';
@@ -83,13 +84,15 @@ export function endChase(caught: boolean): void {
   const p = c.perv;
   G.chase = null; G.obstacles = []; G.ball = null;
   if (caught) {
-    p.dead = true; G.catches++; sfx('catch'); haptic(60);
+    p.dead = true; G.catches++; G.totalCatches++; try { localStorage.setItem('taiho_total', String(G.totalCatches)); } catch { /* ignore */ }
+    sfx('catch'); haptic(60);
     G.freeze = 1100; G.stamp = { t: 0, txt: L.caught }; G.shake = 300;
     const secs = Math.round(c.t / 1000);
     gainXp(100 + secs * 5);
     const yen = 100 + secs * 20; G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
     if (G.catches === GATE_CATCHES && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; toast(L.elev, 2500); sfx('level'); }
     if (G.tutorial && p.scripted) G.tut.step = 8;
+    checkCostume();
   } else {
     G.escapes++; toast(L.escaped, 1800); sfx('escape');
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');

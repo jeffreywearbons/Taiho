@@ -15,6 +15,7 @@ const ja: Strings = {
   mode_time: 'タイムアタック  90びょう', rank: 'ランキング', res_title: 'しゅうりょう!', res_body: '90びょうで {c}にん タイホ', name_ph: 'なまえ', submit: 'とうろく',
   board_local: 'この たんまつの ランキング', board_shared: 'みんなの ランキング', board_empty: 'まだ だれも いない。いちばんのりだ。', saved: 'とうろく した!', again: 'もういちど', back: 'タイトルへ', close: 'とじる',
   shop_title: 'コンビニの レジ', buy: 'かう', owned: 'もってる', shop_hint: 'アイテムは つぎの ついせきで じどうで つかう。ホカクボールは B で なげる。',
+  costumes: ['しみん', 'マスク', 'マント', 'ヒーロー', 'ゴールド ヒーロー'], costume_toast: 'あたらしい すがた: {c}!',
   broke: 'おかねが たりない。', bought: 'まいど あり!', used_juice: 'ジャンプジュース はつどう!', used_vita: 'ビタダッシュ はつどう!', no_ball: 'ホカクボールが ない。レジで かおう。', ball_hit: 'ボール ヒット!', reward: '+¥{y}',
   items: [
     ['ホカクボール', 'ついせきちゅうに B で なげる。あたれば そくタイホ。', 1000],

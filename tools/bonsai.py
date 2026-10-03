@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import os
-OUT = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out'); os.makedirs(OUT, exist_ok=True)
 
 PAL = {
  '.': None,
@@ -100,6 +100,8 @@ BONSAI.save(os.path.join(OUT,'bonsai.png'))
 PORTRAIT.save(os.path.join(OUT,'bonsai_portrait.png'))
 
 # ---------- dialogue box mock, 240x160 game screen at 1x ----------
+import sys
+if not os.path.exists(os.path.join(OUT,'konbini_map1_mock.png')): sys.exit(0)
 mock4 = Image.open(os.path.join(OUT,'konbini_map1_mock.png')).convert('RGBA')
 scene = mock4.crop((320*4//4*0+ 32*4, 32*4, 32*4+240*4, 32*4+160*4)).resize((240,160),Image.NEAREST)
 
@@ -125,9 +127,10 @@ def draw_box(scene, text_lines, font, portrait, name_font, name):
     d.polygon([(226,150),(232,150),(229,154)],fill=(26,26,46))
     return s
 
-f_ja = ImageFont.truetype(os.path.join(OUT,'pixelmplus/PixelMplus-20130602/PixelMplus10-Regular.ttf'),10)
-f_en = ImageFont.truetype(os.path.join(OUT,'pixelmplus/PixelMplus-20130602/PixelMplus10-Regular.ttf'),10)
-f_name = ImageFont.truetype(os.path.join(OUT,'misaki/misaki_gothic.ttf'),8)
+FONT=os.path.join(os.path.dirname(OUT),'..','src','assets','fonts','PixelMplus10-subset.ttf')
+f_ja = ImageFont.truetype(FONT,10)
+f_en = ImageFont.truetype(FONT,10)
+f_name = ImageFont.truetype(FONT,10)
 
 ja = draw_box(scene, ["あかい マークが でたら","いまだ! タックルしろ!"], f_ja, PORTRAIT, f_name, "ボンサイ")
 en = draw_box(scene, ["When the red mark pops up,","that's your cue. TACKLE!"], f_en, PORTRAIT, f_name, "BONSAI")
@@ -137,7 +140,7 @@ sheet = Image.new('RGBA',(240*S*2+30, 160*S+120),(40,40,52,255))
 sheet.paste(ja.resize((240*S,160*S),Image.NEAREST),(10,40))
 sheet.paste(en.resize((240*S,160*S),Image.NEAREST),(240*S+20,40))
 d=ImageDraw.Draw(sheet)
-big = ImageFont.truetype(os.path.join(OUT,'pixelmplus/PixelMplus-20130602/PixelMplus12-Bold.ttf'),24)
+big = ImageFont.truetype(FONT,24)
 d.text((10,8),"Japanese (kana only, PixelMplus 10)",font=big,fill=(255,255,255))
 d.text((240*S+20,8),"English (same font)",font=big,fill=(255,255,255))
 # bonsai sprite + portrait reference row

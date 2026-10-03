@@ -16,7 +16,9 @@ export interface Ent {
   target: Ent | null; jump: boolean; fx: number; fy: number;
   leaving: boolean; bailT: number; scripted: boolean; age: number; looking: boolean;
   chasing: boolean; dead: boolean; onElev: boolean;
+  dir: Facing;
 }
+export type Facing = 'down' | 'up' | 'side';
 
 export type Obstacle = { x: number; y: number; type: 'bag' | 'box' };
 export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean };
@@ -38,6 +40,7 @@ export interface Game {
   yen: number; inv: Inv; floor: number; elevOpen: boolean;
   tutorial: boolean; tut: Tut; freeze: number; stamp: { t: number; txt: string } | null; shake: number;
   spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
+  totalCatches: number; costume: number;
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -46,7 +49,7 @@ export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
     moving: false, from: { x: tx, y: ty }, to: { x: tx, y: ty }, t: 0, ms: 170,
     flip: false, frame: 0, animT: 0, path: [], goal: null, waitT: 0, idleT: 0,
     state: 'enter', st: 0, timer: 0, dwell: 0, target: null, jump: false, fx: 0, fy: 1,
-    leaving: false, bailT: 0, scripted: false, age: 0, looking: false, chasing: false, dead: false, onElev: false,
+    leaving: false, bailT: 0, scripted: false, age: 0, looking: false, chasing: false, dead: false, onElev: false, dir: 'down',
   };
 }
 
@@ -58,7 +61,7 @@ export function newGame(): Game {
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
-    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null,
+    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0,
   };
 }
 
@@ -68,3 +71,16 @@ export const G: Game = newGame();
 export const xpNeed = (l: number): number => 100 * l;
 export const playerMs = (): number => Math.round(150 * (1 - 0.08 * G.stats.speed) * (G.chase && G.chase.vita ? 0.66 : 1));
 export const detectR = (): number => 6 + 2 * G.stats.detect;
+
+/** Costume tiers: 0 civilian, 1 masked (Lv5), 2 caped (Lv10), 3 vigilante (Lv15), 4 gold (100 career catches). */
+export const COSTUME_SPRITES = ['hero', 'hero_mask', 'hero_cape', 'hero_vig', 'hero_gold'] as const;
+export function costumeTier(level: number, totalCatches: number): number {
+  if (totalCatches >= 100) return 4;
+  if (level >= 15) return 3;
+  if (level >= 10) return 2;
+  if (level >= 5) return 1;
+  return 0;
+}
+/** Walk cycle: stand, step, stand, other step. */
+export const WALK_SEQ = [1, 0, 2, 0] as const;
+export const frameName = (e: Ent): string => `${e.sprite}_${e.dir}_${e.moving ? WALK_SEQ[e.frame % 4] : 0}`;

@@ -3,7 +3,7 @@ import { TW } from './const';
 import { held, consumeTap } from '../core/input';
 import { sfx } from '../core/audio';
 import { L } from '../i18n';
-import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast } from './world';
+import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face } from './world';
 import { startChase, endChase } from './chase';
 import { openShop } from '../ui/overlays';
 
@@ -51,7 +51,7 @@ export function updPlayer(dt: number): void {
   if (!dx && !dy) { const t = consumeTap(); if (t === 'left') dx = -1; else if (t === 'right') dx = 1; else if (t === 'up') dy = -1; else if (t === 'down') dy = 1; }
   if (!dx && !dy) return;
   consumeTap();
-  P.fx = dx; P.fy = dy; if (dx < 0) P.flip = true; if (dx > 0) P.flip = false;
+  face(P, dx, dy);
   const nx = P.tx + dx, ny = P.ty + dy;
   const e = entAt(nx, ny); if (e && e.chasing) { endChase(true); return; }
   const ob = obstacleAt(nx, ny);

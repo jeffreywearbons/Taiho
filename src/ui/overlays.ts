@@ -5,6 +5,7 @@ import { clearPresses } from '../core/input';
 import { buy, leaderboard, type ScoreRow } from '../game/economy';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial } from '../game/tutorial';
+import { checkCostume } from '../game/costume';
 
 export const $ = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(id) as T;
 
@@ -29,7 +30,7 @@ export function choosePick(i: number): void {
   (['speed', 'detect', 'strength'] as const).forEach((k, j) => { if (j === i) G.stats[k]++; });
   $('pick').hidden = true; G.scene = 'play'; clearPresses();
   if (G.tutorial && !G.tut.done && G.tut.step === 9) tutBox('t9', finishTutorial);
-  if (G.level >= 5 && G.player.sprite === 'hero') { G.player.sprite = 'hero_vig'; toast(L.suit, 2500); }
+  checkCostume();
 }
 
 // ---- shop ----

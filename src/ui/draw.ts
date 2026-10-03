@@ -1,4 +1,4 @@
-import { G, detectR, xpNeed, type Ent } from '../game/state';
+import { G, detectR, xpNeed, frameName, type Ent } from '../game/state';
 import { TW, MW, MH, TILE, GATE_CATCHES } from '../game/const';
 import { ch, cheb } from '../game/world';
 import { PERV_ICON } from '../game/ai';
@@ -35,7 +35,7 @@ export function drawWorld(): void {
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;
-    spr(e.sprite + '_' + (e.moving ? e.frame : 0), e.px, e.py - 8 + yo, e.flip);
+    spr(frameName(e), e.px, e.py - 8 + yo, e.flip);
     if (e.kind !== 'perv') continue;
     const v = iconVisible(e);
     let ic: string | null = null;
@@ -86,7 +86,7 @@ function drawBox(): void {
   const H = 44, y0 = vh - H - 2;
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(2, y0, vw - 4, H); ctx.fillStyle = '#f8f8f8'; ctx.fillRect(4, y0 + 2, vw - 8, H - 4); ctx.fillStyle = '#c8c8d2'; ctx.fillRect(4, y0 + 2, vw - 8, 1);
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(7, y0 + 5, 36, 36); ctx.fillStyle = '#dcebff'; ctx.fillRect(9, y0 + 7, 32, 32);
-  if (who === 'b') spr('bonsai_portrait', 9, y0 + 7); else spr(G.player.sprite + '_0', 17, y0 + 9);
+  if (who === 'b') spr('bonsai_portrait', 9, y0 + 7); else spr(G.player.sprite + '_down_0', 17, y0 + 9);
   const name = who === 'b' ? L.bonsai : L.hero;
   ctx.font = '10px PM10'; const w = ctx.measureText(name).width + 8;
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(6, y0 - 10, w, 12); text(name, 10, y0 - 9, '#f8f8f8');
