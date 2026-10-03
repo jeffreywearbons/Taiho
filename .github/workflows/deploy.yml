@@ -1,9 +1,7 @@
-# Publishes the playable build to GitHub Pages.
-# One-time setup: repository Settings -> Pages -> Source: "GitHub Actions".
-name: Deploy
+# Publishes the playable build to GitHub Pages. Manual only: the site ships from Cloudflare Pages
+# (web-cloudflare.yml). Needs a public repo on a free plan, then Settings -> Pages -> Source: "GitHub Actions".
+name: Deploy (GitHub Pages)
 on:
-  push:
-    branches: [master, game/scaffold]
   workflow_dispatch:
 permissions:
   contents: read
