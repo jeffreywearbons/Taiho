@@ -92,7 +92,10 @@ function sanitizeCard(c: unknown): string | null {
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
-    const origin = env.ALLOWED_ORIGIN || '*';
+    // ALLOWED_ORIGIN may list several origins, comma-separated; the request's own origin is echoed when it is one of them
+    const allowed = (env.ALLOWED_ORIGIN || '*').split(',').map((o) => o.trim()).filter(Boolean);
+    const reqOrigin = req.headers.get('origin') || '';
+    const origin = allowed.includes('*') ? '*' : allowed.includes(reqOrigin) ? reqOrigin : allowed[0];
     if (req.method === 'OPTIONS') return json(null, 204, origin);
     const url = new URL(req.url); const path = url.pathname.replace(/\/+$/, '');
     const body = async (): Promise<Record<string, unknown>> => ((await req.json().catch(() => null)) as Record<string, unknown> | null) ?? {};

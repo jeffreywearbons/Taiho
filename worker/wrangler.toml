@@ -8,7 +8,8 @@ database_name = "taiho"
 database_id = "38576564-5f39-41ab-923e-b17b81ba9a69"
 
 [vars]
-ALLOWED_ORIGIN = "https://jeffreywearbons.github.io"
+# Comma-separated list of sites allowed to call the API.
+ALLOWED_ORIGIN = "https://taiho.pages.dev,https://jeffreywearbons.github.io"
 # Sign in with Apple: your app's bundle id (and the Services ID for web). Google: OAuth client ids. Comma-separated.
 APPLE_AUDIENCES = ""
 GOOGLE_AUDIENCES = ""
