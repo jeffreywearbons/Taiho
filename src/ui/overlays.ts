@@ -2,7 +2,7 @@ import { G } from '../game/state';
 import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
-import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
+import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, isExclusive, type ScoreRow } from '../game/economy';
 import { wear, wornOf, heroSprite } from '../game/costume';
 import { allSets, buySet, hasSet, restorePurchases } from '../game/purchases';
 import { api, sessionToken } from '../game/api';
@@ -25,7 +25,7 @@ export function applyStrings(): void {
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
-  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').textContent = L.cal_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').textContent = L.cal_btn; $('b-pass').textContent = L.pass_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;
@@ -107,6 +107,7 @@ function renderWardrobe(): void {
   // real-money sets first: direct unlocks, no currency
   head(L.wd_sets); const note = document.createElement('p'); note.className = 'small'; note.textContent = api.enabled || (window as any).Capacitor?.Plugins?.Purchases ? L.sets_hint : L.sets_offline; list.appendChild(note);
   for (const s of allSets) {
+    if (s.id.startsWith('pass_')) continue;
     const [name, desc] = L.sets[s.id];
     const btn = document.createElement('button');
     if (hasSet(s.id)) { btn.textContent = L.owned_set; btn.disabled = true; }
@@ -123,6 +124,7 @@ function renderWardrobe(): void {
     }
     const [name, desc] = L.cosmetics[c.id];
     if (G.wardrobe.includes(c.id)) mkRow(name, desc, wearBtn(c.id, c.kind));
+    else if (isExclusive(c.id)) { const tag = document.createElement('button'); tag.textContent = L.exclusive; tag.disabled = true; mkRow(name, desc, tag); }
     else { const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price; btn.onclick = () => { const r = buyCosmetic(c.id); $('wd-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); if (r === 'ok') wear(c.id, c.kind); renderWardrobe(); }; mkRow(name, desc, btn); }
   }
 }

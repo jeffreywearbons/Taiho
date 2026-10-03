@@ -2,6 +2,7 @@ import { G, type Ent, playerMs, xpNeed } from './state';
 import { checkCostume } from './costume';
 import { saveProfile } from './profile';
 import { report, streakMult } from './goals';
+import { addSeasonPoints, SEASON } from './season';
 import { CHASE_MS } from './const';
 import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
@@ -126,6 +127,7 @@ export function endChase(caught: boolean): void {
     const yen = Math.round((100 + secs * 20) * mult * (c.charm ? 2 : 1)); G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
     if (c.charm) toast(L.charm_paid, 1500);
     if (G.streak >= 2) toast(fmt(L.streak, { n: G.streak, m: streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '') }), 1800);
+    addSeasonPoints(p.boss ? SEASON.bossPoints : SEASON.catchPoints);
     if (p.boss) { toast(L.boss_caught, 2200); G.bossDone = Math.max(G.bossDone, p.bossId * 5 + 5); G.lastBossLevel = G.bossDone; }
     report({ kind: 'catch', data: { secsLeft: secs, boss: p.boss, byBall: c.byBall, hops: c.hops, inArena, streak: G.streak } }, (y, x) => { G.yen += y; gainXp(x); });
     if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }

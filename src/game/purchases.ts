@@ -14,7 +14,7 @@ function remember(ids: Iterable<string>): void { try { localStorage.setItem('tai
 /** Unlock everything a set contains into the wardrobe and inventory. Idempotent for cosmetics; items only on first grant. */
 export function applySet(id: string, firstTime: boolean): void {
   const s = setById(id); if (!s) return;
-  const cos = s.everything ? COSMETICS.map((c) => c.id) : s.cosmetics;
+  const cos = s.everything ? COSMETICS.filter((c) => c.price > 0).map((c) => c.id) : s.cosmetics;
   for (const c of cos) if (!G.wardrobe.includes(c)) G.wardrobe.push(c);
   if (firstTime && s.items) for (const [k, n] of Object.entries(s.items)) { const key = k as keyof typeof G.inv; G.inv[key] = Math.min(maxOf(key), G.inv[key] + (n ?? 0)); }
   saveProfile();

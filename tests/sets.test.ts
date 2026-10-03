@@ -11,6 +11,6 @@ describe('real-money sets', () => {
   });
   it('covers every cosmetic through at least one set', () => {
     const covered = new Set(SETS.flatMap((s) => s.cosmetics));
-    for (const c of COSMETICS) expect(covered.has(c.id), c.id).toBe(true);
+    for (const c of COSMETICS) if (c.price > 0) expect(covered.has(c.id), c.id).toBe(true);
   });
 });

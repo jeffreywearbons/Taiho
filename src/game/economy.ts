@@ -42,7 +42,9 @@ export const COSMETICS: { id: string; price: number; kind: CosmeticKind }[] = [
   { id: 'trail_bats', price: 6000, kind: 'trail' },
   { id: 'trail_neon', price: 6000, kind: 'trail' },
   { id: 'trail_fire', price: 6000, kind: 'trail' },
+  { id: 'aura_s1', price: 0, kind: 'aura' },   // season 1 exclusive: only from the premium pass
 ];
+export const isExclusive = (id: string): boolean => COSMETICS.find((c) => c.id === id)?.price === 0;
 export const cosmeticKind = (id: string): CosmeticKind => COSMETICS.find((c) => c.id === id)?.kind ?? 'costume';
 export function buyCosmetic(id: string): 'ok' | 'broke' | 'owned' {
   const c = COSMETICS.find((x) => x.id === id)!;

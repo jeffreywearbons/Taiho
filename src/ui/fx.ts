@@ -44,6 +44,11 @@ export function drawAura(k: string | null, px: number, py: number, t: number = G
   } else if (k === 'aura_smoke') {
     for (let i = 0; i < 6; i++) { const ph = (t / 900 + i / 6) % 1; const x = cx + Math.round(Math.sin((t / 300) + i) * 8), y = cy + 12 - ph * 26; ctx.globalAlpha = 0.5 * (1 - ph); ctx.fillStyle = i % 2 ? '#3a2a5a' : '#241a3a'; ctx.fillRect(x - 2, Math.round(y), 4 + Math.round(ph * 3), 3); }
     ctx.globalAlpha = 1;
+  } else if (k === 'aura_s1') {
+    // season 1 flare: two counter-rotating gold rings with a warm core
+    for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI * 2 + t / 500; const r = 11 + Math.sin(t / 200 + i) * 1.5; ctx.globalAlpha = 0.7; ctx.fillStyle = '#ffb000'; ctx.fillRect(Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r * 0.6), 2, 2); }
+    for (let i = 0; i < 6; i++) { const a = -i / 6 * Math.PI * 2 - t / 350; ctx.globalAlpha = 0.9; ctx.fillStyle = '#fff1a8'; ctx.fillRect(Math.round(cx + Math.cos(a) * 7), Math.round(cy + 2 + Math.sin(a) * 4), 1, 1); }
+    ctx.globalAlpha = 0.14; ctx.fillStyle = '#ff9a1f'; ctx.fillRect(cx - 11, cy - 13, 22, 28); ctx.globalAlpha = 1;
   } else if (k === 'aura_sakura') {
     for (let i = 0; i < 5; i++) { const ph = (t / 1400 + i / 5) % 1; const x = cx + Math.round(Math.sin(t / 250 + i * 2) * 10), y = cy - 14 + ph * 30; ctx.globalAlpha = 0.9 * (1 - ph * 0.6); ctx.fillStyle = i % 2 ? '#ffb7d5' : '#ff8fb8'; ctx.fillRect(x, Math.round(y), 2, 2); }
     ctx.globalAlpha = 1;

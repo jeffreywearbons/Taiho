@@ -16,5 +16,6 @@ export const SETS: SetDef[] = [
   { id: 'auras', cosmetics: ['aura_shonen', 'aura_lightning', 'aura_smoke', 'aura_sakura'], yen: 480, usd: 2.99 },
   { id: 'trails', cosmetics: ['trail_sakura', 'trail_bats', 'trail_neon', 'trail_fire'], yen: 360, usd: 1.99 },
   { id: 'everything', cosmetics: [], everything: true, yen: 2480, usd: 16.99 },
+  { id: 'pass_s1', cosmetics: [], yen: 980, usd: 6.99 },
 ];
 export const setById = (id: string): SetDef | undefined => SETS.find((s) => s.id === id);

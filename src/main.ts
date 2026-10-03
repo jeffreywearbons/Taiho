@@ -19,6 +19,7 @@ import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
 import { openLink, wireLink } from './ui/link';
 import { openCalendar, wireCalendar } from './ui/calendar';
+import { openPass, wirePass } from './ui/pass';
 import { syncEntitlements } from './game/purchases';
 import { myCard } from './ui/overlays';
 
@@ -49,7 +50,8 @@ function wire(): void {
   $('b-mycard').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); let nm = ''; try { nm = localStorage.getItem('taiho_name') || ''; } catch { /* ignore */ } openCard(nm || L.you, myCard()); };
   $('b-card-close').onclick = () => closeCard();
   $('b-link').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); openLink(); };
-  wireLink(); wireCalendar();
+  wireLink(); wireCalendar(); wirePass();
+  $('b-pass').onclick = () => openPass();
   $('b-cal').onclick = () => openCalendar(false);
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);

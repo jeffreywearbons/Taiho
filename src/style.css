@@ -60,6 +60,12 @@ button.pad.on { background: var(--line); }
 .maps button { font-family: var(--font-pixel); font-size: 13px; padding: 8px 10px; background: var(--paper); color: var(--panel); border: 2px solid var(--panel); cursor: pointer; }
 .maps button.locked { opacity: 0.45; cursor: default; }
 #card { z-index: 5; }
+.tier { display: grid; grid-template-columns: 24px 1fr 1fr; gap: 6px; align-items: center; padding: 4px 0; border-top: 1px solid #ddd; font-size: 12px; }
+.tier.head { border-top: none; font-weight: bold; }
+.tier.reached b { color: #b03030; }
+.tier .cell { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.tier .cell.prem { background: #fff3cc; padding: 2px 4px; }
+.tier .cell button { font-size: 11px; padding: 4px 6px; }
 .cal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
 .cal-cell { border: 2px solid var(--panel); padding: 6px 4px; font-size: 11px; display: flex; flex-direction: column; gap: 3px; background: #fff; }
 .cal-cell b { font-size: 12px; }
