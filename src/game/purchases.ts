@@ -5,7 +5,7 @@
 import { G } from './state';
 import { api } from './api';
 import { SETS, setById } from './sets';
-import { COSMETICS } from './economy';
+import { COSMETICS, maxOf } from './economy';
 import { saveProfile } from './profile';
 
 export const owned = (): Set<string> => { try { return new Set(JSON.parse(localStorage.getItem('taiho_sets') || '[]')); } catch { return new Set(); } };
@@ -16,7 +16,7 @@ export function applySet(id: string, firstTime: boolean): void {
   const s = setById(id); if (!s) return;
   const cos = s.everything ? COSMETICS.map((c) => c.id) : s.cosmetics;
   for (const c of cos) if (!G.wardrobe.includes(c)) G.wardrobe.push(c);
-  if (firstTime && s.items) for (const [k, n] of Object.entries(s.items)) G.inv[k as keyof typeof G.inv] += n ?? 0;
+  if (firstTime && s.items) for (const [k, n] of Object.entries(s.items)) { const key = k as keyof typeof G.inv; G.inv[key] = Math.min(maxOf(key), G.inv[key] + (n ?? 0)); }
   saveProfile();
 }
 export const hasSet = (id: string): boolean => owned().has(id) || owned().has('everything');

@@ -3,19 +3,21 @@ import { api } from './api';
 import { saveProfile } from './profile';
 
 /** The register catalog. Prices are steep on purpose: an item should take several catches to earn. */
-export const CATALOG: { key: ItemKey; price: number; kind: 'active' | 'passive' }[] = [
-  { key: 'ball', price: 3000, kind: 'active' },
-  { key: 'net', price: 4500, kind: 'active' },
-  { key: 'peel', price: 1200, kind: 'active' },
-  { key: 'decoy', price: 1800, kind: 'active' },
-  { key: 'stop', price: 2000, kind: 'active' },
-  { key: 'cart', price: 2500, kind: 'active' },
-  { key: 'senzu', price: 2500, kind: 'active' },
-  { key: 'juice', price: 1200, kind: 'passive' },
-  { key: 'vita', price: 800, kind: 'passive' },
-  { key: 'shield', price: 1500, kind: 'passive' },
-  { key: 'charm', price: 2000, kind: 'passive' },
+/** `max` is the stack cap: the strongest tools hold three, the rest five, so a full wallet never trivializes a chase. */
+export const CATALOG: { key: ItemKey; price: number; kind: 'active' | 'passive'; max: number }[] = [
+  { key: 'ball', price: 3000, kind: 'active', max: 3 },
+  { key: 'net', price: 4500, kind: 'active', max: 3 },
+  { key: 'peel', price: 1200, kind: 'active', max: 5 },
+  { key: 'decoy', price: 1800, kind: 'active', max: 5 },
+  { key: 'stop', price: 2000, kind: 'active', max: 3 },
+  { key: 'cart', price: 2500, kind: 'active', max: 5 },
+  { key: 'senzu', price: 2500, kind: 'active', max: 3 },
+  { key: 'juice', price: 1200, kind: 'passive', max: 5 },
+  { key: 'vita', price: 800, kind: 'passive', max: 5 },
+  { key: 'shield', price: 1500, kind: 'passive', max: 3 },
+  { key: 'charm', price: 2000, kind: 'passive', max: 3 },
 ];
+export const maxOf = (k: ItemKey): number => CATALOG.find((c) => c.key === k)?.max ?? 5;
 export const ITEM_KEYS: ItemKey[] = CATALOG.map((c) => c.key);
 
 /** Wardrobe: purely cosmetic, priced to be a long-term goal. Ordered most to least expensive. */
@@ -81,8 +83,9 @@ export class RemoteLeaderboard implements Leaderboard {
 }
 export const leaderboard: Leaderboard = api.enabled ? new RemoteLeaderboard() : new LocalLeaderboard();
 
-export function buy(k: ItemKey): 'ok' | 'broke' {
+export function buy(k: ItemKey): 'ok' | 'broke' | 'full' {
   const price = priceOf(k);
+  if (G.inv[k] >= maxOf(k)) return 'full';
   if (G.yen < price) return 'broke';
   G.yen -= price; G.inv[k]++;
   const active = CATALOG.find((c) => c.key === k)!.kind === 'active';

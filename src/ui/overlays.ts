@@ -84,10 +84,11 @@ function renderShop(): void {
     const info = document.createElement('div'); info.className = 'info';
     const b = document.createElement('b'); b.textContent = it[0];
     const sp = document.createElement('span'); sp.textContent = it[1];
-    const own = document.createElement('i'); own.textContent = `${L.owned} ${G.inv[c.key]}`;
+    const own = document.createElement('i'); own.textContent = `${L.owned} ${G.inv[c.key]}/${c.max}`;
     info.append(b, sp, own);
-    const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price;
-    btn.onclick = () => { const r = buy(c.key); $('shop-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); renderShop(); };
+    const full = G.inv[c.key] >= c.max;
+    const btn = document.createElement('button'); btn.textContent = full ? L.full : `${L.buy} ¥${c.price}`; btn.disabled = full || G.yen < c.price;
+    btn.onclick = () => { const r = buy(c.key); $('shop-msg').textContent = r === 'ok' ? L.bought : r === 'full' ? L.full_msg : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); renderShop(); };
     row.append(info, btn); list.appendChild(row);
   }
 }

@@ -19,7 +19,7 @@ const en = {
   bonsai: 'BONSAI', hero: 'HERO',
   mode_time: 'TIME ATTACK  90s', rank: 'RANKING', res_title: "Time's up!", res_body: 'Caught {c} in 90 seconds', name_ph: 'Your name', submit: 'SUBMIT',
   board_local: 'Ranking on this device', board_shared: 'Shared ranking', board_empty: 'No scores yet. Be the first.', saved: 'Saved!', again: 'PLAY AGAIN', back: 'TITLE', close: 'CLOSE',
-  shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Active items fire with B during a chase; SEL (C on keyboard) switches between them. Passives trigger on your next chase.',
+  shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Active items fire with B during a chase; SEL (C on keyboard) switches between them. Passives trigger on your next chase. Each item has a carry limit.',
   costumes: ['Civilian', 'Masked', 'Caped', 'Vigilante', 'Gold Vigilante'], costume_toast: 'New look: {c}!',
   wardrobe: 'WARDROBE', wardrobe_hint: 'Costumes are cosmetic. Your earned look keeps leveling underneath.', wear: 'WEAR', wearing: 'WEARING', earned_look: 'Earned look', earned_desc: 'Currently: {c}. Changes as you level.',
   cosmetics: {
@@ -58,7 +58,7 @@ const en = {
     everything: ['Everything', 'Every cosmetic in the game, including ones added later.'],
   } as Record<string, [string, string]>,
   wd_sections: { costume: 'Costumes', aura: 'Auras', trail: 'Run trails' } as Record<string, string>, none: 'None', none_desc: 'Nothing equipped in this slot.',
-  broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
+  broke: 'Not enough yen.', full: 'FULL', full_msg: 'You are carrying the maximum of that item.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
   items: {
     ball: ['Capture Ball', 'B: throw straight ahead. A hit is an instant catch.'],
     net: ['Net Launcher', 'B: three shots in parallel lanes. Hard to dodge.'],

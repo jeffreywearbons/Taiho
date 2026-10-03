@@ -19,7 +19,7 @@ const ja: Strings = {
   bonsai: 'ボンサイ', hero: 'ヒーロー',
   mode_time: 'タイムアタック  90びょう', rank: 'ランキング', res_title: 'しゅうりょう!', res_body: '90びょうで {c}にん タイホ', name_ph: 'なまえ', submit: 'とうろく',
   board_local: 'この たんまつの ランキング', board_shared: 'みんなの ランキング', board_empty: 'まだ だれも いない。いちばんのりだ。', saved: 'とうろく した!', again: 'もういちど', back: 'タイトルへ', close: 'とじる',
-  shop_title: 'コンビニの レジ', buy: 'かう', owned: 'もってる', shop_hint: 'アクティブ アイテムは ついせきちゅうに B で つかう。SEL (キーボードは C) で きりかえ。パッシブは つぎの ついせきで じどう。',
+  shop_title: 'コンビニの レジ', buy: 'かう', owned: 'もってる', shop_hint: 'アクティブ アイテムは ついせきちゅうに B で つかう。SEL (キーボードは C) で きりかえ。パッシブは つぎの ついせきで じどう。アイテムには もてる かずの じょうげんが ある。',
   costumes: ['しみん', 'マスク', 'マント', 'ヒーロー', 'ゴールド ヒーロー'], costume_toast: 'あたらしい すがた: {c}!',
   wardrobe: 'きがえ', wardrobe_hint: 'コスチュームは みための へんこう だけ。レベルの すがたは そのまま そだつ。', wear: 'きる', wearing: 'きている', earned_look: 'レベルの すがた', earned_desc: 'いま: {c}。レベルで かわる。',
   cosmetics: {
@@ -58,7 +58,7 @@ const ja: Strings = {
     everything: ['ぜんぶ いり', 'いまと これからの コスチューム ぜんぶ。'],
   } as Record<string, [string, string]>,
   wd_sections: { costume: 'コスチューム', aura: 'オーラ', trail: 'ラン トレイル' } as Record<string, string>, none: 'なし', none_desc: 'この わくには なにも つけていない。',
-  broke: 'おかねが たりない。', bought: 'まいど あり!', used_juice: 'ジャンプジュース はつどう!', used_vita: 'ビタダッシュ はつどう!',  ball_hit: 'ボール ヒット!', reward: '+¥{y}',
+  broke: 'おかねが たりない。', full: 'いっぱい', full_msg: 'その アイテムは もう これいじょう もてない。', bought: 'まいど あり!', used_juice: 'ジャンプジュース はつどう!', used_vita: 'ビタダッシュ はつどう!',  ball_hit: 'ボール ヒット!', reward: '+¥{y}',
   items: {
     ball: ['ホカクボール', 'B: まっすぐ なげる。あたれば そくタイホ。'],
     net: ['ネットランチャー', 'B: 3れつに はっしゃ。よけにくい。'],
