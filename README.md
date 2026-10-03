@@ -38,6 +38,10 @@ Portrait first. On phones the viewport is a scrolling window of about 15 by 15 t
 
 Career progress (level, stats, yen, items, total catches, unlocked maps) persists on the device and syncs to the cloud when the API is configured. "Reset save" on the title screen erases it after a confirming tap.
 
+## Floors
+
+Ten floors: Konbini, Boutique, Department Store, Electronics Store, Shopping Mall, then Mega Mall 1F-5F. Maps 4 and up are assembled by `src/game/mall.ts`: a fixture strip with the elevator, shop rooms behind glass partitions with two-wide openings, back halls that open during chases, and separate IN / OUT doors. Each room places its own shop's fixtures, so a mall floor is a konbini corner next to a boutique next to an electronics shop. The mega malls are built from a seed per floor (deterministic, bigger each floor, shops drawn from the catalogue). Tipped vending machines appear from map 4 and need Strength 3.
+
 ## Rewarded ads (optional)
 
 Two placements only, never forced: a second chance after an escape and doubling a boss reward. On the web no provider exists and the offers never appear. In the app, install `@capacitor-community/admob`, create two rewarded ad units, and build with `VITE_AD_SECOND_CHANCE` and `VITE_AD_DOUBLE_BOSS` set to their ids.

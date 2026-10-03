@@ -88,7 +88,7 @@ export function updChase(dt: number): void {
     const cands = chaseTiles().filter((f) => Math.abs(f.x - p.tx) <= 3 && Math.abs(f.y - p.ty) <= 3 && !(f.x === G.player.tx && f.y === G.player.ty) && !obstacleAt(f.x, f.y) && !(f.x === p.tx && f.y === p.ty) && !entAt(f.x, f.y));
     if (cands.length) {
       const f = pick(cands); const r = random();
-      const type = cur.obstacleTier >= 2 && r < 0.25 ? 'crate' : (G.level >= 3 || cur.obstacleTier >= 1) && r < 0.55 ? 'box' : 'bag';
+      const type = cur.obstacleTier >= 3 && r < 0.12 ? 'vending' : cur.obstacleTier >= 2 && r < 0.3 ? 'crate' : (G.level >= 3 || cur.obstacleTier >= 1) && r < 0.58 ? 'box' : 'bag';
       G.obstacles.push({ x: f.x, y: f.y, type });
     }
   }

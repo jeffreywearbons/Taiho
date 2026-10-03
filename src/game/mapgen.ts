@@ -60,7 +60,18 @@ export function genMap(def: MapDef, attempts = 300): string[] {
       const x = rint(x0, x1 - w + 1), y = rint(y0, y1 - h + 1);
       const clash = blocks.some((b) => !(x > b.x + b.w + 1 || x + w + 1 < b.x || y > b.y + b.h + 1 || y + h + 1 < b.y));
       if (clash) continue;
-      blocks.push({ x, y, w, h, t: def.blockTiles[Math.floor(random() * def.blockTiles.length)] });
+      // the footprint must be floor, and nothing solid inside the interior (shop partitions) may sit within two tiles of it
+      let bad = false;
+      for (let yy = y - 2; yy <= y + h + 1 && !bad; yy++) for (let xx = x - 2; xx <= x + w + 1; xx++) {
+        const inside = xx >= x && xx < x + w && yy >= y && yy < y + h;
+        const c = rows[yy]?.[xx];
+        if (inside ? c !== '.' : xx >= x0 && xx <= x1 && yy >= y0 && yy <= y1 && c !== '.') { bad = true; break; }
+      }
+      if (bad) continue;
+      const room = def.rooms?.find((r) => x >= r.x0 && x + w - 1 <= r.x1 && y >= r.y0 && y + h - 1 <= r.y1);
+      if (def.rooms && !room) continue;
+      const tiles = room ? room.blockTiles : def.blockTiles;
+      blocks.push({ x, y, w, h, t: tiles[Math.floor(random() * tiles.length)] });
     }
     if (blocks.length < 3) continue;
     for (const b of blocks) for (let yy = b.y; yy < b.y + b.h; yy++) for (let xx = b.x; xx < b.x + b.w; xx++) rows[yy][xx] = b.t;

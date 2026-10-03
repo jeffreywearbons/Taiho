@@ -21,10 +21,10 @@ export interface Ent {
 }
 export type Facing = 'down' | 'up' | 'side';
 
-export type ObstacleType = 'bag' | 'box' | 'crate';
+export type ObstacleType = 'bag' | 'box' | 'crate' | 'vending';
 export type Obstacle = { x: number; y: number; type: ObstacleType };
 /** Strength needed to smash each obstacle; bags are hopped instead. */
-export const OBSTACLE_STR: Record<ObstacleType, number> = { bag: 0, box: 1, crate: 2 };
+export const OBSTACLE_STR: Record<ObstacleType, number> = { bag: 0, box: 1, crate: 2, vending: 3 };
 export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean; charm: boolean; frozen: number; hops: number; smashes: number; byBall: boolean };
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
@@ -40,7 +40,7 @@ export const emptyInv = (): Inv => ({ ball: 0, net: 0, peel: 0, decoy: 0, stop: 
 export const ACTIVE_ITEMS: ItemKey[] = ['ball', 'net', 'peel', 'decoy', 'stop', 'cart', 'senzu'];
 export const MAX_HP = 10;
 /** HP lost when the hero bumps into an obstacle instead of hopping or smashing it. */
-export const OBSTACLE_DMG: Record<ObstacleType, number> = { bag: 1, box: 2, crate: 3 };
+export const OBSTACLE_DMG: Record<ObstacleType, number> = { bag: 1, box: 2, crate: 3, vending: 4 };
 export type Peel = { x: number; y: number };
 export type Decoy = { x: number; y: number; t: number };
 export type Tut = { step: number; moved: number; done: boolean; perv: Ent | null; shown: Set<string>; s3?: boolean };
