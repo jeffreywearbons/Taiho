@@ -95,3 +95,14 @@ button.pad.on { background: var(--line); }
 .book-cell.miss { opacity: 0.7; }
 .book-cell.miss span { color: #777; }
 .book-cell b { font-size: 11px; color: var(--panel); }
+
+/* long floor lists scroll sideways instead of wrapping; the open or chosen floor is scrolled into view */
+.strip { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; padding: 4px 2px 8px; scrollbar-width: thin; scrollbar-color: var(--panel) transparent; }
+.strip button { flex: 0 0 auto; scroll-snap-align: start; white-space: nowrap; }
+.strip::-webkit-scrollbar { height: 6px; }
+.strip::-webkit-scrollbar-thumb { background: var(--panel); border-radius: 3px; }
+.strip-wrap { position: relative; }
+.strip-wrap::before, .strip-wrap::after { content: ''; position: absolute; top: 0; bottom: 8px; width: 18px; pointer-events: none; }
+.strip-wrap::before { left: 0; background: linear-gradient(to right, var(--paper), transparent); }
+.strip-wrap::after { right: 0; background: linear-gradient(to left, var(--paper), transparent); }
+.strip-hint { font-size: 10px; opacity: 0.55; margin: -4px 0 4px; }

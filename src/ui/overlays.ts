@@ -43,6 +43,12 @@ export function myCard(): Card { return { sprite: heroSprite(), aura: G.aura, tr
 export function toggleMute(): void { setMuted(!isMuted()); $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on); }
 export let onMapPick: (i: number) => void = () => undefined;
 export function setMapPick(fn: (i: number) => void): void { onMapPick = fn; }
+/** Bring one button of a scrolling strip into view (the newest open floor, the chosen tab) without moving the page. */
+export function revealIn(strip: HTMLElement, index: number): void {
+  const b = strip.children[index] as HTMLElement | undefined; if (!b) return;
+  const left = b.offsetLeft - (strip.clientWidth - b.offsetWidth) / 2;
+  try { strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' }); } catch { strip.scrollLeft = Math.max(0, left); }
+}
 function renderMapSelect(): void {
   const box = $('maps'); box.innerHTML = '';
   const open = unlockedMaps();
@@ -51,6 +57,7 @@ function renderMapSelect(): void {
     b.textContent = `${i + 1}. ${m.name[lang]}` + (i < open ? '' : `  (${L.locked})`);
     b.onclick = () => onMapPick(i); box.appendChild(b);
   });
+  revealIn(box, open - 1);
 }
 
 // ---- level up ----
@@ -158,6 +165,7 @@ function renderBoard(listEl: HTMLElement, titleEl: HTMLElement, rows: ScoreRow[]
 function renderRankTabs(): void {
   const maps = $('rank-maps'); maps.innerHTML = '';
   MAPS.forEach((m, i) => { const b = document.createElement('button'); b.textContent = m.name[lang]; b.className = i === board.map ? 'on' : ''; b.onclick = () => { board.map = i; void openBoard('rank'); }; maps.appendChild(b); });
+  revealIn(maps, board.map);
   const span = $('rank-span'); span.innerHTML = '';
   ([[L.tab_week, weekKey()], [L.tab_all, null]] as [string, string | null][]).forEach(([t, w]) => { const b = document.createElement('button'); b.textContent = t; b.className = board.week === w ? 'on' : ''; b.onclick = () => { board.week = w; void openBoard('rank'); }; span.appendChild(b); });
   $('rank-sub').textContent = boardSub(board);
@@ -187,7 +195,7 @@ export function openTimePick(start: (map: number) => void): void {
   $('tmap-title').textContent = L.tmap_title; $('tmap-body').textContent = L.tmap_body; $('b-tmap-close').textContent = L.close;
   const box = $('tmap-maps'); box.innerHTML = '';
   MAPS.forEach((m, i) => { if (i >= open) return; const b = document.createElement('button'); b.className = 'map'; b.textContent = `${i + 1}. ${m.name[lang]}`; b.onclick = () => { $('tmap').hidden = true; start(i); }; box.appendChild(b); });
-  $('tmap').hidden = false; sfx('blip');
+  $('tmap').hidden = false; sfx('blip'); revealIn(box, Math.min(open - 1, G.lastRun?.map ?? open - 1));
 }
 export async function submitScore(): Promise<void> {
   const nm = $<HTMLInputElement>('name'); const name = (nm.value || '').trim().slice(0, 12);

@@ -12,6 +12,17 @@ import { goals, goalText, dailyText, streakMult } from '../game/goals';
 import { bonsaiSprite } from '../game/costume';
 import { drawAura, drawParticles } from './fx';
 
+/** One-tile ring under a perv, coloured by phase: yellow scoping, orange setting up, red recording (pulses), purple finishing / leaving, red while chased. Same reveal rule as the icons. */
+const PHASE_RING: Record<string, string> = { scoping: '#ffe066', setup: '#ff9f43', live: '#ff4d4d', finish: '#b06cff', chase: '#ff4d4d' };
+function phaseRing(e: Ent): void {
+  const col = e.chasing ? PHASE_RING.chase : PHASE_RING[e.state]; if (!col) return;
+  const v = iconVisible(e); if (v !== 'full' && !e.chasing) return;
+  const cx = e.px + 8, cy = e.py + 8;
+  const hot = e.state === 'live' || e.chasing; const pulse = hot ? 0.5 + 0.5 * Math.sin(G.time / 120) : 0.5;
+  ctx.beginPath(); ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
+  ctx.globalAlpha = 0.22 + 0.18 * pulse; ctx.fillStyle = col; ctx.fill();
+  ctx.globalAlpha = 0.9; ctx.lineWidth = 1.5; ctx.strokeStyle = col; ctx.stroke(); ctx.globalAlpha = 1;
+}
 function iconVisible(e: Ent): 'full' | 'hint' | null {
   if (e.scripted || e.chasing) return 'full';
   const d = cheb(e, G.player);
@@ -53,6 +64,7 @@ export function drawWorld(): void {
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;
+    if (e.kind === 'perv') phaseRing(e);
     if (e.kind === 'player' && G.cartT > 0) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px - 1, e.py + 6, 18, 9); ctx.fillStyle = '#9c9ca8'; ctx.fillRect(e.px, e.py + 7, 16, 6); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px + 2, e.py + 14, 3, 2); ctx.fillRect(e.px + 11, e.py + 14, 3, 2); }
     if (e.kind === 'player' && G.hurtT > 0 && Math.floor(G.time / 60) % 2) ctx.globalAlpha = 0.4;
     spr(frameName(e), e.px, e.py - 8 + yo, e.flip); ctx.globalAlpha = 1;
