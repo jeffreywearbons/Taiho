@@ -25,6 +25,13 @@ npm run check:kana # fails if ja.ts contains kanji
 
 Portrait first. On phones the viewport is a scrolling window of about 15 by 15 tiles with the camera on the player; on larger screens the whole 20 by 15 map shows. The d-pad is slide-over (hold and drag), A and B are big round buttons. Installable to the home screen and playable offline once cached. Wrap with Capacitor for the app stores.
 
+## Ship it
+
+- **CI**: `.github/workflows/ci.yml` runs the kana check, tests and build on every push and pull request.
+- **Web**: `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages on pushes to `master` or `game/scaffold`. One-time setup in the repository: Settings → Pages → Source → "GitHub Actions". The game then lives at `https://<user>.github.io/<repo>/`. To point it at the API, add a repository variable `VITE_API_URL`. Cloudflare Pages works the same way (build command `npm run build`, output `dist`).
+- **Phones, no store**: the site is a PWA. Android and desktop Chrome show an "Install app" button on the title; iPhone users add it from Safari's Share menu. It runs fullscreen and offline.
+- **App stores**: Capacitor is configured (`capacitor.config.ts`, app id `com.wearbons.taiho`). On a machine with Android Studio or Xcode: `npm run cap:add:android` or `npm run cap:add:ios` once, then `npm run cap:android` / `npm run cap:ios` to build, sync and open the native project.
+
 ## Backend (optional)
 
 `worker/` holds a Cloudflare Worker + D1 for the shared Time Attack ranking and cloud saves. Without it the game keeps everything on the device. See `worker/README.md`; build the game with `VITE_API_URL=https://...` to enable it.

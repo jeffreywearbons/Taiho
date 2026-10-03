@@ -31,6 +31,7 @@ button.pad.on { background: var(--line); }
 .menu button:hover, .card button:hover { background: #2f2f4a; }
 .menu button:focus-visible, .card button:focus-visible, button.pad:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 #b-start { background: var(--accent); color: var(--panel); font-weight: bold; }
+#b-install { margin-top: 10px; width: 100%; background: var(--good); color: var(--panel); border-color: var(--panel); font-family: var(--font-pixel); font-size: 15px; padding: 10px; cursor: pointer; }
 .picks { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .picks button { display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; }
 .picks button span { font-size: 12px; opacity: 0.8; }

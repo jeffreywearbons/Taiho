@@ -46,6 +46,13 @@ function wire(): void {
   $('b-again').onclick = () => startGame('time');
   $('b-back').onclick = () => { $('result').hidden = true; $('title').hidden = false; G.scene = 'title'; };
   initKeyboard(choosePick);
+  // "Install app": Android/desktop Chrome fire beforeinstallprompt; iOS Safari needs the Share menu, so show a hint there.
+  let installEvt: (Event & { prompt: () => Promise<void> }) | null = null;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e as any; if (!standalone) $('b-install').hidden = false; });
+  $('b-install').onclick = async () => { if (!installEvt) return; await installEvt.prompt(); $('b-install').hidden = true; installEvt = null; };
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !(window as any).MSStream;
+  if (ios && !standalone) $('t-install-hint').hidden = false;
   const dirs: Record<Dir, HTMLElement> = { up: $('d-up'), down: $('d-down'), left: $('d-left'), right: $('d-right') };
   bindDpadSlide($('dpad'), dirs);
   bindPad($('d-a'), 'a'); bindPad($('d-b'), 'b');

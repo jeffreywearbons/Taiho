@@ -17,7 +17,8 @@ export function applyStrings(): void {
   $('b-tut').textContent = L.tut + (G.tutorial ? L.on : L.off); $('t-keys').textContent = L.keys;
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
-  $('maps-title').textContent = L.maps_title; renderProfileLine(); $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('maps-title').textContent = L.maps_title; renderProfileLine();
+  $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;

@@ -3,7 +3,7 @@ import type { Strings, Page, ShopItem } from './en';
 // Kana only. scripts/check-kana.mjs fails the build if a kanji sneaks in.
 const ja: Strings = {
   title: 'タイホ!!', sub: 'コンビニ ヒーロー', start: 'スタート', lang: 'ことば: にほんご', tut: 'チュートリアル: ', on: 'ON', off: 'OFF',
-  sound: 'おと: ',
+  sound: 'おと: ', install: 'アプリを いれる', install_ios: 'iPhone では きょうゆう ボタンから「ホームがめんに ついか」で フルスクリーンに なる。',
   streak: 'れんぞく {n}  ×{m}', streak_lost: 'れんぞく とぎれた…', boss_wanted: 'おたずねもの: {n} が はいってきた!', boss_caught: 'ボス タイホ! ほうしゅう 3ばい!',
   boss_names: ['あせだく おじさん', 'カバンの おとこ', 'メガネの ひと', 'サラリーマン ゼロ'],
   goal_done: 'ミッション クリア! +¥{y}', daily: 'きょう', daily_done: 'きょうの ミッション たっせい! +¥{y}',
