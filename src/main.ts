@@ -18,6 +18,7 @@ import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
 import { openLink, wireLink } from './ui/link';
+import { openCalendar, wireCalendar } from './ui/calendar';
 import { syncEntitlements } from './game/purchases';
 import { myCard } from './ui/overlays';
 
@@ -48,7 +49,8 @@ function wire(): void {
   $('b-mycard').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); let nm = ''; try { nm = localStorage.getItem('taiho_name') || ''; } catch { /* ignore */ } openCard(nm || L.you, myCard()); };
   $('b-card-close').onclick = () => closeCard();
   $('b-link').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); openLink(); };
-  wireLink();
+  wireLink(); wireCalendar();
+  $('b-cal').onclick = () => openCalendar(false);
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };
@@ -87,7 +89,7 @@ async function boot(): Promise<void> {
   setContext(cv.getContext('2d')!);
   loadLayout(); wire(); fit();
   await loadAssets();
-  void syncProfile().then(renderProfileLine).then(() => syncEntitlements()).then(() => { if (location.hash === '#purchased') { history.replaceState(null, '', location.pathname); renderProfileLine(); } });
+  void syncProfile().then((p) => { applyProfile(p); renderProfileLine(); openCalendar(true); }).then(() => syncEntitlements()).then(() => { if (location.hash === '#purchased') { history.replaceState(null, '', location.pathname); renderProfileLine(); } });
   let last = performance.now();
   const loop = (now: number) => {
     const dt = Math.min(50, now - last); last = now;
