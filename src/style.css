@@ -16,10 +16,11 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; background: #
 #dpad { display: grid; grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 58px); gap: 2px; touch-action: none; }
 #d-up { grid-column: 2; grid-row: 1; } #d-left { grid-column: 1; grid-row: 2; } #d-right { grid-column: 3; grid-row: 2; } #d-down { grid-column: 2; grid-row: 3; }
 button.pad { background: var(--panel); border: 2px solid var(--line); color: var(--paper); font-family: var(--font-pixel); font-size: 22px; border-radius: 10px; touch-action: none; pointer-events: none; }
-#d-a, #d-b { pointer-events: auto; }
+#d-a, #d-b, #d-sel { pointer-events: auto; }
 button.pad.on { background: var(--line); }
 .ab { display: flex; align-items: flex-end; gap: 12px; }
 #d-a { width: 92px; height: 92px; border-radius: 50%; font-size: 28px; border-color: var(--accent); color: var(--accent); }
+#d-sel { width: 48px; height: 48px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; }
 #d-b { width: 64px; height: 64px; border-radius: 50%; font-size: 22px; border-color: var(--blue); color: var(--blue); }
 .overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(20,20,32,0.86); padding: 12px; box-sizing: border-box; }
 .card { background: var(--paper); color: var(--ink); border: 3px solid var(--panel); box-shadow: 0 0 0 2px var(--paper), 0 0 0 5px var(--panel); padding: 18px 20px; width: min(100%, 440px); max-height: 100%; overflow-y: auto; box-sizing: border-box; text-align: center; }

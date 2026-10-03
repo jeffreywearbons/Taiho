@@ -1,5 +1,5 @@
 export type Page = ['b' | 'h', string];
-export type ShopItem = [name: string, desc: string, price: number];
+export type ShopItem = [name: string, desc: string];
 
 const en = {
   title: 'TAIHO!!', sub: 'Konbini Vigilante', start: 'START', lang: 'Language: English', tut: 'Tutorial: ', on: 'ON', off: 'OFF',
@@ -8,7 +8,7 @@ const en = {
   boss_names: ['Mr. Sweaty', 'The Briefcase', 'Glasses Guy', 'Salaryman Zero'],
   goal_done: 'Goal clear! +¥{y}', daily: 'DAILY', daily_done: 'Daily bounty done! +¥{y}',
   goals: { catch3: 'Catch {t} pervs', fast: 'Catch one with 12s+ left', hop3: 'Hop 3 bags in one chase', smash2: 'Smash {t} boxes', boss: 'Catch a boss', ball: 'Catch one with a Capture Ball', streak3: '3 catches in a row', arena: 'Catch one in the back halls', daily: 'Catch {t} today' }, profile_line: 'Lv{l}   {c} career catches   ¥{y}', reset: 'Reset save', reset_confirm: 'Tap again to erase everything',
-  keys: 'Arrows / WASD to move.  Z, Space, Enter = A.  X or Shift = B (throw).',
+  keys: 'Arrows / WASD to move.  Z, Space, Enter = A.  X or Shift = B (use item).  C = switch item.',
   hud_caught: 'CAUGHT', hud_lv: 'Lv', hud_timer: 'ESCAPE IN', hud_time: 'TIME',
   notyet: 'Not yet. Wait for the red mark.', caught: 'TAIHO!!', escaped: 'He got away...', levelup: 'LEVEL UP!',
   elev: 'Elevator unlocked!', bail: 'He noticed you!', heavy: 'Too heavy! Needs Strength {n}.', arena_open: 'The back halls are open!', smash: 'SMASH!', suit: 'Vigilante suit unlocked!',
@@ -19,14 +19,23 @@ const en = {
   bonsai: 'BONSAI', hero: 'HERO',
   mode_time: 'TIME ATTACK  90s', rank: 'RANKING', res_title: "Time's up!", res_body: 'Caught {c} in 90 seconds', name_ph: 'Your name', submit: 'SUBMIT',
   board_local: 'Ranking on this device', board_shared: 'Shared ranking', board_empty: 'No scores yet. Be the first.', saved: 'Saved!', again: 'PLAY AGAIN', back: 'TITLE', close: 'CLOSE',
-  shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Items are used automatically on your next chase. Throw a Capture Ball with B.',
+  shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Active items fire with B during a chase; SEL (C on keyboard) switches between them. Passives trigger on your next chase.',
   costumes: ['Civilian', 'Masked', 'Caped', 'Vigilante', 'Gold Vigilante'], costume_toast: 'New look: {c}!',
-  broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!', no_ball: 'No Capture Balls. Buy them at the register.', ball_hit: 'BALL HIT!', reward: '+¥{y}',
-  items: [
-    ['Capture Ball', 'Throw it with B during a chase. A hit is an instant catch.', 1000],
-    ['Auto-Jump Juice', 'Next chase: you hop bags automatically.', 500],
-    ['Vita Dash 1000', 'Next chase: 50% faster for the whole chase.', 300],
-  ] as ShopItem[],
+  broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
+  items: {
+    ball: ['Capture Ball', 'B: throw straight ahead. A hit is an instant catch.'],
+    net: ['Net Launcher', 'B: three shots in parallel lanes. Hard to dodge.'],
+    peel: ['Banana Peel', 'B: drop at your feet. He slips and is stunned 1.5s.'],
+    decoy: ['Decoy Mannequin', 'B: place it ahead. He runs at it for 3s.'],
+    stop: ['Stopwatch', 'B: freeze the escape timer for 5s.'],
+    cart: ['Shopping Cart', 'B: ride 4s at double speed, plowing through bags.'],
+    juice: ['Auto-Jump Juice', 'Next chase: you hop bags automatically.'],
+    vita: ['Vita Dash 1000', 'Next chase: 50% faster for the whole chase.'],
+    shield: ['Streak Shield', 'One escape does not break your streak.'],
+    charm: ['Lucky Charm', 'Next catch pays double yen.'],
+  } as Record<string, ShopItem>,
+  shop_active: 'Active: press B in a chase, SEL to switch', shop_passive: 'Passive: used on your next chase',
+  equip: 'B: {i}', no_item: 'Nothing equipped. Buy items at the register.', peel_slip: 'He slipped!', decoy_set: 'Decoy placed!', time_stop: 'TIME STOP!', cart_ride: 'Cart ride!', shield_used: 'Streak shielded!', used_charm: 'Lucky Charm active!', charm_paid: 'Lucky Charm: double yen!',
   t1: [['b', "Welcome to your first shift.\nI'm Bonsai, your assistant."], ['b', 'Try not to embarrass us.\nUse the arrows to walk around.'], ['h', 'Justice never checks out.'], ['b', 'Okay.']] as Page[],
   t2: [['b', 'Good, you can walk.\nLegs are important for this job.']] as Page[],
   t3: [['b', "See that guy coming in?\nHe's not here for onigiri."], ['b', 'Watch the mark over his head.']] as Page[],

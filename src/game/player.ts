@@ -3,7 +3,8 @@ import { TW } from './const';
 import { held, consumeTap } from '../core/input';
 import { sfx } from '../core/audio';
 import { L, fmt } from '../i18n';
-import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face } from './world';
+import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face, chaseFloor } from './world';
+import { cycleEquip } from './economy';
 import { startChase, endChase, gainXp } from './chase';
 import { report } from './goals';
 import { openShop } from '../ui/overlays';
@@ -33,19 +34,47 @@ export function playerAction(): void {
 const bank = (y: number, x: number): void => { G.yen += y; gainXp(x); };
 function hopped(): void { if (G.chase) { G.chase.hops++; report({ kind: 'hop', hopsThisChase: G.chase.hops }, bank); } }
 
-export function throwBall(): void {
+/** B during a chase fires whatever is equipped. Every active item is a one-use consumable. */
+export function useItem(): void {
   if (!G.chase) return;
-  if (G.inv.ball > 0 && !G.ball) { G.inv.ball--; const P = G.player; G.ball = { x: P.px + 8, y: P.py + 4, dx: P.fx, dy: P.fy, d: 0 }; sfx('throw'); }
-  else if (G.inv.ball <= 0) toast(L.no_ball, 1500);
+  const k = G.equip; const P = G.player;
+  if (!G.inv[k]) { toast(L.no_item, 1500); sfx('notyet'); return; }
+  const c = G.chase;
+  switch (k) {
+    case 'ball':
+      if (G.balls.length) return;
+      G.balls.push({ x: P.px + 8, y: P.py + 4, dx: P.fx, dy: P.fy, d: 0 }); sfx('throw'); break;
+    case 'net': {
+      if (G.balls.length) return;
+      const px = P.fy !== 0 ? 1 : 0, py = P.fx !== 0 ? 1 : 0;  // perpendicular offset
+      for (const o of [-1, 0, 1]) G.balls.push({ x: P.px + 8 + o * px * TW, y: P.py + 4 + o * py * TW, dx: P.fx, dy: P.fy, d: 0 });
+      sfx('throw'); break;
+    }
+    case 'peel':
+      if (G.peels.some((p) => p.x === P.tx && p.y === P.ty) || obstacleAt(P.tx, P.ty)) return;
+      G.peels.push({ x: P.tx, y: P.ty }); sfx('jump'); break;
+    case 'decoy': {
+      const dx = P.tx + P.fx, dy = P.ty + P.fy;
+      const spot = ch(dx, dy) === '.' && !obstacleAt(dx, dy) && !entAt(dx, dy) ? { x: dx, y: dy } : { x: P.tx, y: P.ty };
+      G.decoy = { x: spot.x, y: spot.y, t: 3000 }; c.reroll = 0; toast(L.decoy_set, 1500); sfx('blip'); break;
+    }
+    case 'stop':
+      c.frozen = 5000; toast(L.time_stop, 1800); sfx('level'); break;
+    case 'cart':
+      G.cartT = 4000; toast(L.cart_ride, 1500); sfx('chase'); break;
+    default: return;
+  }
+  G.inv[k]--;
+  if (!G.inv[k]) { const next = cycleEquip(); if (next) G.equip = next; }
 }
 
-export function updBall(dt: number): void {
-  const b = G.ball, c = G.chase; if (!b || !c) return;
-  const sp = dt * 0.22; b.x += b.dx * sp; b.y += b.dy * sp; b.d += sp;
-  const tx = Math.floor((b.x + 4) / TW), ty = Math.floor((b.y + 4) / TW);
-  const pv = c.perv;
-  if (ch(tx, ty) !== '.' || b.d > 7 * TW) { G.ball = null; return; }
-  if (Math.abs(b.x + 4 - (pv.px + 8)) < 9 && Math.abs(b.y + 4 - (pv.py + 4)) < 12) { G.ball = null; toast(L.ball_hit, 1200); c.byBall = true; endChase(true); }
+export function updBalls(dt: number): void {
+  const c = G.chase; if (!c || !G.balls.length) return;
+  const sp = dt * 0.22; const pv = c.perv;
+  for (const b of G.balls) { b.x += b.dx * sp; b.y += b.dy * sp; b.d += sp; }
+  G.balls = G.balls.filter((b) => { const tx = Math.floor((b.x + 4) / TW), ty = Math.floor((b.y + 4) / TW); return chaseFloor(tx, ty) && b.d <= 7 * TW; });
+  const hit = G.balls.find((b) => Math.abs(b.x + 4 - (pv.px + 8)) < 9 && Math.abs(b.y + 4 - (pv.py + 4)) < 12);
+  if (hit) { G.balls = []; toast(L.ball_hit, 1200); c.byBall = true; endChase(true); }
 }
 
 export function updPlayer(dt: number): void {
@@ -59,7 +88,8 @@ export function updPlayer(dt: number): void {
   face(P, dx, dy);
   const nx = P.tx + dx, ny = P.ty + dy;
   const e = entAt(nx, ny); if (e && e.chasing) { endChase(true); return; }
-  const ob = obstacleAt(nx, ny);
+  let ob = obstacleAt(nx, ny);
+  if (ob && ob.type === 'bag' && G.cartT > 0) { G.obstacles = G.obstacles.filter((x) => x !== ob); sfx('smash'); ob = undefined; }
   if (ob && ob.type === 'bag' && G.chase && G.chase.juice) {
     const lx = nx + dx, ly = ny + dy;
     if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); hopped(); return; }

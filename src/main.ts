@@ -55,7 +55,7 @@ function wire(): void {
   if (ios && !standalone) $('t-install-hint').hidden = false;
   const dirs: Record<Dir, HTMLElement> = { up: $('d-up'), down: $('d-down'), left: $('d-left'), right: $('d-right') };
   bindDpadSlide($('dpad'), dirs);
-  bindPad($('d-a'), 'a'); bindPad($('d-b'), 'b');
+  bindPad($('d-a'), 'a'); bindPad($('d-b'), 'b'); bindPad($('d-sel'), 'sel');
   cv.addEventListener('pointerdown', () => { if (G.scene === 'play' && G.box) pressA(); });
   window.addEventListener('resize', fit); hooks.afterRefit = fit;
   if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => undefined);

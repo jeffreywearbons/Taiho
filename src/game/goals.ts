@@ -22,7 +22,7 @@ export const POOL: GoalDef[] = [
   { id: 'hop3', target: 1, reward: 300, xp: 50, applies: always, step: (e) => (e.kind === 'hop' && e.hopsThisChase >= 3 ? 1 : 0) },
   { id: 'smash2', target: 2, reward: 350, xp: 60, applies: () => G.stats.strength >= 1 && (G.level >= 3 || cur.obstacleTier >= 1), step: (e) => (e.kind === 'smash' ? 1 : 0) },
   { id: 'boss', target: 1, reward: 600, xp: 120, applies: always, step: (e) => (e.kind === 'catch' && e.data.boss ? 1 : 0) },
-  { id: 'ball', target: 1, reward: 600, xp: 80, applies: () => G.inv.ball > 0 || G.yen >= 1000, step: (e) => (e.kind === 'catch' && e.data.byBall ? 1 : 0) },
+  { id: 'ball', target: 1, reward: 600, xp: 80, applies: () => G.inv.ball > 0 || G.inv.net > 0 || G.yen >= 3000, step: (e) => (e.kind === 'catch' && e.data.byBall ? 1 : 0) },
   { id: 'streak3', target: 1, reward: 500, xp: 80, applies: always, step: (e) => (e.kind === 'catch' && e.data.streak >= 3 ? 1 : 0) },
   { id: 'arena', target: 1, reward: 500, xp: 80, applies: () => !!cur.arena, step: (e) => (e.kind === 'catch' && e.data.inArena ? 1 : 0) },
 ];

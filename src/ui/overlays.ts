@@ -2,7 +2,7 @@ import { G } from '../game/state';
 import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
-import { buy, leaderboard, type ScoreRow } from '../game/economy';
+import { buy, leaderboard, CATALOG, type ScoreRow } from '../game/economy';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
@@ -68,18 +68,20 @@ export function openShop(): void {
 function renderShop(): void {
   $('shop-yen').textContent = '¥' + G.yen;
   const list = $('shop-list'); list.innerHTML = '';
-  const keys = ['ball', 'juice', 'vita'] as const;
-  L.items.forEach((it, i) => {
+  let lastKind = '';
+  for (const c of CATALOG) {
+    if (c.kind !== lastKind) { lastKind = c.kind; const h = document.createElement('p'); h.className = 'bt'; h.textContent = c.kind === 'active' ? L.shop_active : L.shop_passive; list.appendChild(h); }
+    const it = L.items[c.key];
     const row = document.createElement('div'); row.className = 'item';
     const info = document.createElement('div'); info.className = 'info';
     const b = document.createElement('b'); b.textContent = it[0];
     const sp = document.createElement('span'); sp.textContent = it[1];
-    const own = document.createElement('i'); own.textContent = `${L.owned} ${G.inv[keys[i]]}`;
+    const own = document.createElement('i'); own.textContent = `${L.owned} ${G.inv[c.key]}`;
     info.append(b, sp, own);
-    const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${it[2]}`; btn.disabled = G.yen < it[2];
-    btn.onclick = () => { const r = buy(i); $('shop-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); renderShop(); };
+    const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price;
+    btn.onclick = () => { const r = buy(c.key); $('shop-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); renderShop(); };
     row.append(info, btn); list.appendChild(row);
-  });
+  }
 }
 export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; clearPresses(); }
 

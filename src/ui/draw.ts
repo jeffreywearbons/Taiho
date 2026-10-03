@@ -43,10 +43,14 @@ export function drawWorld(): void {
   }
   otext('IN', cur.doorIn.x * TW + 8, cur.doorIn.y * TW - 4, '#fff', 'center'); otext('OUT', cur.doorOut.x * TW + 8, cur.doorOut.y * TW - 4, '#fff', 'center');
   for (const o of G.obstacles) spr('obs_' + o.type, o.x * TW, o.y * TW);
+  for (const q of G.peels) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(q.x * TW + 3, q.y * TW + 8, 10, 5); ctx.fillStyle = '#ffe066'; ctx.fillRect(q.x * TW + 4, q.y * TW + 9, 8, 3); ctx.fillStyle = '#c8a000'; ctx.fillRect(q.x * TW + 4, q.y * TW + 11, 3, 1); }
+  if (G.decoy) { spr('tile_mannequin', G.decoy.x * TW, G.decoy.y * TW - 4); if (Math.floor(G.time / 200) % 2) otext('!', G.decoy.x * TW + 8, G.decoy.y * TW - 14, '#ffe066', 'center'); }
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;
+    if (e.kind === 'player' && G.cartT > 0) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px - 1, e.py + 6, 18, 9); ctx.fillStyle = '#9c9ca8'; ctx.fillRect(e.px, e.py + 7, 16, 6); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px + 2, e.py + 14, 3, 2); ctx.fillRect(e.px + 11, e.py + 14, 3, 2); }
     spr(frameName(e), e.px, e.py - 8 + yo, e.flip);
+    if (e.stunT > 0) { const a = G.time / 120; for (let i = 0; i < 3; i++) { const ang = a + i * 2.1; otext('★', e.px + 8 + Math.cos(ang) * 7, e.py - 22 + Math.sin(ang) * 2, '#ffe066', 'center'); } }
     if (e.kind !== 'perv') continue;
     const v = iconVisible(e);
     let ic: string | null = null;
@@ -59,7 +63,7 @@ export function drawWorld(): void {
       spr(ic, e.px + 4, e.py - 19 + by);
     } else if (ic && v === 'hint') spr('icon_hint', e.px + 4, e.py - 19);
   }
-  if (G.ball) { const b = G.ball; ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x - 1, b.y - 1, 10, 10); ctx.fillStyle = '#e63c3c'; ctx.fillRect(b.x, b.y, 8, 4); ctx.fillStyle = '#fff'; ctx.fillRect(b.x, b.y + 4, 8, 4); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x, b.y + 3, 8, 1); ctx.fillRect(b.x + 3, b.y + 2, 2, 3); }
+  for (const b of G.balls) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x - 1, b.y - 1, 10, 10); ctx.fillStyle = '#e63c3c'; ctx.fillRect(b.x, b.y, 8, 4); ctx.fillStyle = '#fff'; ctx.fillRect(b.x, b.y + 4, 8, 4); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x, b.y + 3, 8, 1); ctx.fillRect(b.x + 3, b.y + 2, 2, 3); }
   const B = G.bonsai; spr('bonsai_0', B.px, B.py - 8 + Math.round(Math.sin(G.time / 250) * 1.5) - 4, B.flip);
   ctx.restore();
 }
@@ -71,13 +75,14 @@ export function drawHud(): void {
   if (G.elevOpen) text('▲', 62, 1, '#5de36a');
   const narrow = vw < 300;
   text('¥' + G.yen, narrow ? 70 : 76, 1, '#fff');
-  if (!narrow) text(`B×${G.inv.ball} J×${G.inv.juice} V×${G.inv.vita}`, 122, 1, '#c8c8d2');
+  const eq = G.inv[G.equip] ? `B:${L.items[G.equip][0]} ×${G.inv[G.equip]}` : `B: -`;
+  if (!narrow) text(eq, 128, 1, '#c8c8d2');
   text(L.hud_lv + G.level, vw - 78, 1, '#fff');
   ctx.fillStyle = '#3a3a4a'; ctx.fillRect(vw - 48, 3, 45, 6);
   ctx.fillStyle = '#5de36a'; ctx.fillRect(vw - 48, 3, Math.round(45 * G.xp / xpNeed(G.level)), 6);
-  if (narrow) text(`B${G.inv.ball} J${G.inv.juice} V${G.inv.vita}`, 3, vh - 11, '#c8c8d2');
+  if (narrow) text(eq, 3, vh - 11, '#c8c8d2');
   if (G.mode === 'time') { const tl = Math.ceil(G.timeLeft / 1000); otext(`${L.hud_time} ${tl}`, vw / 2, 14, tl <= 10 ? '#ff5a5a' : '#fff', 'center'); }
-  if (G.chase) { const s = (G.chase.t / 1000).toFixed(1); otext(`${L.hud_timer} ${s}`, vw / 2, G.mode === 'time' ? 26 : 14, G.chase.t < 5000 ? '#ff5a5a' : '#ffe066', 'center'); }
+  if (G.chase) { const s = (G.chase.t / 1000).toFixed(1); const fz = G.chase.frozen > 0; otext(`${L.hud_timer} ${s}` + (fz ? ' ❚❚' : ''), vw / 2, G.mode === 'time' ? 26 : 14, fz ? '#7fb4ff' : G.chase.t < 5000 ? '#ff5a5a' : '#ffe066', 'center'); }
   // goals strip, left edge under the bar
   const lines = G.mode === 'time' ? [] : [dailyText(), ...goals.active.slice(0, narrow ? 1 : 3).map(goalText)];
   let gy = 14; for (const ln of lines) { otext(ln, 3, gy, '#c8c8d2'); gy += 11; }

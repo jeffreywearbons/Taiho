@@ -1,4 +1,4 @@
-import { G, type Stats, type Inv } from './state';
+import { G, type Stats, type Inv, emptyInv } from './state';
 import { api } from './api';
 
 /** Career progress that outlives a run. Kept on the device and mirrored to the cloud when an API is configured. */
@@ -6,7 +6,7 @@ import { goals, type Daily } from './goals';
 export interface Profile { v: 1; level: number; xp: number; stats: Stats; yen: number; inv: Inv; totalCatches: number; ts: number; daily?: Daily; bossDone?: number }
 
 const KEY = 'taiho_profile';
-export const blank = (): Profile => ({ v: 1, level: 1, xp: 0, stats: { speed: 0, detect: 0, strength: 0 }, yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, totalCatches: 0, ts: 0 });
+export const blank = (): Profile => ({ v: 1, level: 1, xp: 0, stats: { speed: 0, detect: 0, strength: 0 }, yen: 0, inv: emptyInv(), totalCatches: 0, ts: 0 });
 
 export function loadProfile(): Profile {
   try {
@@ -17,7 +17,7 @@ export function loadProfile(): Profile {
   } catch { return blank(); }
 }
 export function applyProfile(p: Profile): void {
-  G.level = p.level; G.xp = p.xp; G.stats = { ...p.stats }; G.yen = p.yen; G.inv = { ...p.inv }; G.totalCatches = p.totalCatches; G.bossDone = p.bossDone ?? 0;
+  G.level = p.level; G.xp = p.xp; G.stats = { ...p.stats }; G.yen = p.yen; G.inv = { ...emptyInv(), ...p.inv }; G.totalCatches = p.totalCatches; G.bossDone = p.bossDone ?? 0;
 }
 export function snapshot(): Profile {
   return { v: 1, level: G.level, xp: G.xp, stats: { ...G.stats }, yen: G.yen, inv: { ...G.inv }, totalCatches: G.totalCatches, ts: Date.now(), daily: { ...goals.daily }, bossDone: G.bossDone };

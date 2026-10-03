@@ -20,9 +20,11 @@ export function startChase(p: Ent): void {
   const P = pervParams(G.level);
   p.chasing = true; p.path = []; p.state = 'chase';
   if (p.boss) { P.speed += 0.1; P.rerollSec *= 0.6; }
-  G.chase = { perv: p, t: CHASE_MS, reroll: 0, obsT: 0, P, juice: false, vita: false, hops: 0, smashes: 0, byBall: false };
-  if (G.inv.juice > 0) { G.inv.juice--; G.chase.juice = true; toast(L.used_juice, 1500); }
-  if (G.inv.vita > 0) { G.inv.vita--; G.chase.vita = true; toast(L.used_vita, 1500); }
+  const chase = { perv: p, t: CHASE_MS, reroll: 0, obsT: 0, P, juice: false, vita: false, charm: false, frozen: 0, hops: 0, smashes: 0, byBall: false };
+  G.chase = chase; G.balls = []; G.peels = []; G.decoy = null; G.cartT = 0; p.stunT = 0;
+  if (G.inv.juice > 0) { G.inv.juice--; chase.juice = true; toast(L.used_juice, 1500); }
+  if (G.inv.vita > 0) { G.inv.vita--; chase.vita = true; toast(L.used_vita, 1500); }
+  if (G.inv.charm > 0) { G.inv.charm--; chase.charm = true; toast(L.used_charm, 1500); }
   if (cur.arena) { G.arena = true; G.arenaT = 0; toast(L.arena_open, 2000); }
   if (G.tutorial && p.scripted) tutBox('t7');
   sfx('chase'); music.play('chase');
@@ -31,8 +33,9 @@ export function startChase(p: Ent): void {
 export function updChase(dt: number): void {
   const c = G.chase; if (!c) return;
   const p = c.perv;
-  c.t -= dt; if (c.t <= 0) { endChase(false); return; }
+  if (c.frozen > 0) c.frozen -= dt; else { c.t -= dt; if (c.t <= 0) { endChase(false); return; } }
   updMove(p, dt);
+  if (p.stunT > 0) { p.stunT -= dt; if (!p.moving) { if (!G.player.moving && manh(p, G.player) === 0) endChase(true); return; } }
   c.reroll -= dt;
   // the perv obeys the same rules as the player: shelves, boxes and shoppers block him; bags must be hopped
   const walk = (x: number, y: number): boolean => {
@@ -48,7 +51,8 @@ export function updChase(dt: number): void {
       const dm = distMap(G.player.tx, G.player.ty, walk);
       let goal = null as { x: number; y: number } | null;
       const tiles = chaseTiles();
-      if (random() < c.P.feint) goal = pickOne(tiles);
+      if (G.decoy) { goal = { x: G.decoy.x, y: G.decoy.y }; c.reroll = G.decoy.t; }
+      else if (random() < c.P.feint) goal = pickOne(tiles);
       else {
         let best = -1;
         for (const f of tiles) {
@@ -70,6 +74,8 @@ export function updChase(dt: number): void {
         if (random() < 0.35 && !obstacleAt(p.tx, p.ty) && G.obstacles.length < 12) G.obstacles.push({ x: p.tx, y: p.ty, type: 'bag' });
         stepTo(p, n.x, n.y, bag ? Math.round(base * 1.9) : base);
         if (bag) p.jump = true;
+        const peel = G.peels.findIndex((q) => q.x === n.x && q.y === n.y);
+        if (peel >= 0) { G.peels.splice(peel, 1); p.stunT = 1500 + p.ms; toast(L.peel_slip, 1200); sfx('smash'); }
       }
     }
   }
@@ -106,7 +112,7 @@ export function gainXp(n: number): void {
 export function endChase(caught: boolean): void {
   const c = G.chase; if (!c) return;
   const p = c.perv;
-  G.chase = null; G.obstacles = []; G.ball = null; music.play('store');
+  G.chase = null; G.obstacles = []; G.balls = []; G.peels = []; G.decoy = null; G.cartT = 0; p.stunT = 0; music.play('store');
   const inArena = ARENA_TILES.includes(ch(G.player.tx, G.player.ty));
   if (G.arena) closeArena(p, caught);
   if (caught) {
@@ -117,7 +123,8 @@ export function endChase(caught: boolean): void {
     const secs = Math.round(c.t / 1000);
     const mult = streakMult(G.streak) * (p.boss ? 3 : 1);
     gainXp(Math.round((100 + secs * 5) * mult));
-    const yen = Math.round((100 + secs * 20) * mult); G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
+    const yen = Math.round((100 + secs * 20) * mult * (c.charm ? 2 : 1)); G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
+    if (c.charm) toast(L.charm_paid, 1500);
     if (G.streak >= 2) toast(fmt(L.streak, { n: G.streak, m: streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '') }), 1800);
     if (p.boss) { toast(L.boss_caught, 2200); G.bossDone = Math.max(G.bossDone, p.bossId * 5 + 5); G.lastBossLevel = G.bossDone; }
     report({ kind: 'catch', data: { secsLeft: secs, boss: p.boss, byBall: c.byBall, hops: c.hops, inArena, streak: G.streak } }, (y, x) => { G.yen += y; gainXp(x); });
@@ -127,8 +134,8 @@ export function endChase(caught: boolean): void {
   } else {
     G.escapes++; toast(L.escaped, 1800); sfx('escape');
     if (p.boss) G.lastBossLevel = 0; // let him come back
-    if (G.streak >= 2) toast(L.streak_lost, 1600);
-    G.streak = 0;
+    if (G.inv.shield > 0 && G.streak >= 1) { G.inv.shield--; toast(L.shield_used, 1800); }
+    else { if (G.streak >= 2) toast(L.streak_lost, 1600); G.streak = 0; }
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');
   }
 }

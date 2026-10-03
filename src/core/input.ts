@@ -1,6 +1,7 @@
 export type Dir = 'up' | 'down' | 'left' | 'right';
 export const held: Record<Dir, boolean> = { up: false, down: false, left: false, right: false };
-let aPressed = false, bPressed = false;
+let aPressed = false, bPressed = false, selPressed = false;
+export const consumeSel = (): boolean => { const v = selPressed; selPressed = false; return v; };
 let tapDir: Dir | null = null;
 /** A tap on the pad shorter than a frame still yields one step. */
 export const consumeTap = (): Dir | null => { const v = tapDir; tapDir = null; return v; };
@@ -13,6 +14,7 @@ export const pressA = (): void => { aPressed = true; };
 const KEY_DIR: Record<string, Dir> = { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right' };
 const KEY_A = ['KeyZ', 'Space', 'Enter', 'KeyJ'];
 const KEY_B = ['KeyX', 'ShiftLeft', 'ShiftRight', 'KeyK'];
+const KEY_SEL = ['KeyC', 'Tab', 'KeyL'];
 
 export function initKeyboard(onDigit?: (n: number) => void): void {
   window.addEventListener('keydown', (e) => {
@@ -20,6 +22,7 @@ export function initKeyboard(onDigit?: (n: number) => void): void {
     const d = KEY_DIR[e.code]; if (d) { held[d] = true; e.preventDefault(); }
     if (KEY_A.includes(e.code)) { if (!e.repeat) aPressed = true; e.preventDefault(); }
     if (KEY_B.includes(e.code)) { if (!e.repeat) bPressed = true; e.preventDefault(); }
+    if (KEY_SEL.includes(e.code)) { if (!e.repeat) selPressed = true; e.preventDefault(); }
     if (onDigit && /^Digit[1-3]$/.test(e.code)) onDigit(Number(e.code.slice(5)) - 1);
   });
   window.addEventListener('keyup', (e) => { const d = KEY_DIR[e.code]; if (d) held[d] = false; });
@@ -27,9 +30,9 @@ export function initKeyboard(onDigit?: (n: number) => void): void {
 }
 
 /** Touch pad: hold-to-move buttons. Each button tracks its own pointer so two thumbs work. */
-export function bindPad(el: HTMLElement, what: Dir | 'a' | 'b'): void {
-  const on = (e: PointerEvent) => { e.preventDefault(); el.setPointerCapture?.(e.pointerId); if (what === 'a') aPressed = true; else if (what === 'b') bPressed = true; else { held[what] = true; tapDir = what; } el.classList.add('on'); };
-  const off = (e: PointerEvent) => { e.preventDefault(); if (what !== 'a' && what !== 'b') held[what] = false; el.classList.remove('on'); };
+export function bindPad(el: HTMLElement, what: Dir | 'a' | 'b' | 'sel'): void {
+  const on = (e: PointerEvent) => { e.preventDefault(); el.setPointerCapture?.(e.pointerId); if (what === 'a') aPressed = true; else if (what === 'b') bPressed = true; else if (what === 'sel') selPressed = true; else { held[what] = true; tapDir = what; } el.classList.add('on'); };
+  const off = (e: PointerEvent) => { e.preventDefault(); if (what !== 'a' && what !== 'b' && what !== 'sel') held[what] = false; el.classList.remove('on'); };
   el.addEventListener('pointerdown', on);
   el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
   el.addEventListener('contextmenu', (e) => e.preventDefault());
