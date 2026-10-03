@@ -54,7 +54,7 @@ export interface Game {
   catches: number; escapes: number; level: number; xp: number; pendingLevel: number; stats: Stats;
   yen: number; inv: Inv; floor: number; elevOpen: boolean;
   tutorial: boolean; tut: Tut; freeze: number; stamp: { t: number; txt: string } | null; shake: number;
-  spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
+  spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number; map: number } | null;
   totalCatches: number; costume: number; mapIndex: number;
   /** Purchased cosmetic ids and the one being worn (null = earned look). */
   wardrobe: string[]; wearing: string | null; aura: string | null; trail: string | null;

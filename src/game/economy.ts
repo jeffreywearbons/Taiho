@@ -1,5 +1,6 @@
 import { G, type Inv, type ItemKey } from './state';
 import { api } from './api';
+import { weekKey } from './week';
 import { saveProfile } from './profile';
 
 /** The register catalog. Prices are steep on purpose: an item should take several catches to earn. */
@@ -56,27 +57,30 @@ export const priceOf = (k: ItemKey): number => CATALOG.find((c) => c.key === k)!
 
 /** The build a player shows off on the ranking. Sprite ids, not display names, so each viewer sees it in their language. */
 export type Card = { sprite: string; aura: string | null; trail: string | null; total: number; streak: number; maps: number; stats: [number, number, number] };
-export type ScoreRow = { name: string; catches: number; level: number; lang: string; ts: number; card?: Card };
+export type ScoreRow = { name: string; catches: number; level: number; lang: string; ts: number; card?: Card; map: number; week: string };
+/** Which board to read: one map, this week (a week key) or all time (null). */
+export type BoardQuery = { map: number; week: string | null };
 
 /** Leaderboard storage. Local for now; a remote backend drops in behind the same interface. */
-export interface Leaderboard { top(n: number): Promise<ScoreRow[]>; submit(row: ScoreRow): Promise<boolean>; readonly shared: boolean; }
+export interface Leaderboard { top(n: number, q: BoardQuery): Promise<ScoreRow[]>; submit(row: ScoreRow): Promise<boolean>; readonly shared: boolean; }
 
+const byScore = (a: ScoreRow, b: ScoreRow): number => b.catches - a.catches || a.ts - b.ts;
 export class LocalLeaderboard implements Leaderboard {
   readonly shared = false;
-  private read(): ScoreRow[] { try { return JSON.parse(localStorage.getItem('taiho_board') || '[]'); } catch { return []; } }
-  async top(n: number): Promise<ScoreRow[]> { return this.read().sort((a, b) => b.catches - a.catches).slice(0, n); }
+  private read(): ScoreRow[] { try { return (JSON.parse(localStorage.getItem('taiho_board') || '[]') as ScoreRow[]).map((r) => ({ ...r, map: r.map ?? 0, week: r.week ?? weekKey(r.ts) })); } catch { return []; } }
+  async top(n: number, q: BoardQuery): Promise<ScoreRow[]> { return this.read().filter((r) => r.map === q.map && (q.week === null || r.week === q.week)).sort(byScore).slice(0, n); }
   async submit(row: ScoreRow): Promise<boolean> {
-    try { const b = this.read(); b.push(row); b.sort((a, c) => c.catches - a.catches); localStorage.setItem('taiho_board', JSON.stringify(b.slice(0, 50))); return true; } catch { return false; }
+    try { const b = this.read(); b.push(row); b.sort(byScore); localStorage.setItem('taiho_board', JSON.stringify(b.slice(0, 200))); return true; } catch { return false; }
   }
 }
 /** Uses the Worker when the build has an API URL; otherwise, or when the network fails, the device-local board. */
 export class RemoteLeaderboard implements Leaderboard {
   private local = new LocalLeaderboard();
   shared = api.enabled;
-  async top(n: number): Promise<ScoreRow[]> {
-    const r = await api.topScores(n);
-    if (r && r.rows) { this.shared = true; return r.rows.map((x) => ({ name: x.name, catches: x.catches, level: x.level, lang: x.lang, ts: x.ts, card: (x.card as Card | null) ?? undefined })); }
-    this.shared = false; return this.local.top(n);
+  async top(n: number, q: BoardQuery): Promise<ScoreRow[]> {
+    const r = await api.topScores(n, q.map, q.week ?? 'all');
+    if (r && r.rows) { this.shared = true; return r.rows.map((x) => ({ name: x.name, catches: x.catches, level: x.level, lang: x.lang, ts: x.ts, card: (x.card as Card | null) ?? undefined, map: x.map ?? q.map, week: x.week ?? weekKey(x.ts) })); }
+    this.shared = false; return this.local.top(n, q);
   }
   async submit(row: ScoreRow): Promise<boolean> {
     await this.local.submit(row);

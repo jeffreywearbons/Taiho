@@ -34,7 +34,7 @@ Portrait first. On phones the viewport is a scrolling window of about 15 by 15 t
 
 ## Backend (optional)
 
-`worker/` holds a Cloudflare Worker + D1 for the shared Time Attack ranking and cloud saves. Without it the game keeps everything on the device. See `worker/README.md`; build the game with `VITE_API_URL=https://...` to enable it.
+`worker/` holds a Cloudflare Worker + D1 for the shared Time Attack rankings (one board per floor, this week and all time; weeks reset Monday 00:00 UTC) and cloud saves. Without it the game keeps everything on the device. See `worker/README.md`; build the game with `VITE_API_URL=https://...` to enable it.
 
 Career progress (level, stats, yen, items, total catches, unlocked maps) persists on the device and syncs to the cloud when the API is configured. "Reset save" on the title screen erases it after a confirming tap.
 

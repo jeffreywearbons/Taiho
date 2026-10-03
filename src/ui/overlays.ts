@@ -2,7 +2,8 @@ import { G } from '../game/state';
 import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
-import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, isExclusive, type ScoreRow } from '../game/economy';
+import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, isExclusive, type ScoreRow, type BoardQuery } from '../game/economy';
+import { weekKey, weekEndsIn } from '../game/week';
 import { wear, wornOf, heroSprite } from '../game/costume';
 import { allSets, buySet, hasSet, restorePurchases } from '../game/purchases';
 import { api, sessionToken } from '../game/api';
@@ -19,7 +20,7 @@ export const $ = <T extends HTMLElement = HTMLElement>(id: string): T => documen
 
 export function applyStrings(): void {
   $('t-title').textContent = L.title; $('t-sub').textContent = L.sub; $('b-start').textContent = L.start;
-  $('b-time').textContent = L.mode_time; $('b-rank').textContent = L.rank; $('b-lang').textContent = L.lang;
+  $('b-time').textContent = L.mode_time; $('b-rank').textContent = L.rank; $('b-book').textContent = L.book; $('b-lang').textContent = L.lang;
   $('b-tut').textContent = L.tut + (G.tutorial ? L.on : L.off); $('t-keys').textContent = L.keys;
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
@@ -141,24 +142,56 @@ export function openEnd(): void {
 }
 
 // ---- time attack result + ranking ----
+const fmtLeft = (ms: number): string => { const h = Math.floor(ms / 3600000); return h >= 48 ? `${Math.floor(h / 24)}d` : h >= 1 ? `${h}h` : `${Math.max(1, Math.floor(ms / 60000))}m`; };
+const board: BoardQuery = { map: 0, week: weekKey() };
+function boardSub(q: BoardQuery): string {
+  const m = MAPS[q.map]?.name[lang] ?? `#${q.map + 1}`;
+  return q.week ? fmt(L.board_week, { m, w: Number(q.week.slice(-2)), d: fmtLeft(weekEndsIn()) }) : fmt(L.board_all, { m });
+}
 function renderBoard(listEl: HTMLElement, titleEl: HTMLElement, rows: ScoreRow[]): void {
   titleEl.textContent = leaderboard.shared ? L.board_shared : L.board_local; listEl.innerHTML = '';
   if (!rows.length) { const li = document.createElement('li'); li.textContent = L.board_empty; li.className = 'empty'; listEl.appendChild(li); return; }
   rows.forEach((r, i) => { const li = document.createElement('li'); const n = document.createElement('span'); n.textContent = `${i + 1}. ${String(r.name || '???').slice(0, 12)}` + (r.card ? ' ▸' : ''); const c = document.createElement('b'); c.textContent = String(r.catches); li.append(n, c); if (r.card) { li.className = 'has-card'; li.onclick = () => openCard(String(r.name || '???'), r.card!, r); } listEl.appendChild(li); });
 }
-export async function openBoard(id: 'rank' | 'result'): Promise<void> { $(id).hidden = false; renderBoard($(id + '-list'), $(id + '-title'), await leaderboard.top(10)); }
+function renderRankTabs(): void {
+  const maps = $('rank-maps'); maps.innerHTML = '';
+  MAPS.forEach((m, i) => { const b = document.createElement('button'); b.textContent = m.name[lang]; b.className = i === board.map ? 'on' : ''; b.onclick = () => { board.map = i; void openBoard('rank'); }; maps.appendChild(b); });
+  const span = $('rank-span'); span.innerHTML = '';
+  ([[L.tab_week, weekKey()], [L.tab_all, null]] as [string, string | null][]).forEach(([t, w]) => { const b = document.createElement('button'); b.textContent = t; b.className = board.week === w ? 'on' : ''; b.onclick = () => { board.week = w; void openBoard('rank'); }; span.appendChild(b); });
+  $('rank-sub').textContent = boardSub(board);
+}
+/** The ranking screen shows one map at a time, this week or all time; the result screen shows the floor just played, this week. */
+export async function openBoard(id: 'rank' | 'result'): Promise<void> {
+  $(id).hidden = false;
+  const q: BoardQuery = id === 'rank' ? board : { map: G.lastRun?.map ?? G.mapIndex, week: weekKey() };
+  if (id === 'rank') renderRankTabs();
+  const listEl = $(id + '-list'); listEl.innerHTML = '';
+  const rows = await leaderboard.top(10, q);
+  // a slower response must not overwrite a newer tab choice
+  if (id === 'rank' && (q.map !== board.map || q.week !== board.week)) return;
+  renderBoard(listEl, $(id + '-title'), rows);
+  if (id === 'result') $('result-title').textContent += '  ·  ' + boardSub(q);
+}
 export function openResult(): void {
-  G.scene = 'result'; G.lastRun = { catches: G.catches, level: G.level };
+  G.scene = 'result'; G.lastRun = { catches: G.catches, level: G.level, map: G.mapIndex };
   $('res-title').textContent = L.res_title; $('res-body').textContent = fmt(L.res_body, { c: G.catches }); $('res-msg').textContent = '';
   $<HTMLButtonElement>('b-submit').disabled = false; const nm = $<HTMLInputElement>('name'); nm.disabled = false;
   try { nm.value = localStorage.getItem('taiho_name') || ''; } catch { /* ignore */ }
   $('result').hidden = false; sfx('level'); void openBoard('result');
+}
+/** Time Attack asks which floor when more than one is open; each floor has its own board. */
+export function openTimePick(start: (map: number) => void): void {
+  const open = unlockedMaps(); if (open <= 1) { start(0); return; }
+  $('tmap-title').textContent = L.tmap_title; $('tmap-body').textContent = L.tmap_body; $('b-tmap-close').textContent = L.close;
+  const box = $('tmap-maps'); box.innerHTML = '';
+  MAPS.forEach((m, i) => { if (i >= open) return; const b = document.createElement('button'); b.className = 'map'; b.textContent = `${i + 1}. ${m.name[lang]}`; b.onclick = () => { $('tmap').hidden = true; start(i); }; box.appendChild(b); });
+  $('tmap').hidden = false; sfx('blip');
 }
 export async function submitScore(): Promise<void> {
   const nm = $<HTMLInputElement>('name'); const name = (nm.value || '').trim().slice(0, 12);
   if (!name || !G.lastRun) { nm.focus(); return; }
   try { localStorage.setItem('taiho_name', name); } catch { /* ignore */ }
   $<HTMLButtonElement>('b-submit').disabled = true; nm.disabled = true;
-  await leaderboard.submit({ name, catches: G.lastRun.catches, level: G.lastRun.level, lang, ts: Date.now(), card: myCard() });
-  $('res-msg').textContent = L.saved; sfx('catch'); renderBoard($('result-list'), $('result-title'), await leaderboard.top(10));
+  const ts = Date.now(); await leaderboard.submit({ name, catches: G.lastRun.catches, level: G.lastRun.level, lang, ts, card: myCard(), map: G.lastRun.map, week: weekKey(ts) });
+  $('res-msg').textContent = L.saved; sfx('catch'); void openBoard('result');
 }

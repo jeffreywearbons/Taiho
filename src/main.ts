@@ -13,12 +13,13 @@ import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/i
 import { setLang, detectLang, lang, L } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
-import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe } from './ui/overlays';
+import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe, openTimePick } from './ui/overlays';
 import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
 import { openLink, wireLink } from './ui/link';
 import { openCalendar, wireCalendar } from './ui/calendar';
+import { wireBook } from './ui/book';
 import { openPass, wirePass } from './ui/pass';
 import { wireOffer } from './ui/offer';
 import { syncEntitlements } from './game/purchases';
@@ -40,7 +41,8 @@ function wire(): void {
   setLang(detectLang()); applyStrings();
   $('b-start').onclick = () => startGame('story', 0);
   setMapPick((i) => startGame('story', i));
-  $('b-time').onclick = () => startGame('time');
+  $('b-time').onclick = () => openTimePick((i) => startGame('time', i));
+  $('b-tmap-close').onclick = () => { $('tmap').hidden = true; };
   $('b-rank').onclick = () => { void openBoard('rank'); };
   $('b-rank-close').onclick = () => { $('rank').hidden = true; };
   $('b-lang').onclick = () => { setLang(lang === 'en' ? 'ja' : 'en'); applyStrings(); };
@@ -54,6 +56,7 @@ function wire(): void {
   wireLink(); wireCalendar(); wirePass(); wireOffer();
   $('b-pass').onclick = () => openPass();
   $('b-cal').onclick = () => openCalendar(false);
+  wireBook(() => { if (G.scene === 'title') applyProfile(loadProfile()); });
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };
@@ -61,7 +64,7 @@ function wire(): void {
   $('b-end').onclick = () => { $('end').hidden = true; nextFloor(); };
   $('b-shop-close').onclick = () => closeShop();
   $('b-submit').onclick = () => { void submitScore(); };
-  $('b-again').onclick = () => startGame('time');
+  $('b-again').onclick = () => startGame('time', G.lastRun?.map ?? 0);
   $('b-back').onclick = () => { $('result').hidden = true; $('title').hidden = false; G.scene = 'title'; };
   initKeyboard(choosePick);
   // "Install app": Android/desktop Chrome fire beforeinstallprompt; iOS Safari needs the Share menu, so show a hint there.

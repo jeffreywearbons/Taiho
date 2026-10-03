@@ -1,6 +1,6 @@
 # taiho-api
 
-Cloudflare Worker + D1 for the shared Time Attack ranking and cloud saves. Free tier covers a small game comfortably.
+Cloudflare Worker + D1 for the shared Time Attack rankings (weekly and all-time, per map) and cloud saves. Free tier covers a small game comfortably.
 
 ## Deploy once
 
@@ -11,7 +11,8 @@ npx wrangler login
 npm run db:create            # prints a database_id; paste it into wrangler.toml
 npm run db:init              # creates the tables
 npm run deploy               # prints https://taiho-api.<you>.workers.dev
-# existing databases created before player cards: npx wrangler d1 execute taiho --remote --file=./migrate-001-card.sql
+# existing databases: apply the migrate-00N-*.sql files you have not run yet, in order, e.g.
+# npx wrangler d1 execute taiho --remote --file=./migrate-004-weekly.sql
 ```
 
 Then build the game with the API URL:

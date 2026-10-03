@@ -27,8 +27,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T | null> {
 export const api = {
   enabled: !!BASE,
   device: deviceId,
-  topScores: (limit = 10) => call<{ rows: { name: string; catches: number; level: number; lang: string; ts: number; card?: unknown }[] }>(`/api/scores?limit=${limit}`),
-  postScore: (row: { name: string; catches: number; level: number; lang: string; card?: unknown }) => call<{ ok: true }>('/api/scores', { method: 'POST', body: JSON.stringify({ ...row, device: deviceId() }) }),
+  topScores: (limit = 10, map = 0, week: string = 'all') => call<{ rows: { name: string; catches: number; level: number; lang: string; ts: number; card?: unknown; map?: number; week?: string }[] }>(`/api/scores?limit=${limit}&map=${map}&week=${encodeURIComponent(week)}`),
+  postScore: (row: { name: string; catches: number; level: number; lang: string; card?: unknown; map: number }) => call<{ ok: true }>('/api/scores', { method: 'POST', body: JSON.stringify({ ...row, device: deviceId() }) }),
   getSave: <T>() => (sessionToken() ? call<{ data: T; ts: number }>('/api/save') : call<{ data: T; ts: number; linked?: boolean }>(`/api/save/${deviceId()}`)),
   putSave: <T>(data: unknown) => (sessionToken() ? call<{ ok: true; ts: number; kept: 'incoming' | 'existing'; data?: T }>('/api/save', { method: 'PUT', body: JSON.stringify(data) }) : call<{ ok: true; ts: number; kept: 'incoming' | 'existing'; data?: T }>(`/api/save/${deviceId()}`, { method: 'PUT', body: JSON.stringify(data) })),
   signIn: (provider: 'apple' | 'google', idToken: string) => call<{ token: string; account: string }>(`/api/auth/${provider}`, { method: 'POST', body: JSON.stringify({ id_token: idToken, device: deviceId() }) }),

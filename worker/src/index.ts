@@ -8,19 +8,21 @@
  *                   GET  /api/me                          (Bearer) -> { account, provider, devices }
  *                   GET/PUT /api/save                     (Bearer) account save; PUT merges: more career catches wins
  *                   POST /api/auth/logout                 (Bearer)
- * Ranking:          GET  /api/scores?limit=10             best entry per account/device
- *                   POST /api/scores                      { name, catches, level, lang, device, card }, Bearer optional
+ * Ranking:          GET  /api/scores?limit=10&map=0&week=2026-W40   best entry per account/device on that map; week=all for all time, omit for this week
+ *                   POST /api/scores                      { name, catches, level, lang, device, card, map }, Bearer optional; the server stamps the week
  *
  * Saves are keyed by owner: "d:<device>" before linking, "a:<account>" after. Linking moves the
  * device save onto the account with the merge rule, so nothing is lost in either direction.
  */
 import { verifyIdToken, APPLE, GOOGLE } from './jwt';
 import { createCheckout, verifyStripeSignature } from './stripe';
+import { weekKey } from './week';
 
 export interface Env { DB: D1Database; ALLOWED_ORIGIN: string; APPLE_AUDIENCES?: string; GOOGLE_AUDIENCES?: string; STRIPE_SECRET?: string; STRIPE_WEBHOOK_SECRET?: string; STRIPE_PRICES?: string; REVENUECAT_WEBHOOK_SECRET?: string }
-const SET_IDS = ['starter', 'konbini', 'police', 'shonen', 'trainer', 'darkknight', 'auras', 'trails', 'everything'];
+const SET_IDS = ['starter', 'konbini', 'police', 'shonen', 'trainer', 'darkknight', 'auras', 'trails', 'everything', 'pass_s1'];
 
 const DEVICE = /^[A-Za-z0-9_-]{8,64}$/;
+const WEEK = /^\d{4}-W\d{2}$/;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L
 
 const json = (data: unknown, status = 200, origin = '*'): Response =>
@@ -98,22 +100,28 @@ export default {
       // ---- ranking ----
       if (path === '/api/scores' && req.method === 'GET') {
         const limit = Math.max(1, Math.min(50, Number(url.searchParams.get('limit') || 10)));
-        // best entry per owner (account when linked, else device)
-        const r = await env.DB.prepare(`SELECT name, catches, level, lang, ts, card FROM scores s WHERE s.id = (SELECT id FROM scores t WHERE COALESCE(t.account, t.device) = COALESCE(s.account, s.device) ORDER BY catches DESC, ts ASC LIMIT 1) ORDER BY catches DESC, ts ASC LIMIT ?`).bind(limit).all<{ card: string | null }>();
+        const map = Math.max(0, Math.min(99, Number(url.searchParams.get('map') || 0) || 0));
+        // week: an ISO key, "all" for all time, or omitted for the current week
+        const wk = url.searchParams.get('week') || weekKey();
+        const week = wk === 'all' ? null : WEEK.test(wk) ? wk : weekKey();
+        // best entry per owner (account when linked, else device) within the map and week
+        const where = 'map = ?' + (week ? ' AND week = ?' : '');
+        const args = week ? [map, week, map, week, limit] : [map, map, limit];
+        const r = await env.DB.prepare(`SELECT name, catches, level, lang, ts, card, map, week FROM scores s WHERE ${where} AND s.id = (SELECT id FROM scores t WHERE ${where} AND COALESCE(t.account, t.device) = COALESCE(s.account, s.device) ORDER BY catches DESC, ts ASC LIMIT 1) ORDER BY catches DESC, ts ASC LIMIT ?`).bind(...args).all<{ card: string | null }>();
         const rows = r.results.map((row) => { let card: unknown = null; try { card = row.card ? JSON.parse(row.card) : null; } catch { card = null; } return { ...row, card }; });
-        return json({ rows }, 200, origin);
+        return json({ rows, week: week ?? 'all', map }, 200, origin);
       }
       if (path === '/api/scores' && req.method === 'POST') {
         const b = await body();
         const name = String(b.name ?? '').trim().slice(0, 12);
-        const catches = Number(b.catches), level = Number(b.level), device = String(b.device ?? '');
+        const catches = Number(b.catches), level = Number(b.level), device = String(b.device ?? ''), map = Number(b.map ?? 0);
         const lang = b.lang === 'ja' ? 'ja' : 'en';
-        if (!name || !Number.isInteger(catches) || catches < 0 || catches > 200 || !Number.isInteger(level) || level < 1 || level > 999 || !DEVICE.test(device)) return json({ error: 'invalid' }, 400, origin);
+        if (!name || !Number.isInteger(catches) || catches < 0 || catches > 200 || !Number.isInteger(level) || level < 1 || level > 999 || !Number.isInteger(map) || map < 0 || map > 99 || !DEVICE.test(device)) return json({ error: 'invalid' }, 400, origin);
         const now = Date.now();
         const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM scores WHERE device = ? AND ts > ?').bind(device, now - 60_000).first<{ n: number }>();
         if ((recent?.n ?? 0) >= 5) return json({ error: 'slow down' }, 429, origin);
         const account = (await auth(env, req)) ?? (await env.DB.prepare('SELECT account FROM devices WHERE device = ?').bind(device).first<{ account: string }>())?.account ?? null;
-        await env.DB.prepare('INSERT INTO scores (name, catches, level, lang, device, account, ts, card) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(name, catches, level, lang, device, account, now, sanitizeCard(b.card)).run();
+        await env.DB.prepare('INSERT INTO scores (name, catches, level, lang, device, account, ts, card, map, week) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(name, catches, level, lang, device, account, now, sanitizeCard(b.card), map, weekKey(now)).run();
         return json({ ok: true }, 201, origin);
       }
       // ---- anonymous saves ----

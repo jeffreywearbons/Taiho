@@ -26,6 +26,7 @@
           <button id="b-rank">RANKING</button>
           <button id="b-wardrobe">WARDROBE</button>
           <button id="b-mycard">MY CARD</button>
+          <button id="b-book">COLLECTION</button>
           <button id="b-cal">DAILY CHECK-IN</button>
           <button id="b-pass">SEASON PASS</button>
           <button id="b-link">LINK SAVE</button>
@@ -140,9 +141,28 @@
         <div class="menu"><button id="b-again">PLAY AGAIN</button><button id="b-back">TITLE</button></div>
       </div>
     </div>
+    <div id="tmap" class="overlay" hidden>
+      <div class="card">
+        <h2 id="tmap-title">Time Attack</h2>
+        <p id="tmap-body" class="small"></p>
+        <div id="tmap-maps" class="maps"></div>
+        <div class="menu"><button id="b-tmap-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="book" class="overlay" hidden>
+      <div class="card shop">
+        <h2 id="book-title">Collection</h2>
+        <p id="book-sum" class="small"></p>
+        <div id="book-list"></div>
+        <div class="menu"><button id="b-book-close">CLOSE</button></div>
+      </div>
+    </div>
     <div id="rank" class="overlay" hidden>
       <div class="card">
         <h3 id="rank-title" class="bt">Ranking</h3>
+        <div id="rank-maps" class="maps tabs"></div>
+        <div id="rank-span" class="maps tabs"></div>
+        <p id="rank-sub" class="small"></p>
         <ol id="rank-list" class="board"></ol>
         <div class="menu"><button id="b-rank-close">CLOSE</button></div>
       </div>

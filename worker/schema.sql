@@ -7,9 +7,12 @@ CREATE TABLE IF NOT EXISTS scores (
   device TEXT NOT NULL,
   account TEXT,
   ts INTEGER NOT NULL,
-  card TEXT
+  card TEXT,
+  map INTEGER NOT NULL DEFAULT 0,   -- map index the run was played on
+  week TEXT NOT NULL DEFAULT ''     -- ISO week key, e.g. 2026-W40, set by the server
 );
 CREATE INDEX IF NOT EXISTS scores_catches ON scores (catches DESC, ts ASC);
+CREATE INDEX IF NOT EXISTS scores_map_week ON scores (map, week, catches DESC, ts ASC);
 CREATE INDEX IF NOT EXISTS scores_device_ts ON scores (device, ts);
 CREATE INDEX IF NOT EXISTS scores_account ON scores (account);
 
