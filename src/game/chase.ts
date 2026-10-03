@@ -5,7 +5,9 @@ import { CHASE_MS } from './const';
 import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
 import { random, pick } from '../core/rng';
-import { ch, entAt, obstacleAt, updMove, stepTo, randFloor, toast, manh } from './world';
+import { ch, entAt, obstacleAt, updMove, stepTo, toast, manh, chaseFloor, chaseTiles } from './world';
+import { ARENA_TILES } from './maps';
+import { pick as pickOne } from '../core/rng';
 import { bfs, distMap } from './path';
 import { L, fmt } from '../i18n';
 import { sfx, music } from '../core/audio';
@@ -19,6 +21,7 @@ export function startChase(p: Ent): void {
   G.chase = { perv: p, t: CHASE_MS, reroll: 0, obsT: 0, P, juice: false, vita: false };
   if (G.inv.juice > 0) { G.inv.juice--; G.chase.juice = true; toast(L.used_juice, 1500); }
   if (G.inv.vita > 0) { G.inv.vita--; G.chase.vita = true; toast(L.used_vita, 1500); }
+  if (cur.arena) { G.arena = true; G.arenaT = 0; toast(L.arena_open, 2000); }
   if (G.tutorial && p.scripted) tutBox('t7');
   sfx('chase'); music.play('chase');
 }
@@ -31,9 +34,9 @@ export function updChase(dt: number): void {
   c.reroll -= dt;
   // the perv obeys the same rules as the player: shelves, boxes and shoppers block him; bags must be hopped
   const walk = (x: number, y: number): boolean => {
-    if (ch(x, y) !== '.') return false;
+    if (!chaseFloor(x, y)) return false;
     if (G.player.tx === x && G.player.ty === y) return false;
-    const o = obstacleAt(x, y); if (o && o.type === 'box') return false;
+    const o = obstacleAt(x, y); if (o && o.type !== 'bag') return false;
     if (entAt(x, y, p)) return false;
     return true;
   };
@@ -42,10 +45,11 @@ export function updChase(dt: number): void {
       c.reroll = c.P.rerollSec * 1000;
       const dm = distMap(G.player.tx, G.player.ty, walk);
       let goal = null as { x: number; y: number } | null;
-      if (random() < c.P.feint) goal = randFloor();
+      const tiles = chaseTiles();
+      if (random() < c.P.feint) goal = pickOne(tiles);
       else {
         let best = -1;
-        for (const f of G.floorTiles) {
+        for (const f of tiles) {
           const d = dm[f.y * dims.w + f.x]; if (d < 0) continue;
           const dp = Math.abs(f.x - p.tx) + Math.abs(f.y - p.ty);
           const score = d - 0.35 * dp + random() * 2;
@@ -70,10 +74,26 @@ export function updChase(dt: number): void {
   c.obsT -= dt;
   if (c.obsT <= 0 && G.obstacles.length < 12) {
     c.obsT = c.P.obsRate * 1000 * 1.5;
-    const cands = G.floorTiles.filter((f) => Math.abs(f.x - p.tx) <= 3 && Math.abs(f.y - p.ty) <= 3 && !(f.x === G.player.tx && f.y === G.player.ty) && !obstacleAt(f.x, f.y) && !(f.x === p.tx && f.y === p.ty) && !entAt(f.x, f.y));
-    if (cands.length) { const f = pick(cands); const box = (G.level >= 3 || cur.obstacleTier >= 1) && random() < 0.35; G.obstacles.push({ x: f.x, y: f.y, type: box ? 'box' : 'bag' }); }
+    const cands = chaseTiles().filter((f) => Math.abs(f.x - p.tx) <= 3 && Math.abs(f.y - p.ty) <= 3 && !(f.x === G.player.tx && f.y === G.player.ty) && !obstacleAt(f.x, f.y) && !(f.x === p.tx && f.y === p.ty) && !entAt(f.x, f.y));
+    if (cands.length) {
+      const f = pick(cands); const r = random();
+      const type = cur.obstacleTier >= 2 && r < 0.25 ? 'crate' : (G.level >= 3 || cur.obstacleTier >= 1) && r < 0.55 ? 'box' : 'bag';
+      G.obstacles.push({ x: f.x, y: f.y, type });
+    }
   }
   if (!G.player.moving && !p.moving && manh(p, G.player) === 0) endChase(true);
+}
+
+/** Shut the back halls: anyone still inside is moved to the nearest shop floor tile. */
+function closeArena(p: Ent, caught: boolean): void {
+  G.arena = false;
+  const inArena = (e: Ent) => ARENA_TILES.includes(ch(e.tx, e.ty));
+  if (inArena(G.player)) {
+    const path = bfs(G.player.tx, G.player.ty, (x, y) => ch(x, y) === '.', (x, y) => ch(x, y) === '.' || ARENA_TILES.includes(ch(x, y)));
+    const dest = path && path.length ? path[path.length - 1] : cur.start;
+    const P = G.player; P.tx = dest.x; P.ty = dest.y; P.px = dest.x * 16; P.py = dest.y * 16; P.moving = false;
+  }
+  if (!caught && inArena(p)) { p.dead = true; }
 }
 
 export function gainXp(n: number): void {
@@ -85,6 +105,7 @@ export function endChase(caught: boolean): void {
   const c = G.chase; if (!c) return;
   const p = c.perv;
   G.chase = null; G.obstacles = []; G.ball = null; music.play('store');
+  if (G.arena) closeArena(p, caught);
   if (caught) {
     p.dead = true; G.catches++; G.totalCatches++;
     sfx('catch'); haptic(60);

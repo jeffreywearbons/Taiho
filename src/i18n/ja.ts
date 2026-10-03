@@ -7,7 +7,7 @@ const ja: Strings = {
   keys: 'やじるし / WASD で いどう。 Z, スペース, Enter = A。 X か Shift = B (なげる)。',
   hud_caught: 'タイホ', hud_lv: 'Lv', hud_timer: 'のこり', hud_time: 'のこり',
   notyet: 'まだだ。あかい マークを まて。', caught: 'タイホ!!', escaped: 'ニゲラレタ…', levelup: 'レベルアップ!',
-  elev: 'エレベーターが あいた!', bail: 'きづかれた!', heavy: 'おもい! パワー1が ひつよう。', smash: 'ドカッ!', suit: 'ヒーロースーツ かいきん!',
+  elev: 'エレベーターが あいた!', bail: 'きづかれた!', heavy: 'おもい! パワー{n}が ひつよう。', arena_open: 'うらの つうろが あいた!', smash: 'ドカッ!', suit: 'ヒーロースーツ かいきん!',
   pick_title: 'レベルアップ! ステータスを えらべ', stat: ['スピード', 'カンサツ', 'パワー'],
   statd: ['はやく うごける', 'マークが とおくから みえる', 'はこを こわせる'], confirm: 'きめる',
   end_title: '{m} クリア!', end_body: 'エレベーターで {m}へ。\nひろい フロア、おおい ヘンタイ、おもい しょうがいぶつ。', end_body_last: 'いまは ここが さいじょうかい。\nエレベーターで うりばが かわる。', end_btn: 'つぎの フロアへ', locked: 'ロック', maps_title: 'ジャンプ',

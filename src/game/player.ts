@@ -1,8 +1,8 @@
-import { G, playerMs } from './state';
+import { G, playerMs, OBSTACLE_STR } from './state';
 import { TW } from './const';
 import { held, consumeTap } from '../core/input';
 import { sfx } from '../core/audio';
-import { L } from '../i18n';
+import { L, fmt } from '../i18n';
 import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face } from './world';
 import { startChase, endChase } from './chase';
 import { openShop } from '../ui/overlays';
@@ -18,8 +18,9 @@ export function playerAction(): void {
       if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 260); P.jump = true; sfx('jump'); }
       return;
     }
-    if (G.stats.strength >= 1) { G.obstacles = G.obstacles.filter((x) => x !== o); toast(L.smash, 900); sfx('smash'); G.shake = 150; }
-    else toast(L.heavy, 1500);
+    const need = OBSTACLE_STR[o.type];
+    if (G.stats.strength >= need) { G.obstacles = G.obstacles.filter((x) => x !== o); toast(L.smash, 900); sfx('smash'); G.shake = 150; }
+    else { toast(fmt(L.heavy, { n: need }), 1500); sfx('notyet'); }
     return;
   }
   const near = G.ents.filter((e) => e.kind === 'perv' && manh(e, P) === 1);

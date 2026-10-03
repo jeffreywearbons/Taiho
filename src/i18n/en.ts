@@ -7,7 +7,7 @@ const en = {
   keys: 'Arrows / WASD to move.  Z, Space, Enter = A.  X or Shift = B (throw).',
   hud_caught: 'CAUGHT', hud_lv: 'Lv', hud_timer: 'ESCAPE IN', hud_time: 'TIME',
   notyet: 'Not yet. Wait for the red mark.', caught: 'TAIHO!!', escaped: 'He got away...', levelup: 'LEVEL UP!',
-  elev: 'Elevator unlocked!', bail: 'He noticed you!', heavy: 'Too heavy! Needs Strength 1.', smash: 'SMASH!', suit: 'Vigilante suit unlocked!',
+  elev: 'Elevator unlocked!', bail: 'He noticed you!', heavy: 'Too heavy! Needs Strength {n}.', arena_open: 'The back halls are open!', smash: 'SMASH!', suit: 'Vigilante suit unlocked!',
   pick_title: 'Level up! Choose a stat', stat: ['Speed', 'Detection', 'Strength'],
   statd: ['Move faster', 'See marks from further', 'Break boxes in a chase'], confirm: 'CHOOSE',
   end_title: '{m} cleared!', end_body: 'The elevator goes up to the {m}.\nBigger floor, more pervs, heavier obstacles.', end_body_last: 'Top floor for now. The elevator\nreshuffles the aisles.', end_btn: 'NEXT FLOOR', locked: 'locked', maps_title: 'Jump to',

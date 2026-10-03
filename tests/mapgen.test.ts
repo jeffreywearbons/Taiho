@@ -35,3 +35,18 @@ describe('aisle generator', () => {
   });
   it('boutique is bigger with a higher gate', () => { expect(BOUTIQUE.w * BOUTIQUE.h).toBeGreaterThan(KONBINI.w * KONBINI.h); expect(BOUTIQUE.gate).toBeGreaterThan(KONBINI.gate); });
 });
+
+import { DEPT } from '../src/game/maps';
+describe('department store arena', () => {
+  it('has two-tile openings into the back halls and valid chase lanes', () => {
+    reseed(3); const m = genMap(DEPT);
+    const openings = m.map((r, y) => [...r].map((c, x) => (c === 'w' ? [x, y] : null)).filter(Boolean)).flat();
+    expect(openings.length).toBe(4);
+    expect(hasOneWideLane(m, '.aw')).toBeNull();
+    expect(allFloorConnected(m, DEPT.start, '.aw')).toBe(true);
+    expect(allFloorConnected(m, DEPT.start, '.')).toBe(true);
+    // the halls are unreachable while closed
+    const closedReach = (() => { const seen = new Set<string>(); const q = [DEPT.start]; seen.add('13,18'); while (q.length) { const { x, y } = q.shift()!; for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) { const nx = x+dx, ny = y+dy; if (m[ny]?.[nx] !== '.' || seen.has(nx+','+ny)) continue; seen.add(nx+','+ny); q.push({ x: nx, y: ny }); } } return seen; })();
+    expect([...closedReach].some((k) => Number(k.split(',')[0]) >= 28)).toBe(false);
+  });
+});

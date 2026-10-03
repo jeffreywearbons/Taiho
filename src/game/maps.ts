@@ -13,8 +13,10 @@ export interface MapDef {
   tiles: Record<string, string>;
   spawn: Pt; exit: Pt; elev: Pt; start: Pt; doorIn: Pt; doorOut: Pt;
   gate: number; maxNpc: number; targets: number;
-  /** 0: bags only (boxes appear from level 3). 1: boxes from the start. */
+  /** 0: bags only (boxes appear from level 3). 1: boxes from the start. 2: crates too (Strength 2). */
   obstacleTier: number;
+  /** Chases open the 'a' and 'w' tiles (back halls) into the map. */
+  arena?: boolean;
 }
 
 const KONBINI_TILES: Record<string, string> = {
@@ -82,7 +84,45 @@ export const BOUTIQUE: MapDef = {
   gate: 10, maxNpc: 12, targets: 4, obstacleTier: 1,
 };
 
-export const MAPS: readonly MapDef[] = [KONBINI, BOUTIQUE];
+export const DEPT: MapDef = {
+  id: 'dept', name: { en: 'Department Store', ja: 'デパート' }, w: 36, h: 24,
+  frame: [
+    'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+    'WcccccczzccccEVcccczzccccccWaaaaaaaH',
+    'WR.........................WaaaaaaaH',
+    'WC.........................WaaBBaaaH',
+    'WC.........................WaaBBaaaH',
+    'WC.........................WaaaaaaaH',
+    'W..........................waaaaaaaH',
+    'W..........................waaaaaaaH',
+    'W..........................WaaaaaaaH',
+    'W..........................WaaaaaBBH',
+    'W..........................WaaaaaBBH',
+    'W..........................WaaaaaaaH',
+    'W..........................waaaaaaaH',
+    'W..........................waaaaaaaH',
+    'W..........................WaaaaaaaH',
+    'W..........................WBBaaaaaH',
+    'W..........................WBBaaaaaH',
+    'W..........................WaaaaaaaH',
+    'W..........................WaaaaaaaH',
+    'W..........................WaaaaaaaH',
+    'FFFFFFFFYFFFFNFFFFFXFFFFFFFFHHHHHHHH',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+  ],
+  interior: { x0: 4, y0: 4, x1: 24, y1: 17 }, blockTiles: ['c', 's', 'g'], blocks: [7, 10], minBlockTiles: 24,
+  tiles: {
+    W: 'wall_dept', c: 'cosmetics', s: 'shoes', g: 'bags', z: 'escalator', E: 'elevator', V: 'vending', R: 'register_dept', C: 'counter_dept',
+    '.': 'floor_marble', F: 'storefront_dept', N: 'sign_dept', Y: 'door_dept', X: 'door_dept', P: 'pavement', T: 'trash_bins', m: 'entrance_mat',
+    a: 'hall_floor', w: 'arena_door', B: 'stock_shelf', H: 'hall_wall',
+  },
+  spawn: { x: 8, y: 23 }, exit: { x: 19, y: 23 }, elev: { x: 13, y: 1 }, start: { x: 13, y: 18 }, doorIn: { x: 8, y: 20 }, doorOut: { x: 19, y: 20 },
+  gate: 15, maxNpc: 14, targets: 5, obstacleTier: 2, arena: true,
+};
+
+export const MAPS: readonly MapDef[] = [KONBINI, BOUTIQUE, DEPT];
 
 /** The map currently loaded. Modules read dimensions and anchors from here. */
 export let cur: MapDef = KONBINI;
@@ -90,7 +130,9 @@ export const dims = { w: KONBINI.w, h: KONBINI.h };
 export function setMap(i: number): MapDef { cur = MAPS[Math.max(0, Math.min(MAPS.length - 1, i))]; dims.w = cur.w; dims.h = cur.h; return cur; }
 
 /** Tiles an NPC may stop beside to "look at an item". */
-export const ITEM_TILES = 'SODIMVAHRCQUJKL';
+export const ITEM_TILES = 'SODIMVAHRCQUJKLcsgz';
+/** Tiles that become walkable while a chase has the arena open. */
+export const ARENA_TILES = 'aw';
 /** Solid for the player: anything that is not floor (the elevator opens separately). */
 export const isFloor = (c: string): boolean => c === '.';
 

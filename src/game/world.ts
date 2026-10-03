@@ -1,6 +1,6 @@
 import { G, type Ent, type Kind, mk } from './state';
 import { TW, DIRS, type Pt, type Spot } from './const';
-import { cur, dims, ITEM_TILES, setMap } from './maps';
+import { cur, dims, ITEM_TILES, ARENA_TILES, setMap } from './maps';
 import { genMap } from './mapgen';
 import { bfs } from './path';
 import { pick, rnd } from '../core/rng';
@@ -15,8 +15,12 @@ const ty = (e: Pt | Ent) => ('ty' in e ? e.ty : e.y);
 export function solidForPlayer(x: number, y: number): boolean {
   const c = ch(x, y);
   if (c === 'E') return !G.elevOpen;
+  if (ARENA_TILES.includes(c)) return !G.arena;
   return c !== '.';
 }
+/** Floor a chase may run over: the shop, plus the back halls while the arena is open. */
+export const chaseFloor = (x: number, y: number): boolean => { const c = ch(x, y); return c === '.' || (G.arena && ARENA_TILES.includes(c)); };
+export const chaseTiles = (): Pt[] => (G.arena ? G.floorTiles.concat(G.arenaTiles) : G.floorTiles);
 export function solidForNpc(x: number, y: number, leaving: boolean): boolean {
   const c = ch(x, y);
   if (c === 'Y') return leaving;       // IN door: entering only
@@ -28,8 +32,8 @@ export const entAt = (x: number, y: number, except?: Ent): Ent | undefined =>
   G.ents.find((e) => e !== except && e.kind !== 'bonsai' && ((e.tx === x && e.ty === y) || (e.moving && e.to.x === x && e.to.y === y)));
 
 export function rebuildTiles(): void {
-  G.floorTiles = []; G.browseSpots = [];
-  for (let y = 0; y < dims.h; y++) for (let x = 0; x < dims.w; x++) if (ch(x, y) === '.') G.floorTiles.push({ x, y });
+  G.floorTiles = []; G.browseSpots = []; G.arenaTiles = [];
+  for (let y = 0; y < dims.h; y++) for (let x = 0; x < dims.w; x++) { const c = ch(x, y); if (c === '.') G.floorTiles.push({ x, y }); else if (ARENA_TILES.includes(c)) G.arenaTiles.push({ x, y }); }
   for (const f of G.floorTiles) for (const [dx, dy] of DIRS) {
     if (ITEM_TILES.includes(ch(f.x + dx, f.y + dy)) && f.y < cur.doorIn.y - 1) { G.browseSpots.push({ x: f.x, y: f.y, fx: dx, fy: dy }); break; }
   }

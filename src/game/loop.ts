@@ -21,7 +21,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.tutorial = mode === 'time' ? false : $('b-tut').dataset.on === '1';
   G.scene = 'play'; $('title').hidden = true; $('result').hidden = true;
   G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.pendingLevel = 0;
-  G.elevOpen = false; G.chase = null; G.box = null; G.ball = null;
+  G.elevOpen = false; G.chase = null; G.box = null; G.ball = null; G.arena = false;
   G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
   applyProfile(loadProfile());
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
@@ -35,7 +35,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
 export function nextFloor(): void {
   const next = G.mapIndex + 1 < MAPS.length ? G.mapIndex + 1 : G.mapIndex;
   loadLayout(next); refit();
-  G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.ball = null; G.floor++;
+  G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.ball = null; G.arena = false; G.floor++;
   const P = G.player; P.tx = cur.start.x; P.ty = cur.start.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
   G.bonsai.px = P.px - 14; G.bonsai.py = P.py; saveProfile();
   G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor, m: cur.name[lang] }), 2000);
@@ -58,6 +58,7 @@ export function update(dt: number): void {
   if (G.scene !== 'play') return;
   for (const t of G.toasts) t.t -= dt; G.toasts = G.toasts.filter((t) => t.t > 0);
   if (G.shake > 0) G.shake -= dt;
+  if (G.arena) G.arenaT += dt;
   if (G.freeze > 0) {
     clearPresses(); G.freeze -= dt; if (G.stamp) G.stamp.t += dt;
     if (G.freeze <= 0) {

@@ -21,7 +21,10 @@ export interface Ent {
 }
 export type Facing = 'down' | 'up' | 'side';
 
-export type Obstacle = { x: number; y: number; type: 'bag' | 'box' };
+export type ObstacleType = 'bag' | 'box' | 'crate';
+export type Obstacle = { x: number; y: number; type: ObstacleType };
+/** Strength needed to smash each obstacle; bags are hopped instead. */
+export const OBSTACLE_STR: Record<ObstacleType, number> = { bag: 0, box: 1, crate: 2 };
 export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean };
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
@@ -42,6 +45,7 @@ export interface Game {
   tutorial: boolean; tut: Tut; freeze: number; stamp: { t: number; txt: string } | null; shake: number;
   spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
   totalCatches: number; costume: number; mapIndex: number;
+  arena: boolean; arenaT: number; arenaTiles: Pt[];
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -62,7 +66,7 @@ export function newGame(): Game {
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
-    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0,
+    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, arena: false, arenaT: 0, arenaTiles: [],
   };
 }
 

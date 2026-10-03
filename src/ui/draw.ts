@@ -1,6 +1,6 @@
 import { G, detectR, xpNeed, frameName, type Ent } from '../game/state';
 import { TW } from '../game/const';
-import { cur, dims } from '../game/maps';
+import { cur, dims, ARENA_TILES } from '../game/maps';
 import { ch, cheb } from '../game/world';
 import { PERV_ICON } from '../game/ai';
 import { cam } from '../core/camera';
@@ -27,12 +27,21 @@ export function drawWorld(): void {
   const x1 = Math.min(dims.w - 1, Math.ceil((cam.x + vw) / TW)), y1 = Math.min(dims.h - 1, Math.ceil((cam.y + vh) / TW));
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const c = ch(x, y);
+    if (ARENA_TILES.includes(c)) {
+      // back halls: dark until a chase opens them, then fade in
+      const k = G.arena ? Math.min(1, G.arenaT / 450) : 0;
+      ctx.fillStyle = '#0e0e18'; ctx.fillRect(x * TW, y * TW, TW, TW);
+      if (k > 0) { ctx.globalAlpha = k; spr('tile_' + cur.tiles['a'], x * TW, y * TW); if (c === 'w') { ctx.fillStyle = '#ffe066'; ctx.fillRect(x * TW, y * TW + 7, 1, 2); ctx.fillRect(x * TW + 15, y * TW + 7, 1, 2); } ctx.globalAlpha = 1; }
+      else if (c === 'w') spr('tile_' + cur.tiles['w'], x * TW, y * TW);
+      continue;
+    }
+    if (c === 'B' || c === 'H') { const k = G.arena ? Math.min(1, G.arenaT / 450) : 0; ctx.fillStyle = '#0e0e18'; ctx.fillRect(x * TW, y * TW, TW, TW); if (k > 0) { ctx.globalAlpha = k; spr('tile_' + cur.tiles[c], x * TW, y * TW); ctx.globalAlpha = 1; } else if (c === 'H') spr('tile_' + cur.tiles[c], x * TW, y * TW); continue; }
     spr('tile_' + cur.tiles['.'], x * TW, y * TW);
     if (c !== '.') spr('tile_' + (cur.tiles[c] ?? 'wall'), x * TW, y * TW);
     if (c === 'E' && G.elevOpen) { ctx.fillStyle = '#5de36a'; ctx.fillRect(x * TW + 7, y * TW + 1, 2, 2); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(x * TW + 6, y * TW + 4, 4, 10); ctx.fillStyle = '#ffe066'; ctx.fillRect(x * TW + 7, y * TW + 5, 2, 8); }
   }
   otext('IN', cur.doorIn.x * TW + 8, cur.doorIn.y * TW - 4, '#fff', 'center'); otext('OUT', cur.doorOut.x * TW + 8, cur.doorOut.y * TW - 4, '#fff', 'center');
-  for (const o of G.obstacles) spr(o.type === 'bag' ? 'obs_bag' : 'obs_box', o.x * TW, o.y * TW);
+  for (const o of G.obstacles) spr('obs_' + o.type, o.x * TW, o.y * TW);
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;

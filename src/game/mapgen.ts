@@ -2,23 +2,25 @@ import { DIRS, type Pt } from './const';
 import type { MapDef } from './maps';
 import { rint, random } from '../core/rng';
 
+const OPEN_CHASE = '.aw';
+
 /** Rule: every lane is at least two tiles wide. A walkable tile may never be
  *  pinched between solids on both sides, horizontally or vertically. */
-export function hasOneWideLane(m: readonly string[]): Pt | null {
+export function hasOneWideLane(m: readonly string[], open = OPEN_CHASE): Pt | null {
   const h = m.length, w = m[0].length;
-  const sol = (x: number, y: number) => !(x >= 0 && y >= 0 && x < w && y < h) || m[y][x] !== '.';
+  const sol = (x: number, y: number) => !(x >= 0 && y >= 0 && x < w && y < h) || !open.includes(m[y][x]);
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    if (m[y][x] !== '.') continue;
+    if (!open.includes(m[y][x])) continue;
     if ((sol(x - 1, y) && sol(x + 1, y)) || (sol(x, y - 1) && sol(x, y + 1))) return { x, y };
   }
   return null;
 }
 
-export function allFloorConnected(m: readonly string[], from: Pt): boolean {
+export function allFloorConnected(m: readonly string[], from: Pt, open = '.'): boolean {
   const h = m.length, w = m[0].length;
-  const sol = (x: number, y: number) => !(x >= 0 && y >= 0 && x < w && y < h) || m[y][x] !== '.';
+  const sol = (x: number, y: number) => !(x >= 0 && y >= 0 && x < w && y < h) || !open.includes(m[y][x]);
   let floor = 0;
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (m[y][x] === '.') floor++;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (open.includes(m[y][x])) floor++;
   const seen = new Set<number>([from.x * 1000 + from.y]);
   const q: Pt[] = [from];
   while (q.length) {
@@ -37,7 +39,8 @@ export function validMap(m: readonly string[], def: MapDef): boolean {
   let blocks = 0;
   for (const row of m) for (const c of row) if (def.blockTiles.includes(c)) blocks++;
   if (blocks < def.minBlockTiles) return false;
-  return allFloorConnected(m, def.start);
+  if (!allFloorConnected(m, def.start, '.')) return false;
+  return !def.arena || allFloorConnected(m, def.start, OPEN_CHASE);
 }
 
 type Block = { x: number; y: number; w: number; h: number; t: string };
