@@ -67,6 +67,7 @@ export function drawWorld(): void {
     if (e.kind === 'perv') phaseRing(e);
     if (e.kind === 'player' && G.cartT > 0) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px - 1, e.py + 6, 18, 9); ctx.fillStyle = '#9c9ca8'; ctx.fillRect(e.px, e.py + 7, 16, 6); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px + 2, e.py + 14, 3, 2); ctx.fillRect(e.px + 11, e.py + 14, 3, 2); }
     if (e.kind === 'player' && G.hurtT > 0 && Math.floor(G.time / 60) % 2) ctx.globalAlpha = 0.4;
+    else if (e.kind === 'player' && G.chase && G.ents.some((o) => o !== e && !o.chasing && Math.abs(o.px - e.px) < 12 && Math.abs(o.py - e.py) < 12)) ctx.globalAlpha = 0.65; // phasing through a shopper
     spr(frameName(e), e.px, e.py - 8 + yo, e.flip); ctx.globalAlpha = 1;
     if (e.kind === 'player' && G.koT > 0) otext('KO', e.px + 8, e.py - 24, '#ff5a5a', 'center');
     if (e.kind === 'perv' && (e.chasing || e.state === 'finish') && e.moving) {

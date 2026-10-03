@@ -111,10 +111,12 @@ export function updPlayer(dt: number): void {
   if (ob && ob.type === 'bag' && G.cartT > 0) { G.obstacles = G.obstacles.filter((x) => x !== ob); sfx('smash'); ob = undefined; }
   if (ob && ob.type === 'bag' && G.chase && G.chase.juice) {
     const lx = nx + dx, ly = ny + dy;
-    if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); hopped(); return; }
+    const le = entAt(lx, ly); if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && (!le || !le.chasing)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); hopped(); return; }
   }
   if (ob && G.hurtT <= 0) { hurt(OBSTACLE_DMG[ob.type]); return; }
-  if (!solidForPlayer(nx, ny) && !ob && !e) {
+  // in a chase the hero slips through shoppers; only the runner himself (handled above) and solids stop him
+  const blocker = e && !(G.chase && !e.chasing);
+  if (!solidForPlayer(nx, ny) && !ob && !blocker) {
     stepTo(P, nx, ny, playerMs()); G.tut.moved++;
     if (ch(nx, ny) === 'E' && G.elevOpen) P.onElev = true;
   }
