@@ -3,6 +3,7 @@ import { G } from './game/state';
 import { loadLayout } from './game/world';
 import { startGame, nextFloor, update } from './game/loop';
 import { startChase, endChase } from './game/chase';
+import { showSign } from './game/player';
 import { setState } from './game/ai';
 import { spawnNpc } from './game/world';
 import { loadAssets } from './core/loader';
@@ -56,7 +57,16 @@ function wire(): void {
   const dirs: Record<Dir, HTMLElement> = { up: $('d-up'), down: $('d-down'), left: $('d-left'), right: $('d-right') };
   bindDpadSlide($('dpad'), dirs);
   bindPad($('d-a'), 'a'); bindPad($('d-b'), 'b'); bindPad($('d-sel'), 'sel');
-  cv.addEventListener('pointerdown', () => { if (G.scene === 'play' && G.box) pressA(); });
+  cv.addEventListener('pointerdown', (e) => {
+    if (G.scene !== 'play') return;
+    if (G.box) { pressA(); return; }
+    if (G.sign) { G.sign = null; return; }
+    if (G.chase) return;
+    const r = cv.getBoundingClientRect();
+    const tx = Math.floor(((e.clientX - r.left) / r.width * cv.width + cam.x) / TW), ty = Math.floor(((e.clientY - r.top) / r.height * cv.height + cam.y) / TW);
+    const P = G.player;
+    if (Math.max(Math.abs(tx - P.tx), Math.abs(ty - P.ty)) <= 2) showSign(tx, ty);
+  });
   window.addEventListener('resize', fit); hooks.afterRefit = fit;
   if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => undefined);
 }

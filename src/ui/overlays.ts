@@ -4,7 +4,7 @@ import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, type ScoreRow } from '../game/economy';
 import { toast } from '../game/world';
-import { tutBox, finishTutorial } from '../game/tutorial';
+import { tutBox, finishTutorial, showBox } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
 import { checkCostume } from '../game/costume';
 import { saveProfile, resetProfile, loadProfile } from '../game/profile';
@@ -83,7 +83,7 @@ function renderShop(): void {
     row.append(info, btn); list.appendChild(row);
   }
 }
-export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; clearPresses(); }
+export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; clearPresses(); if (G.pendingTutBuy) { G.pendingTutBuy = false; showBox(L.tbuy); } }
 
 // ---- end of floor ----
 export function openEnd(): void {

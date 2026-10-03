@@ -71,6 +71,7 @@ export function update(dt: number): void {
   for (const t of G.toasts) t.t -= dt; G.toasts = G.toasts.filter((t) => t.t > 0);
   if (G.shake > 0) G.shake -= dt;
   if (G.arena) G.arenaT += dt;
+  if (G.sign) { G.sign.t -= dt; if (G.sign.t <= 0) G.sign = null; }
   if (G.freeze > 0) {
     clearPresses(); G.freeze -= dt; if (G.stamp) G.stamp.t += dt;
     if (G.freeze <= 0) {
@@ -91,6 +92,7 @@ export function update(dt: number): void {
   if (G.cartT > 0) G.cartT -= dt;
   if (G.decoy) { G.decoy.t -= dt; if (G.decoy.t <= 0) G.decoy = null; }
   updBalls(dt); if (G.scene !== 'play') return;
+  if (G.sign && consumeA()) { G.sign = null; return; }
   if (consumeA()) playerAction();
   updPlayer(dt);
   for (const e of G.ents) { if (e.chasing) continue; updNpc(e, dt); if (e.bailT > 0) e.bailT -= dt; }

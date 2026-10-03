@@ -12,7 +12,8 @@ import { openShop } from '../ui/overlays';
 export function playerAction(): void {
   const P = G.player; if (P.moving) return;
   const fx = P.tx + P.fx, fy = P.ty + P.fy;
-  if ('RCH'.includes(ch(fx, fy))) { openShop(); return; }
+  if ('RH'.includes(ch(fx, fy))) { openShop(); return; }
+  if (!G.chase && showSign(fx, fy)) return;
   const o = obstacleAt(fx, fy);
   if (o) {
     if (o.type === 'bag') {
@@ -32,6 +33,11 @@ export function playerAction(): void {
 }
 
 const bank = (y: number, x: number): void => { G.yen += y; gainXp(x); };
+/** Price card for a shelf, fridge or fixture tile. Returns false when the tile has nothing to show. */
+export function showSign(x: number, y: number): boolean {
+  const sec = L.sections[ch(x, y)]; if (!sec) return false;
+  G.sign = { title: sec.t, lines: sec.i.map(([n, p]) => [n, typeof p === 'number' ? '¥' + p : String(p)]), t: 4000 }; sfx('blip'); return true;
+}
 function hopped(): void { if (G.chase) { G.chase.hops++; report({ kind: 'hop', hopsThisChase: G.chase.hops }, bank); } }
 
 /** B during a chase fires whatever is equipped. Every active item is a one-use consumable. */
@@ -84,7 +90,7 @@ export function updPlayer(dt: number): void {
   if (held.left) dx = -1; else if (held.right) dx = 1; else if (held.up) dy = -1; else if (held.down) dy = 1;
   if (!dx && !dy) { const t = consumeTap(); if (t === 'left') dx = -1; else if (t === 'right') dx = 1; else if (t === 'up') dy = -1; else if (t === 'down') dy = 1; }
   if (!dx && !dy) return;
-  consumeTap();
+  consumeTap(); G.sign = null;
   face(P, dx, dy);
   const nx = P.tx + dx, ny = P.ty + dy;
   const e = entAt(nx, ny); if (e && e.chasing) { endChase(true); return; }

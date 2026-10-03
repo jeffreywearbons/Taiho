@@ -50,7 +50,11 @@ export const leaderboard: Leaderboard = api.enabled ? new RemoteLeaderboard() : 
 export function buy(k: ItemKey): 'ok' | 'broke' {
   const price = priceOf(k);
   if (G.yen < price) return 'broke';
-  G.yen -= price; G.inv[k]++; if (!G.inv[G.equip] && CATALOG.find((c) => c.key === k)!.kind === 'active') G.equip = k; saveProfile(); return 'ok';
+  G.yen -= price; G.inv[k]++;
+  const active = CATALOG.find((c) => c.key === k)!.kind === 'active';
+  if (!G.inv[G.equip] && active) G.equip = k;
+  if (active) { try { if (!localStorage.getItem('taiho_tbuy')) { localStorage.setItem('taiho_tbuy', '1'); G.pendingTutBuy = true; } } catch { /* ignore */ } }
+  saveProfile(); return 'ok';
 }
 /** Cycle B to the next active item the player owns. */
 export function cycleEquip(): ItemKey | null {

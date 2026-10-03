@@ -98,9 +98,19 @@ export function drawHud(): void {
     otext(G.stamp.txt, vw / 2, vh / 2 - 22, '#ffe066', 'center', 20);
     if (lang === 'ja') otext('CAUGHT', vw / 2, vh / 2 + 2, '#fff', 'center');
   }
+  if (G.sign) drawSign();
   if (G.box) drawBox();
 }
 
+function drawSign(): void {
+  const vw = cam.w * TW, vh = cam.h * TW; const s = G.sign!;
+  const H = 16 + s.lines.length * 11, y0 = vh - H - 2, W = Math.min(vw - 4, 200), x0 = Math.round((vw - W) / 2);
+  ctx.fillStyle = '#1a1a2e'; ctx.fillRect(x0, y0, W, H); ctx.fillStyle = '#fff8e6'; ctx.fillRect(x0 + 2, y0 + 2, W - 4, H - 4);
+  ctx.fillStyle = '#e63c3c'; ctx.fillRect(x0 + 2, y0 + 2, W - 4, 11);
+  text(s.title, x0 + W / 2, y0 + 3, '#fff', 'center');
+  let ty = y0 + 15;
+  for (const [n, p] of s.lines) { text(n, x0 + 6, ty, '#282834'); text(p, x0 + W - 6, ty, '#b03030', 'right'); ty += 11; }
+}
 function drawBox(): void {
   const vw = cam.w * TW, vh = cam.h * TW;
   const b = G.box!, pg = b.pages[b.i], who = pg[0], full = pg[1], shown = full.slice(0, Math.floor(b.shown));

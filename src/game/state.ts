@@ -29,6 +29,7 @@ export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: Per
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
 export type Toast = { txt: string; t: number };
+export type Sign = { title: string; lines: [string, string][]; t: number };
 export type Mode = 'story' | 'time';
 export type Scene = 'title' | 'play' | 'pick' | 'shop' | 'end' | 'result';
 export type Stats = { speed: number; detect: number; strength: number };
@@ -44,6 +45,7 @@ export interface Game {
   scene: Scene; mode: Mode;
   map: string[]; floorTiles: Pt[]; browseSpots: Spot[];
   ents: Ent[]; obstacles: Obstacle[]; player: Ent; bonsai: Ent;
+  sign: Sign | null; pendingTutBuy: boolean;
   chase: Chase | null; balls: Ball[]; peels: Peel[]; decoy: Decoy | null; cartT: number; equip: ItemKey; toasts: Toast[]; box: TextBox | null;
   catches: number; escapes: number; level: number; xp: number; pendingLevel: number; stats: Stats;
   yen: number; inv: Inv; floor: number; elevOpen: boolean;
@@ -70,6 +72,7 @@ export function newGame(): Game {
   return {
     scene: 'title', mode: 'story', map: KONBINI.frame.slice(), floorTiles: [], browseSpots: [],
     ents: [], obstacles: [], player: mk('player', 'hero', 9, 10), bonsai: mk('bonsai', 'bonsai', 8, 10),
+    sign: null, pendingTutBuy: false,
     chase: null, balls: [], peels: [], decoy: null, cartT: 0, equip: 'ball', toasts: [], box: null,
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: emptyInv(), floor: 1, elevOpen: false,
