@@ -7,10 +7,13 @@ Cloudflare Worker + D1 for the shared Time Attack rankings (weekly and all-time,
 ```sh
 cd worker
 npm install
+# The D1 database `taiho` already exists (id in wrangler.toml, region APAC) with every table created.
+# Deploy from GitHub: add repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, then
+# `.github/workflows/worker.yml` deploys on every push that touches worker/ (or run it from the Actions tab).
+# Or deploy from your machine:
 npx wrangler login
-npm run db:create            # prints a database_id; paste it into wrangler.toml
-npm run db:init              # creates the tables
 npm run deploy               # prints https://taiho-api.<you>.workers.dev
+# Fresh database only: npm run db:create, paste the id into wrangler.toml, npm run db:init
 # existing databases: apply the migrate-00N-*.sql files you have not run yet, in order, e.g.
 # npx wrangler d1 execute taiho --remote --file=./migrate-004-weekly.sql
 ```

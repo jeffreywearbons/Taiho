@@ -5,10 +5,10 @@ compatibility_date = "2026-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "taiho"
-database_id = "REPLACE_WITH_YOUR_D1_ID"
+database_id = "38576564-5f39-41ab-923e-b17b81ba9a69"
 
 [vars]
-ALLOWED_ORIGIN = "*"
+ALLOWED_ORIGIN = "https://jeffreywearbons.github.io"
 # Sign in with Apple: your app's bundle id (and the Services ID for web). Google: OAuth client ids. Comma-separated.
 APPLE_AUDIENCES = ""
 GOOGLE_AUDIENCES = ""

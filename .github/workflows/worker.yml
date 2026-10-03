@@ -1,0 +1,31 @@
+# Deploys the Cloudflare Worker (shared rankings, cloud saves, payments) whenever worker/ changes.
+# One-time setup: add repository secrets CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers", plus D1 edit)
+# and CLOUDFLARE_ACCOUNT_ID (Workers & Pages overview, right-hand column).
+name: Deploy Worker
+on:
+  push:
+    branches: [master, main, game/scaffold]
+    paths: ['worker/**', '.github/workflows/worker.yml']
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: worker } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - name: Apply pending migrations (safe to re-run; already-applied statements are skipped)
+        run: |
+          for f in migrate-*.sql; do
+            npx wrangler d1 execute taiho --remote --file="$f" || echo "skip $f (already applied)"
+          done
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
