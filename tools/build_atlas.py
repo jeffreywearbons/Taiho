@@ -10,7 +10,7 @@ OUT = os.path.join(TOOLS, 'out')
 ASSETS = os.path.join(TOOLS, '..', 'src', 'assets')
 os.makedirs(OUT, exist_ok=True)
 
-for script in ('sprites.py', 'konbini.py', 'bonsai.py', 'boutique.py', 'dept.py', 'mall.py'):
+for script in ('sprites.py', 'konbini.py', 'bonsai.py', 'boutique.py', 'dept.py', 'mall.py', 'tokyo.py'):
     runpy.run_path(os.path.join(TOOLS, script), run_name='__main__')
 chars = runpy.run_path(os.path.join(TOOLS, 'characters.py'), run_name='build')['build']()
 
@@ -48,7 +48,7 @@ for f in sorted(os.listdir(kdir)):
 bdir = os.path.join(OUT, 'boutique')
 for f in sorted(os.listdir(bdir)):
     if f.endswith('.png'): items.append(('tile_' + f[:-4], load(os.path.join(bdir, f))))
-for sub in ('dept', 'mall'):
+for sub in ('dept', 'mall', 'tokyo'):
     ddir = os.path.join(OUT, sub)
     for f in sorted(os.listdir(ddir)):
         if f.endswith('.png'): items.append((('' if f.startswith('obs_') else 'tile_') + f[:-4], load(os.path.join(ddir, f))))

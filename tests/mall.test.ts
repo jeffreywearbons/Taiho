@@ -6,9 +6,11 @@ import { reseed } from '../src/core/rng';
 import { OBSTACLE_STR } from '../src/game/state';
 
 describe('big floors', () => {
-  it('ten floors, each bigger with a higher gate than the last', () => {
-    expect(MAPS.length).toBe(10);
-    for (let i = 1; i < MAPS.length; i++) { expect(MAPS[i].w * MAPS[i].h).toBeGreaterThan(MAPS[i - 1].w * MAPS[i - 1].h); expect(MAPS[i].gate).toBeGreaterThan(MAPS[i - 1].gate); }
+  it('twenty floors: the store run grows every floor, the gate climbs all the way', () => {
+    expect(MAPS.length).toBe(20);
+    for (let i = 1; i < 10; i++) expect(MAPS[i].w * MAPS[i].h).toBeGreaterThan(MAPS[i - 1].w * MAPS[i - 1].h);
+    for (let i = 1; i < MAPS.length; i++) expect(MAPS[i].gate).toBeGreaterThan(MAPS[i - 1].gate);
+    expect(MAPS.slice(10).every((m) => m.outdoor)).toBe(true); expect(MAPS.slice(0, 10).some((m) => m.outdoor)).toBe(false);
   });
   it('built frames are valid before any blocks are added', () => {
     for (const d of MAPS.slice(3)) { expect(validMap(d.frame.map((r) => r.replace(/[^.#]/g, (c) => c)), { ...d, minBlockTiles: 0 })).toBe(true); expect(d.frame[d.elev.y + 1][d.elev.x]).toBe('.'); expect(d.frame[d.start.y][d.start.x]).toBe('.'); }

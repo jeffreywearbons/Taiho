@@ -136,8 +136,10 @@ export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; c
 // ---- end of floor ----
 export function openEnd(): void {
   G.scene = 'end'; const last = G.mapIndex + 1 >= MAPS.length;
-  $('end-title').textContent = fmt(L.end_title, { m: cur.name[lang] }); $('end-body').textContent = last ? L.end_body_last : fmt(L.end_body, { m: MAPS[G.mapIndex + 1].name[lang] });
-  $('end-stats').textContent = fmt(L.stats, { c: G.catches, e: G.escapes, l: G.level }); $('b-end').textContent = L.end_btn;
+  const next = last ? cur : MAPS[G.mapIndex + 1]; const out = !!next.outdoor;
+  $('end-title').textContent = fmt(L.end_title, { m: cur.name[lang] });
+  $('end-body').textContent = last ? (out ? L.end_body_last_out : L.end_body_last) : fmt(out ? L.end_body_out : L.end_body, { m: next.name[lang] });
+  $('end-stats').textContent = fmt(L.stats, { c: G.catches, e: G.escapes, l: G.level }); $('b-end').textContent = out ? L.end_btn_out : L.end_btn;
   $('end').hidden = false; sfx('level');
 }
 

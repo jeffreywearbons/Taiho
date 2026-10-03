@@ -1,5 +1,6 @@
 import type { Pt } from './const';
 import { ELEC, MALL, megaMall } from './mall';
+import { TOKYO } from './tokyo';
 
 export interface MapDef {
   id: string;
@@ -18,6 +19,8 @@ export interface MapDef {
   obstacleTier: number;
   /** Shops inside a mall: blocks placed in a room use that room's fixtures instead of blockTiles. */
   rooms?: { x0: number; y0: number; x1: number; y1: number; blockTiles: readonly string[] }[];
+  /** A Tokyo street: the station stands in for the elevator and the koban for the shop. */
+  outdoor?: boolean;
   /** Chases open the 'a' and 'w' tiles (back halls) into the map. */
   arena?: boolean;
 }
@@ -126,7 +129,7 @@ export const DEPT: MapDef = {
 };
 
 /** Maps 4 and 5 are built from fixed specs; floors 6-10 are mega malls assembled from a seed per floor. */
-export const MAPS: readonly MapDef[] = [KONBINI, BOUTIQUE, DEPT, ELEC, MALL, megaMall(1), megaMall(2), megaMall(3), megaMall(4), megaMall(5)];
+export const MAPS: readonly MapDef[] = [KONBINI, BOUTIQUE, DEPT, ELEC, MALL, megaMall(1), megaMall(2), megaMall(3), megaMall(4), megaMall(5), ...TOKYO];
 
 /** The map currently loaded. Modules read dimensions and anchors from here. */
 export let cur: MapDef = KONBINI;
@@ -134,7 +137,7 @@ export const dims = { w: KONBINI.w, h: KONBINI.h };
 export function setMap(i: number): MapDef { cur = MAPS[Math.max(0, Math.min(MAPS.length - 1, i))]; dims.w = cur.w; dims.h = cur.h; return cur; }
 
 /** Tiles an NPC may stop beside to "look at an item". */
-export const ITEM_TILES = 'SODIMVAHRCQUJKLcsgztpkdeibqfu';
+export const ITEM_TILES = 'SODIMVAHRCQUJKLcsgztpkdeibqfuorhjlnxyvzG';
 /** Tiles that become walkable while a chase has the arena open. */
 export const ARENA_TILES = 'aw';
 /** Solid for the player: anything that is not floor (the elevator opens separately). */

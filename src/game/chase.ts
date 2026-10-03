@@ -154,7 +154,7 @@ export function endChase(caught: boolean): void {
     if (p.boss && adsAvailable()) { G.offer = { kind: 'double_boss', yen, xp: Math.round((100 + secs * 5) * mult) }; }
     if (p.boss) { toast(L.boss_caught, 2200); G.bossDone = Math.max(G.bossDone, p.bossId * 5 + 5); G.lastBossLevel = G.bossDone; }
     report({ kind: 'catch', data: { secsLeft: secs, boss: p.boss, byBall: c.byBall, hops: c.hops, inArena, streak: G.streak } }, (y, x) => { G.yen += y; gainXp(x); });
-    if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }
+    if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(cur.outdoor ? L.station : L.elev, 2500); sfx('level'); }
     if (G.tutorial && p.scripted) G.tut.step = 8;
     checkCostume(); saveProfile();
   } else {
