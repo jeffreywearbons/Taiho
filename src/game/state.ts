@@ -1,4 +1,5 @@
-import { type Pt, type Spot, FRAME } from './const';
+import { type Pt, type Spot } from './const';
+import { KONBINI } from './maps';
 import type { PervParams } from './difficulty';
 import type { Page } from '../i18n/en';
 
@@ -40,7 +41,7 @@ export interface Game {
   yen: number; inv: Inv; floor: number; elevOpen: boolean;
   tutorial: boolean; tut: Tut; freeze: number; stamp: { t: number; txt: string } | null; shake: number;
   spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
-  totalCatches: number; costume: number;
+  totalCatches: number; costume: number; mapIndex: number;
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -55,13 +56,13 @@ export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
 
 export function newGame(): Game {
   return {
-    scene: 'title', mode: 'story', map: FRAME.slice(), floorTiles: [], browseSpots: [],
+    scene: 'title', mode: 'story', map: KONBINI.frame.slice(), floorTiles: [], browseSpots: [],
     ents: [], obstacles: [], player: mk('player', 'hero', 9, 10), bonsai: mk('bonsai', 'bonsai', 8, 10),
     chase: null, ball: null, toasts: [], box: null,
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
-    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0,
+    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0,
   };
 }
 

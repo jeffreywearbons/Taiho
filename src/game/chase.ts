@@ -1,6 +1,7 @@
 import { G, type Ent, playerMs, xpNeed } from './state';
 import { checkCostume } from './costume';
-import { CHASE_MS, GATE_CATCHES } from './const';
+import { CHASE_MS } from './const';
+import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
 import { random, pick } from '../core/rng';
 import { ch, entAt, obstacleAt, updMove, stepTo, randFloor, toast, manh } from './world';
@@ -44,7 +45,7 @@ export function updChase(dt: number): void {
       else {
         let best = -1;
         for (const f of G.floorTiles) {
-          const d = dm[f.y * 20 + f.x]; if (d < 0) continue;
+          const d = dm[f.y * dims.w + f.x]; if (d < 0) continue;
           const dp = Math.abs(f.x - p.tx) + Math.abs(f.y - p.ty);
           const score = d - 0.35 * dp + random() * 2;
           if (score > best) { best = score; goal = f; }
@@ -69,7 +70,7 @@ export function updChase(dt: number): void {
   if (c.obsT <= 0 && G.obstacles.length < 12) {
     c.obsT = c.P.obsRate * 1000 * 1.5;
     const cands = G.floorTiles.filter((f) => Math.abs(f.x - p.tx) <= 3 && Math.abs(f.y - p.ty) <= 3 && !(f.x === G.player.tx && f.y === G.player.ty) && !obstacleAt(f.x, f.y) && !(f.x === p.tx && f.y === p.ty) && !entAt(f.x, f.y));
-    if (cands.length) { const f = pick(cands); const box = G.level >= 3 && random() < 0.35; G.obstacles.push({ x: f.x, y: f.y, type: box ? 'box' : 'bag' }); }
+    if (cands.length) { const f = pick(cands); const box = (G.level >= 3 || cur.obstacleTier >= 1) && random() < 0.35; G.obstacles.push({ x: f.x, y: f.y, type: box ? 'box' : 'bag' }); }
   }
   if (!G.player.moving && !p.moving && manh(p, G.player) === 0) endChase(true);
 }
@@ -90,7 +91,7 @@ export function endChase(caught: boolean): void {
     const secs = Math.round(c.t / 1000);
     gainXp(100 + secs * 5);
     const yen = 100 + secs * 20; G.yen += yen; toast(fmt(L.reward, { y: yen }), 1800);
-    if (G.catches === GATE_CATCHES && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; toast(L.elev, 2500); sfx('level'); }
+    if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }
     if (G.tutorial && p.scripted) G.tut.step = 8;
     checkCostume();
   } else {

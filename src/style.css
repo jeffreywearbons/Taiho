@@ -54,4 +54,7 @@ button.pad.on { background: var(--line); }
 .item .info i { font-style: normal; font-size: 11px; color: #2f6cb3; }
 .item button { font-size: 13px; padding: 10px; color: var(--accent); white-space: nowrap; }
 .item button:disabled { opacity: 0.4; cursor: default; }
+.maps { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.maps button { font-family: var(--font-pixel); font-size: 13px; padding: 8px 10px; background: var(--paper); color: var(--panel); border: 2px solid var(--panel); cursor: pointer; }
+.maps button.locked { opacity: 0.45; cursor: default; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

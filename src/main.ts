@@ -4,12 +4,12 @@ import { loadLayout } from './game/world';
 import { startGame, nextFloor, update } from './game/loop';
 import { loadAssets } from './core/loader';
 import { setContext } from './core/render';
-import { cam, chooseViewport, follow } from './core/camera';
+import { cam, chooseViewport, follow, hooks } from './core/camera';
 import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/input';
 import { setLang, detectLang, lang } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
-import { $, applyStrings, choosePick, closeShop, openBoard, submitScore } from './ui/overlays';
+import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick } from './ui/overlays';
 
 const cv = $<HTMLCanvasElement>('cv');
 const stage = $('stage');
@@ -25,7 +25,8 @@ function wire(): void {
   try { G.tutorial = localStorage.getItem('taiho_tut') !== '1'; } catch { /* ignore */ }
   $('b-tut').dataset.on = G.tutorial ? '1' : '0';
   setLang(detectLang()); applyStrings();
-  $('b-start').onclick = () => startGame('story');
+  $('b-start').onclick = () => startGame('story', 0);
+  setMapPick((i) => startGame('story', i));
   $('b-time').onclick = () => startGame('time');
   $('b-rank').onclick = () => { void openBoard('rank'); };
   $('b-rank-close').onclick = () => { $('rank').hidden = true; };
@@ -42,7 +43,7 @@ function wire(): void {
   bindDpadSlide($('dpad'), dirs);
   bindPad($('d-a'), 'a'); bindPad($('d-b'), 'b');
   cv.addEventListener('pointerdown', () => { if (G.scene === 'play' && G.box) pressA(); });
-  window.addEventListener('resize', fit);
+  window.addEventListener('resize', fit); hooks.afterRefit = fit;
   if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => undefined);
 }
 

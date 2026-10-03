@@ -1,5 +1,6 @@
 import { G, type Ent } from './state';
-import { DIRS, EXIT, BOLT_RANGE, type Spot } from './const';
+import { DIRS, BOLT_RANGE, type Spot } from './const';
+import { cur } from './maps';
 import { pervParams } from './difficulty';
 import { rnd, pick } from '../core/rng';
 import { ch, cheb, manh, entAt, updMove, stepTo, goTo, atGoal, faceSpot, randSpot, toast } from './world';
@@ -34,8 +35,8 @@ function updShopper(e: Ent, dt: number): void {
     return;
   }
   const mustLeave = (quick && e.age > 6500) || e.dwell < 0;
-  if (mustLeave && !e.leaving) { e.leaving = true; e.looking = false; e.state = 'leave'; goTo(e, EXIT); return; }
-  if (e.state === 'leave') { if (!e.moving && !e.path.length) { if (e.tx === EXIT.x && e.ty === EXIT.y) e.dead = true; else goTo(e, EXIT); } return; }
+  if (mustLeave && !e.leaving) { e.leaving = true; e.looking = false; e.state = 'leave'; goTo(e, cur.exit); return; }
+  if (e.state === 'leave') { if (!e.moving && !e.path.length) { if (e.tx === cur.exit.x && e.ty === cur.exit.y) e.dead = true; else goTo(e, cur.exit); } return; }
   if (e.state === 'wander') {
     if (e.moving || e.path.length) return;
     if (e.looking) { e.idleT -= dt; if (e.idleT <= 0) { e.looking = false; if (quick) e.dwell = -1; else goTo(e, randSpot()); } return; }
@@ -106,7 +107,7 @@ function updPerv(e: Ent, dt: number): void {
   if (e.state === 'finish') {
     e.leaving = true;
     if (!e.moving && !e.path.length) {
-      if (e.tx === EXIT.x && e.ty === EXIT.y) { e.dead = true; G.escapes++; if (e.scripted) tutFail(); } else goTo(e, EXIT);
+      if (e.tx === cur.exit.x && e.ty === cur.exit.y) { e.dead = true; G.escapes++; if (e.scripted) tutFail(); } else goTo(e, cur.exit);
     }
   }
 }

@@ -1,10 +1,11 @@
 import { G, type Ent, type Kind, mk } from './state';
-import { TW, MW, MH, DIRS, ITEM_TILES, SPAWN, PLAYER_START, type Pt, type Spot } from './const';
+import { TW, DIRS, type Pt, type Spot } from './const';
+import { cur, dims, ITEM_TILES, setMap } from './maps';
 import { genMap } from './mapgen';
 import { bfs } from './path';
-import { pick } from '../core/rng';
+import { pick, rnd } from '../core/rng';
 
-export const inb = (x: number, y: number): boolean => x >= 0 && y >= 0 && x < MW && y < MH;
+export const inb = (x: number, y: number): boolean => x >= 0 && y >= 0 && x < dims.w && y < dims.h;
 export const ch = (x: number, y: number): string => (inb(x, y) ? G.map[y][x] : 'W');
 export const cheb = (a: Pt | Ent, b: Pt | Ent): number => Math.max(Math.abs(tx(a) - tx(b)), Math.abs(ty(a) - ty(b)));
 export const manh = (a: Pt | Ent, b: Pt | Ent): number => Math.abs(tx(a) - tx(b)) + Math.abs(ty(a) - ty(b));
@@ -28,12 +29,12 @@ export const entAt = (x: number, y: number, except?: Ent): Ent | undefined =>
 
 export function rebuildTiles(): void {
   G.floorTiles = []; G.browseSpots = [];
-  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) if (ch(x, y) === '.') G.floorTiles.push({ x, y });
+  for (let y = 0; y < dims.h; y++) for (let x = 0; x < dims.w; x++) if (ch(x, y) === '.') G.floorTiles.push({ x, y });
   for (const f of G.floorTiles) for (const [dx, dy] of DIRS) {
-    if (ITEM_TILES.includes(ch(f.x + dx, f.y + dy)) && f.y < 11) { G.browseSpots.push({ x: f.x, y: f.y, fx: dx, fy: dy }); break; }
+    if (ITEM_TILES.includes(ch(f.x + dx, f.y + dy)) && f.y < cur.doorIn.y - 1) { G.browseSpots.push({ x: f.x, y: f.y, fx: dx, fy: dy }); break; }
   }
 }
-export function loadLayout(): void { G.map = genMap(PLAYER_START); rebuildTiles(); }
+export function loadLayout(mapIndex = G.mapIndex): void { const def = setMap(mapIndex); G.mapIndex = mapIndex; G.map = genMap(def); rebuildTiles(); }
 export const randFloor = (): Pt => pick(G.floorTiles);
 export const randSpot = (): Spot => pick(G.browseSpots);
 
@@ -72,7 +73,7 @@ export function faceSpot(e: Ent): void {
   if (e.goal && e.goal.fx !== undefined) face(e, e.goal.fx, e.goal.fy!);
 }
 export function spawnNpc(kind: Kind, sprite: string): Ent {
-  const e = mk(kind, sprite, SPAWN.x, SPAWN.y);
-  e.goal = randSpot(); e.state = 'enter'; G.ents.push(e); return e;
+  const e = mk(kind, sprite, cur.spawn.x, cur.spawn.y);
+  e.goal = randSpot(); e.state = 'enter'; e.dwell = rnd(50000, 110000); G.ents.push(e); return e;
 }
 export function toast(txt: string, ms = 1400): void { G.toasts.push({ txt, t: ms }); }

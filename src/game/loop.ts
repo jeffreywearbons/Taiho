@@ -1,5 +1,7 @@
 import { G, mk, COSTUME_SPRITES, costumeTier } from './state';
-import { TW, MAX_NPC, PLAYER_START, TIME_ATTACK_MS } from './const';
+import { TW, TIME_ATTACK_MS } from './const';
+import { cur, MAPS, unlockedMaps } from './maps';
+import { refit } from '../core/camera';
 import { pervParams } from './difficulty';
 import { rnd, pick } from '../core/rng';
 import { consumeA, consumeB, clearPresses } from '../core/input';
@@ -9,11 +11,11 @@ import { updChase } from './chase';
 import { updPlayer, playerAction, throwBall, updBall } from './player';
 import { updTutorial, advanceBox, showBox } from './tutorial';
 import { openPick, openEnd, openResult, $ } from '../ui/overlays';
-import { L, fmt } from '../i18n';
+import { L, fmt, lang } from '../i18n';
 import { audioInit } from '../core/audio';
 
-export function startGame(mode: 'story' | 'time'): void {
-  loadLayout();
+export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
+  loadLayout(Math.min(mapIndex, unlockedMaps() - 1)); refit();
   G.mode = mode; G.timeLeft = TIME_ATTACK_MS;
   G.tutorial = mode === 'time' ? false : $('b-tut').dataset.on === '1';
   G.scene = 'play'; $('title').hidden = true; $('result').hidden = true;
@@ -23,17 +25,19 @@ export function startGame(mode: 'story' | 'time'): void {
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
   try { G.totalCatches = Number(localStorage.getItem('taiho_total') || 0) || 0; } catch { G.totalCatches = 0; }
   G.costume = costumeTier(1, G.totalCatches);
-  G.player = mk('player', COSTUME_SPRITES[G.costume], PLAYER_START.x, PLAYER_START.y); G.player.fy = -1; G.player.dir = 'up';
-  G.bonsai = mk('bonsai', 'bonsai', PLAYER_START.x - 1, PLAYER_START.y);
-  if (!G.tutorial) for (let i = 0; i < 3; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
+  G.player = mk('player', COSTUME_SPRITES[G.costume], cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
+  G.bonsai = mk('bonsai', 'bonsai', cur.start.x - 1, cur.start.y);
+  if (!G.tutorial) for (let i = 0; i < cur.targets; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
   audioInit();
 }
 
 export function nextFloor(): void {
-  loadLayout();
+  const next = G.mapIndex + 1 < MAPS.length ? G.mapIndex + 1 : G.mapIndex;
+  loadLayout(next); refit();
   G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.ball = null; G.floor++;
-  const P = G.player; P.tx = PLAYER_START.x; P.ty = PLAYER_START.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
-  G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor }), 2000);
+  const P = G.player; P.tx = cur.start.x; P.ty = cur.start.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
+  G.bonsai.px = P.px - 14; G.bonsai.py = P.py;
+  G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor, m: cur.name[lang] }), 2000);
 }
 
 function updSpawner(dt: number): void {
@@ -41,8 +45,8 @@ function updSpawner(dt: number): void {
   G.spawnT -= dt; if (G.spawnT > 0) return; G.spawnT = rnd(1200, 2600);
   const P = pervParams(G.level);
   const n = (k: string) => G.ents.filter((e) => e.kind === k && !e.leaving).length;
-  if (G.ents.length >= MAX_NPC) return;
-  if (n('target') < 3) { spawnNpc('target', pick(['target', 'shopper3'])); return; }
+  if (G.ents.length >= cur.maxNpc) return;
+  if (n('target') < cur.targets) { spawnNpc('target', pick(['target', 'shopper3'])); return; }
   const wantPervs = Math.max(G.mode === 'time' ? 3 : 0, Math.round(P.pervs));
   if (n('perv') < wantPervs && !(G.tutorial && !G.tut.done)) { const p = spawnNpc('perv', pick(['perv', 'perv2'])); p.dwell = rnd(45000, 90000); return; }
   if (n('shopper') < 2) spawnNpc('shopper', pick(['shopper1', 'shopper2']));

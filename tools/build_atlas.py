@@ -10,7 +10,7 @@ OUT = os.path.join(TOOLS, 'out')
 ASSETS = os.path.join(TOOLS, '..', 'src', 'assets')
 os.makedirs(OUT, exist_ok=True)
 
-for script in ('sprites.py', 'konbini.py', 'bonsai.py'):
+for script in ('sprites.py', 'konbini.py', 'bonsai.py', 'boutique.py'):
     runpy.run_path(os.path.join(TOOLS, script), run_name='__main__')
 chars = runpy.run_path(os.path.join(TOOLS, 'characters.py'), run_name='build')['build']()
 
@@ -25,6 +25,9 @@ kdir = os.path.join(OUT, 'konbini')
 for f in sorted(os.listdir(kdir)):
     if f.endswith('.png') and not any(t in f for t in ('_stripe', '_blue', '_green', '_red', '_yellow')):
         items.append(('tile_' + f[:-4], load(os.path.join(kdir, f))))
+bdir = os.path.join(OUT, 'boutique')
+for f in sorted(os.listdir(bdir)):
+    if f.endswith('.png'): items.append(('tile_' + f[:-4], load(os.path.join(bdir, f))))
 # obstacles
 from PIL import ImageDraw
 bag = Image.new('RGBA', (16, 16), (0, 0, 0, 0)); d = ImageDraw.Draw(bag)

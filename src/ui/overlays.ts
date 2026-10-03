@@ -5,6 +5,7 @@ import { clearPresses } from '../core/input';
 import { buy, leaderboard, type ScoreRow } from '../game/economy';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial } from '../game/tutorial';
+import { MAPS, cur, unlockedMaps } from '../game/maps';
 import { checkCostume } from '../game/costume';
 
 export const $ = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -15,6 +16,19 @@ export function applyStrings(): void {
   $('b-tut').textContent = L.tut + (G.tutorial ? L.on : L.off); $('t-keys').textContent = L.keys;
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
+  $('maps-title').textContent = L.maps_title;
+  renderMapSelect();
+}
+export let onMapPick: (i: number) => void = () => undefined;
+export function setMapPick(fn: (i: number) => void): void { onMapPick = fn; }
+function renderMapSelect(): void {
+  const box = $('maps'); box.innerHTML = '';
+  const open = unlockedMaps();
+  MAPS.forEach((m, i) => {
+    const b = document.createElement('button'); b.className = 'map' + (i < open ? '' : ' locked'); b.disabled = i >= open;
+    b.textContent = `${i + 1}. ${m.name[lang]}` + (i < open ? '' : `  (${L.locked})`);
+    b.onclick = () => onMapPick(i); box.appendChild(b);
+  });
 }
 
 // ---- level up ----
@@ -58,7 +72,8 @@ export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; c
 
 // ---- end of floor ----
 export function openEnd(): void {
-  G.scene = 'end'; $('end-title').textContent = L.end_title; $('end-body').textContent = L.end_body;
+  G.scene = 'end'; const last = G.mapIndex + 1 >= MAPS.length;
+  $('end-title').textContent = fmt(L.end_title, { m: cur.name[lang] }); $('end-body').textContent = last ? L.end_body_last : fmt(L.end_body, { m: MAPS[G.mapIndex + 1].name[lang] });
   $('end-stats').textContent = fmt(L.stats, { c: G.catches, e: G.escapes, l: G.level }); $('b-end').textContent = L.end_btn;
   $('end').hidden = false; sfx('level');
 }

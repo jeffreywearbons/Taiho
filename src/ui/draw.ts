@@ -1,5 +1,6 @@
 import { G, detectR, xpNeed, frameName, type Ent } from '../game/state';
-import { TW, MW, MH, TILE, GATE_CATCHES } from '../game/const';
+import { TW } from '../game/const';
+import { cur, dims } from '../game/maps';
 import { ch, cheb } from '../game/world';
 import { PERV_ICON } from '../game/ai';
 import { cam } from '../core/camera';
@@ -23,14 +24,14 @@ export function drawWorld(): void {
   if (G.shake > 0) ctx.translate(rint(-2, 2), rint(-2, 2));
   ctx.translate(-cam.x, -cam.y);
   const x0 = Math.max(0, Math.floor(cam.x / TW)), y0 = Math.max(0, Math.floor(cam.y / TW));
-  const x1 = Math.min(MW - 1, Math.ceil((cam.x + vw) / TW)), y1 = Math.min(MH - 1, Math.ceil((cam.y + vh) / TW));
+  const x1 = Math.min(dims.w - 1, Math.ceil((cam.x + vw) / TW)), y1 = Math.min(dims.h - 1, Math.ceil((cam.y + vh) / TW));
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const c = ch(x, y);
-    spr('tile_floor', x * TW, y * TW);
-    if (c !== '.') spr('tile_' + TILE[c], x * TW, y * TW);
+    spr('tile_' + cur.tiles['.'], x * TW, y * TW);
+    if (c !== '.') spr('tile_' + (cur.tiles[c] ?? 'wall'), x * TW, y * TW);
     if (c === 'E' && G.elevOpen) { ctx.fillStyle = '#5de36a'; ctx.fillRect(x * TW + 7, y * TW + 1, 2, 2); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(x * TW + 6, y * TW + 4, 4, 10); ctx.fillStyle = '#ffe066'; ctx.fillRect(x * TW + 7, y * TW + 5, 2, 8); }
   }
-  otext('IN', 5 * TW + 8, 12 * TW - 4, '#fff', 'center'); otext('OUT', 14 * TW + 8, 12 * TW - 4, '#fff', 'center');
+  otext('IN', cur.doorIn.x * TW + 8, cur.doorIn.y * TW - 4, '#fff', 'center'); otext('OUT', cur.doorOut.x * TW + 8, cur.doorOut.y * TW - 4, '#fff', 'center');
   for (const o of G.obstacles) spr(o.type === 'bag' ? 'obs_bag' : 'obs_box', o.x * TW, o.y * TW);
   const draw = [...G.ents.filter((e) => e.kind !== 'bonsai'), G.player].sort((a, b) => a.py - b.py);
   for (const e of draw) {
@@ -55,7 +56,7 @@ export function drawWorld(): void {
 export function drawHud(): void {
   const vw = cam.w * TW, vh = cam.h * TW;
   ctx.fillStyle = 'rgba(26,26,46,0.85)'; ctx.fillRect(0, 0, vw, 12);
-  text(`${L.hud_caught} ${G.catches}/${GATE_CATCHES}`, 3, 1, '#ffe066');
+  text(`${L.hud_caught} ${G.catches}/${cur.gate}`, 3, 1, '#ffe066');
   if (G.elevOpen) text('▲', 62, 1, '#5de36a');
   const narrow = vw < 300;
   text('¥' + G.yen, narrow ? 70 : 76, 1, '#fff');

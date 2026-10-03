@@ -2,6 +2,7 @@ import { G } from './state';
 import { L } from '../i18n';
 import type { Page } from '../i18n/en';
 import { spawnNpc } from './world';
+import { cur } from './maps';
 import { sfx } from '../core/audio';
 
 export function showBox(pages: Page[], onDone?: () => void): void { G.box = { pages, i: 0, shown: 0, onDone }; sfx('blip'); }
@@ -31,5 +32,5 @@ export function updTutorial(): void {
   const T = G.tut;
   if (T.step === 0) { T.step = 1; showBox(L.t1); }
   else if (T.step === 1) { if (T.moved >= 3) { T.step = 2; showBox(L.t2, () => { T.step = 3; tutSpawnPerv(); }); } }
-  else if (T.step === 3) { const p = T.perv; if (p && p.ty <= 11 && !T.s3) { T.s3 = true; showBox(L.t3); T.step = 4; } }
+  else if (T.step === 3) { const p = T.perv; if (p && p.ty < cur.doorIn.y && !T.s3) { T.s3 = true; showBox(L.t3); T.step = 4; } }
 }
