@@ -22,6 +22,7 @@ import { openCalendar, wireCalendar } from './ui/calendar';
 import { wireBook } from './ui/book';
 import { wireMenu, renderMenu, onceInMenu } from './ui/menu';
 import { wirePause, openAttr } from './ui/pause';
+import { wireNav } from './ui/nav';
 import { unlockedMaps } from './game/maps';
 import { openPass, wirePass } from './ui/pass';
 import { wireOffer } from './ui/offer';
@@ -66,7 +67,7 @@ function wire(): void {
   for (let i = 0; i < 3; i++) $('p' + i).onclick = () => choosePick(i);
   $('b-pick-later').onclick = () => pickLater();
   $('b-attr').onclick = () => openAttr('title');
-  wirePause(() => startGame(G.mode, G.mapIndex));
+  wirePause(() => startGame(G.mode, G.mapIndex)); wireNav();
   $('b-end').onclick = () => { $('end').hidden = true; nextFloor(); };
   $('b-shop-close').onclick = () => closeShop();
   $('b-submit').onclick = () => { void submitScore(); };

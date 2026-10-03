@@ -1,7 +1,7 @@
 import { G, playerMs, OBSTACLE_STR, OBSTACLE_DMG, MAX_HP } from './state';
 import { haptic } from '../core/input';
 import { TW } from './const';
-import { held, consumeTap } from '../core/input';
+import { heldDirs, consumeTap, type Dir } from '../core/input';
 import { sfx } from '../core/audio';
 import { L, fmt } from '../i18n';
 import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face, chaseFloor } from './world';
@@ -96,10 +96,13 @@ export function updBalls(dt: number): void {
 export function updPlayer(dt: number): void {
   const P = G.player; updMove(P, dt);
   if (P.moving) return;
-  let dx = 0, dy = 0;
-  if (held.left) dx = -1; else if (held.right) dx = 1; else if (held.up) dy = -1; else if (held.down) dy = 1;
-  if (!dx && !dy) { const t = consumeTap(); if (t === 'left') dx = -1; else if (t === 'right') dx = 1; else if (t === 'up') dy = -1; else if (t === 'down') dy = 1; }
-  if (!dx && !dy) return;
+  // cornering: the newest held direction wins at each tile; if that way is blocked, keep going the older way
+  const V: Record<Dir, [number, number]> = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
+  let dirs = heldDirs();
+  if (!dirs.length) { const t = consumeTap(); if (t) dirs = [t]; }
+  if (!dirs.length) return;
+  let [dx, dy] = V[dirs[0]];
+  for (const d of dirs) { const [ex, ey] = V[d]; if (!solidForPlayer(P.tx + ex, P.ty + ey)) { dx = ex; dy = ey; break; } }
   consumeTap(); G.sign = null;
   face(P, dx, dy);
   const nx = P.tx + dx, ny = P.ty + dy;

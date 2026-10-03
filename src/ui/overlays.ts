@@ -4,6 +4,7 @@ import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, isExclusive, type ScoreRow, type BoardQuery } from '../game/economy';
 import { weekKey, weekEndsIn } from '../game/week';
+import { refreshBackLabels } from './nav';
 import { wear, wornOf, heroSprite } from '../game/costume';
 import { allSets, buySet, hasSet, restorePurchases } from '../game/purchases';
 import { api, sessionToken } from '../game/api';
@@ -28,7 +29,7 @@ export function applyStrings(): void {
   $('b-settings').querySelector('span')!.textContent = L.settings; $('b-attr').querySelector('span')!.textContent = L.attr_btn; $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close; $('s-title').textContent = L.title; $('s-sub').textContent = L.sub; $('s-tap').textContent = L.tap_start;
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
   $('b-wardrobe').querySelector('span')!.textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').querySelector('span')!.textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').querySelector('span')!.textContent = L.cal_btn; $('b-pass').querySelector('span')!.textContent = L.pass_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
-  renderMapSelect();
+  renderMapSelect(); refreshBackLabels();
 }
 let resetArmed = false;
 export function renderProfileLine(): void {

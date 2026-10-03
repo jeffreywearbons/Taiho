@@ -13,8 +13,10 @@
   <title>TAIHO!!</title>
 </head>
 <body>
-<div id="app">
-  <div id="stage">
+<div id="app" class="shell">
+  <div class="bezel">
+    <div class="bezel-top"><span class="led"></span><span class="led-label">POWER</span><span class="bezel-name">TAIHO!! <i>COLOR</i></span></div>
+    <div id="stage">
     <canvas id="cv" width="320" height="240" aria-label="TAIHO!! game screen"></canvas>
     <div id="splash" class="overlay splash">
       <div class="splash-in">
@@ -30,7 +32,7 @@
         <h2 id="t-sub" hidden>Konbini Vigilante</h2>
         <p id="t-profile" class="small profile"></p>
         <div class="menu primary">
-          <button id="b-start">PLAY</button>
+          <button id="b-start" class="nav-first">PLAY</button>
           <p id="t-floor" class="floor-line"></p>
           <button id="b-time">TIME ATTACK 90s</button>
         </div>
@@ -81,7 +83,7 @@
         <h2 id="pause-title">PAUSED</h2>
         <p id="pause-sub" class="small"></p>
         <div class="menu">
-          <button id="b-resume">RESUME</button>
+          <button id="b-resume" class="nav-first">RESUME</button>
           <button id="b-p-attr">ATTRIBUTES</button>
           <button id="b-p-shop">SHOP</button>
           <button id="b-p-restart">RESTART FLOOR</button>
@@ -221,15 +223,20 @@
       </div>
     </div>
   </div>
+  </div>
+  <div class="brand"><b>WearBons</b><span class="llc"><i>L</i><i>L</i><i>C</i></span></div>
   <div id="controls">
     <div id="dpad">
       <button class="pad" id="d-up" aria-label="Up">▲</button>
       <button class="pad" id="d-left" aria-label="Left">◀</button>
+      <span class="d-center"></span>
       <button class="pad" id="d-right" aria-label="Right">▶</button>
       <button class="pad" id="d-down" aria-label="Down">▼</button>
     </div>
-    <div class="ab"><div class="mini"><button class="pad" id="d-start" aria-label="Pause menu">START</button><button class="pad" id="d-sel" aria-label="Select item">SEL</button></div><button class="pad" id="d-b" aria-label="B button">B</button><button class="pad" id="d-a" aria-label="A button">A</button></div>
+    <div class="mini"><div class="pill"><button class="pad" id="d-sel" aria-label="Select item"></button><span>SELECT</span></div><div class="pill"><button class="pad" id="d-start" aria-label="Pause menu"></button><span>START</span></div></div>
+    <div class="ab"><button class="pad" id="d-b" aria-label="B button">B</button><button class="pad" id="d-a" aria-label="A button">A</button></div>
   </div>
+  <div class="speaker"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 </div>
 <script type="module" src="./src/main.ts"></script>
 </body>

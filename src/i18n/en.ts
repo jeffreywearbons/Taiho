@@ -14,7 +14,7 @@ const en = {
   elev: 'Elevator unlocked!', bail: 'He noticed you!', heavy: 'Too heavy! Needs Strength {n}.', arena_open: 'The back halls are open!', smash: 'SMASH!', suit: 'Vigilante suit unlocked!',
   pick_title: 'Level up! Choose a stat', stat: ['Speed', 'Detection', 'Strength'],
   statd: ['Move faster', 'See marks from further', 'Break boxes in a chase'], confirm: 'CHOOSE', pick_later: 'Decide later',
-  pause_title: 'PAUSED', pause_sub: '{m}  ·  floor {f}  ·  {c}/{g} caught', resume: 'RESUME', attr_btn: 'ATTRIBUTES', pause_shop: 'SHOP', restart: 'RESTART FLOOR', save: 'SAVE', saved_ok: 'Saved!', quit: 'QUIT TO MENU',
+  back_btn: 'BACK', pause_title: 'PAUSED', pause_sub: '{m}  ·  floor {f}  ·  {c}/{g} caught', resume: 'RESUME', attr_btn: 'ATTRIBUTES', pause_shop: 'SHOP', restart: 'RESTART FLOOR', save: 'SAVE', saved_ok: 'Saved!', quit: 'QUIT TO MENU',
   attr_title: 'Attributes', attr_points: '{n} point(s) to spend', attr_none: 'No points to spend', attr_next: 'Next point at Lv{l}  ·  {x}/{n} XP', attr_fx: ['Move speed +{v}%', 'See marks from {v} tiles', 'Smash: {v}'], smash_lv: ['nothing', 'boxes', 'boxes, crates', 'boxes, crates, vending machines'], upgrade: '+1',
   station: 'Station unlocked! Next stop awaits.', end_body_out: 'Take the train to {m}.\nOpen streets, bigger crowds, back alleys.', end_body_last_out: 'Last stop for now. The train\nloops back and the street reshuffles.', end_btn_out: 'NEXT STOP',
   end_title: '{m} cleared!', end_body: 'The elevator goes up to the {m}.\nBigger floor, more pervs, heavier obstacles.', end_body_last: 'Top floor for now. The elevator\nreshuffles the aisles.', end_btn: 'NEXT FLOOR', locked: 'locked', maps_title: 'Jump to',
