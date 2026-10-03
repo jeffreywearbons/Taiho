@@ -24,6 +24,7 @@
           <button id="b-start">START</button>
           <button id="b-time">TIME ATTACK 90s</button>
           <button id="b-rank">RANKING</button>
+          <button id="b-wardrobe">WARDROBE</button>
           <button id="b-lang">Language: English</button>
           <button id="b-tut">Tutorial: ON</button>
           <button id="b-mute">Sound: ON</button>
@@ -55,7 +56,17 @@
         <div id="shop-list"></div>
         <p id="shop-msg" class="small"></p>
         <p id="shop-hint" class="small"></p>
-        <div class="menu"><button id="b-shop-close">CLOSE</button></div>
+        <div class="menu"><button id="b-shop-wd">WARDROBE</button><button id="b-shop-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="wardrobe" class="overlay" hidden>
+      <div class="card shop">
+        <h2 id="wd-title">Wardrobe</h2>
+        <p id="wd-yen" class="yen">¥0</p>
+        <div id="wd-list"></div>
+        <p id="wd-msg" class="small"></p>
+        <p id="wd-hint" class="small"></p>
+        <div class="menu"><button id="b-wd-close">CLOSE</button></div>
       </div>
     </div>
     <div id="result" class="overlay" hidden>

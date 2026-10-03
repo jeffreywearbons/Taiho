@@ -2,7 +2,8 @@ import { G } from '../game/state';
 import { L, fmt, lang } from '../i18n';
 import { sfx, isMuted, setMuted } from '../core/audio';
 import { clearPresses } from '../core/input';
-import { buy, leaderboard, CATALOG, type ScoreRow } from '../game/economy';
+import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
+import { wear } from '../game/costume';
 import { toast } from '../game/world';
 import { tutBox, finishTutorial, showBox } from '../game/tutorial';
 import { MAPS, cur, unlockedMaps } from '../game/maps';
@@ -18,7 +19,8 @@ export function applyStrings(): void {
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
-  $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
+  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;
@@ -83,6 +85,25 @@ function renderShop(): void {
     row.append(info, btn); list.appendChild(row);
   }
 }
+// ---- wardrobe ----
+export function openWardrobe(from: 'title' | 'shop'): void {
+  $('wd-title').textContent = L.wardrobe; $('wd-hint').textContent = L.wardrobe_hint; $('b-wd-close').textContent = L.close; $('wd-msg').textContent = '';
+  (window as any).__wdFrom = from; renderWardrobe(); $('wardrobe').hidden = false; sfx('blip');
+}
+function renderWardrobe(): void {
+  $('wd-yen').textContent = '¥' + G.yen;
+  const list = $('wd-list'); list.innerHTML = '';
+  const mkRow = (name: string, desc: string, right: HTMLElement) => { const row = document.createElement('div'); row.className = 'item'; const info = document.createElement('div'); info.className = 'info'; const b = document.createElement('b'); b.textContent = name; const sp = document.createElement('span'); sp.textContent = desc; info.append(b, sp); row.append(info, right); list.appendChild(row); };
+  const wearBtn = (id: string | null) => { const btn = document.createElement('button'); const on = G.wearing === id; btn.textContent = on ? L.wearing : L.wear; btn.disabled = on; btn.onclick = () => { wear(id); sfx('blip'); renderWardrobe(); }; return btn; };
+  mkRow(L.earned_look, fmt(L.earned_desc, { c: L.costumes[G.costume] }), wearBtn(null));
+  for (const c of COSMETICS) {
+    const [name, desc] = L.cosmetics[c.id];
+    if (G.wardrobe.includes(c.id)) mkRow(name, desc, wearBtn(c.id));
+    else { const btn = document.createElement('button'); btn.textContent = `${L.buy} ¥${c.price}`; btn.disabled = G.yen < c.price; btn.onclick = () => { const r = buyCosmetic(c.id); $('wd-msg').textContent = r === 'ok' ? L.bought : L.broke; sfx(r === 'ok' ? 'buy' : 'notyet'); if (r === 'ok') wear(c.id); renderWardrobe(); }; mkRow(name, desc, btn); }
+  }
+}
+export function closeWardrobe(): void { $('wardrobe').hidden = true; if ((window as any).__wdFrom === 'shop') G.scene = 'shop'; else if (G.scene !== 'title') G.scene = 'play'; clearPresses(); renderProfileLine(); }
+
 export function closeShop(): void { $('shop').hidden = true; G.scene = 'play'; clearPresses(); if (G.pendingTutBuy) { G.pendingTutBuy = false; showBox(L.tbuy); } }
 
 // ---- end of floor ----

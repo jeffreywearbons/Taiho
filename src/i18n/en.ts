@@ -21,6 +21,17 @@ const en = {
   board_local: 'Ranking on this device', board_shared: 'Shared ranking', board_empty: 'No scores yet. Be the first.', saved: 'Saved!', again: 'PLAY AGAIN', back: 'TITLE', close: 'CLOSE',
   shop_title: 'Konbini Register', buy: 'BUY', owned: 'Have', shop_hint: 'Active items fire with B during a chase; SEL (C on keyboard) switches between them. Passives trigger on your next chase.',
   costumes: ['Civilian', 'Masked', 'Caped', 'Vigilante', 'Gold Vigilante'], costume_toast: 'New look: {c}!',
+  wardrobe: 'WARDROBE', wardrobe_hint: 'Costumes are cosmetic. Your earned look keeps leveling underneath.', wear: 'WEAR', wearing: 'WEARING', earned_look: 'Earned look', earned_desc: 'Currently: {c}. Changes as you level.',
+  cosmetics: {
+    dark: ['Dark Knight Suit', 'Black armor, gold belt, scalloped cape. The most expensive thing in the store.'],
+    trainer: ['Trainer Set', 'Red cap and blue vest. Bonsai goes electric: yellow and brown.'],
+    police: ['Omawari-san Uniform', 'Navy police uniform with a gold badge and white gloves.'],
+    clerk_stripe: ['Clerk: Stripe', 'Orange, green and red vest with a visor.'],
+    clerk_blue: ['Clerk: Blue', 'Blue and white vest with a visor.'],
+    clerk_green: ['Clerk: Green', 'Green, white and blue vest with a visor.'],
+    clerk_red: ['Clerk: Red', 'Red and white vest with a visor.'],
+    clerk_yellow: ['Clerk: Yellow', 'Blue and yellow vest with a visor.'],
+  } as Record<string, [string, string]>,
   broke: 'Not enough yen.', bought: 'Thanks for shopping!', used_juice: 'Auto-Jump active!', used_vita: 'Vita Dash active!',  ball_hit: 'BALL HIT!', reward: '+¥{y}',
   items: {
     ball: ['Capture Ball', 'B: throw straight ahead. A hit is an instant catch.'],

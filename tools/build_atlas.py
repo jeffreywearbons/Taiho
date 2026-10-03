@@ -19,6 +19,17 @@ items = []
 for key, im in chars.items(): items.append((key, im))
 items.append(('bonsai_0', load(os.path.join(OUT, 'bonsai.png'))))
 items.append(('bonsai_portrait', load(os.path.join(OUT, 'bonsai_portrait.png'))))
+# Bonsai in yellow and brown while the trainer costume is worn
+def electric(im):
+    im = im.copy(); px = im.load()
+    swap = {(86,170,96): (250,210,50), (58,128,72): (200,150,30), (140,210,120): (255,240,130), (70,110,170): (120,70,40), (50,80,130): (90,50,30), (120,160,210): (160,110,60), (120,220,255): (255,80,80)}
+    for y in range(im.height):
+        for x in range(im.width):
+            c = px[x, y]
+            if c[3] and c[:3] in swap: px[x, y] = swap[c[:3]] + (255,)
+    return im
+items.append(('bonsai_pika_0', electric(load(os.path.join(OUT, 'bonsai.png')))))
+items.append(('bonsai_pika_portrait', electric(load(os.path.join(OUT, 'bonsai_portrait.png')))))
 for n in ('scoping', 'setting_up', 'in_progress', 'finishing', 'hint'):
     items.append(('icon_' + n, load(os.path.join(OUT, n + '.png'))))
 kdir = os.path.join(OUT, 'konbini')

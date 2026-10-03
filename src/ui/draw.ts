@@ -8,6 +8,7 @@ import { ctx, spr, text, otext } from '../core/render';
 import { L, lang } from '../i18n';
 import { rint } from '../core/rng';
 import { goals, goalText, dailyText, streakMult } from '../game/goals';
+import { bonsaiSprite } from '../game/costume';
 
 function iconVisible(e: Ent): 'full' | 'hint' | null {
   if (e.scripted || e.chasing) return 'full';
@@ -64,7 +65,7 @@ export function drawWorld(): void {
     } else if (ic && v === 'hint') spr('icon_hint', e.px + 4, e.py - 19);
   }
   for (const b of G.balls) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x - 1, b.y - 1, 10, 10); ctx.fillStyle = '#e63c3c'; ctx.fillRect(b.x, b.y, 8, 4); ctx.fillStyle = '#fff'; ctx.fillRect(b.x, b.y + 4, 8, 4); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x, b.y + 3, 8, 1); ctx.fillRect(b.x + 3, b.y + 2, 2, 3); }
-  const B = G.bonsai; spr('bonsai_0', B.px, B.py - 8 + Math.round(Math.sin(G.time / 250) * 1.5) - 4, B.flip);
+  const B = G.bonsai; spr(bonsaiSprite() + '_0', B.px, B.py - 8 + Math.round(Math.sin(G.time / 250) * 1.5) - 4, B.flip);
   ctx.restore();
 }
 
@@ -117,7 +118,7 @@ function drawBox(): void {
   const H = 44, y0 = vh - H - 2;
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(2, y0, vw - 4, H); ctx.fillStyle = '#f8f8f8'; ctx.fillRect(4, y0 + 2, vw - 8, H - 4); ctx.fillStyle = '#c8c8d2'; ctx.fillRect(4, y0 + 2, vw - 8, 1);
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(7, y0 + 5, 36, 36); ctx.fillStyle = '#dcebff'; ctx.fillRect(9, y0 + 7, 32, 32);
-  if (who === 'b') spr('bonsai_portrait', 9, y0 + 7); else spr(G.player.sprite + '_down_0', 17, y0 + 9);
+  if (who === 'b') spr(bonsaiSprite() + '_portrait', 9, y0 + 7); else spr(G.player.sprite + '_down_0', 17, y0 + 9);
   const name = who === 'b' ? L.bonsai : L.hero;
   ctx.font = '10px PM10'; const w = ctx.measureText(name).width + 8;
   ctx.fillStyle = '#1a1a2e'; ctx.fillRect(6, y0 - 10, w, 12); text(name, 10, y0 - 9, '#f8f8f8');

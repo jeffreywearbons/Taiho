@@ -13,7 +13,8 @@ import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/i
 import { setLang, detectLang, lang } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
-import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine } from './ui/overlays';
+import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe } from './ui/overlays';
+import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 
 const cv = $<HTMLCanvasElement>('cv');
@@ -37,6 +38,9 @@ function wire(): void {
   $('b-rank-close').onclick = () => { $('rank').hidden = true; };
   $('b-lang').onclick = () => { setLang(lang === 'en' ? 'ja' : 'en'); applyStrings(); };
   $('b-mute').onclick = () => toggleMute();
+  $('b-wardrobe').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); openWardrobe('title'); };
+  $('b-shop-wd').onclick = () => openWardrobe('shop');
+  $('b-wd-close').onclick = () => closeWardrobe();
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };

@@ -86,7 +86,17 @@ def head_front(c, ch, frame):
     if ch.get('blush'): c.p(4, y+9, SKIN_S); c.p(11, y+9, SKIN_S)
     c.rect(7, y+10, 8, y+10, SKIN_S)  # mouth
     if ch.get('hat'):
-        h = ch['hat']; c.rect(4, y-1, 11, y+1, h); c.rect(5, y-2, 10, y-2, h); c.rect(2, y+2, 13, y+2, h); c.rect(5, y+1, 10, y+1, (60, 40, 40))
+        h = ch['hat']; c.rect(4, y-1, 11, y+1, h); c.rect(5, y-2, 10, y-2, h); c.rect(2, y+2, 13, y+2, h)
+    if ch.get('cap'):
+        cp, fr = ch['cap']; c.rect(4, y-1, 11, y+1, cp); c.rect(5, y-2, 10, y-2, cp); c.rect(3, y+2, 12, y+4, cp)
+    if ch.get('visor'):
+        v = ch['visor']; c.rect(3, y+3, 12, y+4, v); c.rect(5, y+1, 10, y+1, (60, 40, 40))
+    if ch.get('cap'):
+        cp, fr = ch['cap']; c.rect(4, y-1, 11, y+1, cp); c.rect(5, y-2, 10, y-2, cp); c.rect(3, y+2, 12, y+3, cp)
+        c.rect(5, y, 10, y+1, fr); c.rect(3, y+4, 12, y+4, cp)   # front panel + brim
+        if ch.get('badge'): c.p(7, y+1, ch['badge']); c.p(8, y+1, ch['badge'])
+    if ch.get('visor'):
+        v = ch['visor']; c.rect(3, y+3, 12, y+4, v); c.rect(2, y+5, 13, y+5, v)
 
 def head_back(c, ch, frame):
     hair, style = ch['hair'], ch['style']
@@ -124,6 +134,10 @@ def head_side(c, ch, frame):
     c.p(11, y+10, SKIN_S)
     if ch.get('hat'):
         h = ch['hat']; c.rect(5, y-1, 11, y+1, h); c.rect(6, y-2, 10, y-2, h); c.rect(3, y+2, 14, y+2, h)
+    if ch.get('cap'):
+        cp, fr = ch['cap']; c.rect(5, y-1, 11, y+1, cp); c.rect(6, y-2, 10, y-2, cp); c.rect(4, y+2, 12, y+3, cp); c.rect(10, y+4, 15, y+4, cp)
+    if ch.get('visor'):
+        v = ch['visor']; c.rect(4, y+3, 12, y+4, v); c.rect(10, y+5, 15, y+5, v)
 
 def body_front(c, ch, frame):
     o = ch['outfit']; col = ch['col']; bob = -1 if frame else 0; y = 13 + bob
@@ -139,6 +153,21 @@ def body_front(c, ch, frame):
     elif o == 'suit':
         c.rect(3, y, 12, y+5, col['top']); c.rect(7, y, 8, y+3, W); c.rect(7, y, 8, y+2, col['tie'])
         c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top']); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
+    elif o == 'armor':
+        cp = col['cape']; c.rect(1, y, 1, y+8, cp); c.rect(14, y, 14, y+8, cp); c.p(2, y+6, cp); c.p(13, y+6, cp)
+        c.rect(3, y, 12, y+5, col['top']); c.rect(4, y+1, 11, y+1, col['top_s']); c.rect(5, y+1, 10, y+2, col['emblem']); c.rect(6, y, 9, y, col['emblem']); c.p(7, y+1, col['top']); c.p(8, y+1, col['top'])
+        c.rect(3, y+5, 12, y+5, col['belt']); c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top']); c.p(2, y+5, col['top']); c.p(13, y+5, col['top'])
+    elif o == 'vest':
+        c.rect(3, y, 12, y+5, W); c.rect(3, y, 5, y+5, col['top']); c.rect(10, y, 12, y+5, col['top']); c.rect(4, y, 11, y, col['top'])
+        c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
+    elif o == 'uniform':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(7, y, 8, y+4, col['top_s']); c.p(7, y+1, (220, 220, 230)); c.p(7, y+3, (220, 220, 230))
+        c.rect(3, y+5, 12, y+5, (30, 30, 40)); c.p(7, y+5, (255, 210, 60)); c.p(8, y+5, (255, 210, 60))
+        c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top']); c.p(2, y+5, W); c.p(13, y+5, W)
+    elif o == 'clerk':
+        s1, s2, s3 = col['stripes']
+        c.rect(3, y, 12, y+5, W); c.rect(3, y+1, 12, y+1, s1); c.rect(3, y+2, 12, y+2, s2); c.rect(3, y+3, 12, y+3, s3); c.rect(3, y+4, 12, y+5, s1)
+        c.rect(6, y+1, 9, y+5, W); c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
     elif o == 'blouse_skirt':
         c.rect(3, y, 12, y+3, col['top']); c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top'])
         c.p(2, y+4, SKIN); c.p(13, y+4, SKIN)
@@ -160,6 +189,15 @@ def body_back(c, ch, frame):
             c.rect(2, y+1, 2, y+4, base); c.rect(13, y+1, 13, y+4, base)
     elif o == 'suit':
         c.rect(3, y, 12, y+5, col['top']); c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top'])
+    elif o == 'armor':
+        cp = col['cape']; c.rect(2, y, 13, y+8, cp); c.rect(1, y+1, 1, y+8, cp); c.rect(14, y+1, 14, y+8, cp); c.rect(3, y, 12, y, col['top'])
+    elif o == 'vest':
+        c.rect(3, y, 12, y+5, W); c.rect(3, y, 5, y+5, col['top']); c.rect(10, y, 12, y+5, col['top']); c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W)
+    elif o == 'uniform':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(3, y+5, 12, y+5, (30, 30, 40)); c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top'])
+    elif o == 'clerk':
+        s1, s2, s3 = col['stripes']
+        c.rect(3, y, 12, y+5, W); c.rect(3, y+1, 12, y+1, s1); c.rect(3, y+2, 12, y+2, s2); c.rect(3, y+3, 12, y+3, s3); c.rect(3, y+4, 12, y+5, s1); c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W)
     elif o == 'blouse_skirt':
         c.rect(3, y, 12, y+3, col['top']); c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top'])
         c.rect(4, y+4, 11, y+4, col['skirt']); c.rect(3, y+5, 12, y+7, col['skirt'])
@@ -177,6 +215,16 @@ def body_side(c, ch, frame):
         c.rect(8, y+1, 9, y+4, col['top_s']); c.p(9, y+5, SKIN)                    # near arm
     elif o == 'suit':
         c.rect(5, y, 11, y+5, col['top']); c.rect(10, y, 10, y+2, W); c.p(10, y, col['tie']); c.rect(8, y+1, 9, y+4, col['top']); c.p(9, y+5, SKIN)
+    elif o == 'armor':
+        c.rect(2, y, 5, y+8, col['cape']); c.p(1, y+3, col['cape']); c.p(1, y+6, col['cape'])
+        c.rect(5, y, 11, y+5, col['top']); c.rect(9, y+1, 10, y+2, col['emblem']); c.rect(5, y+5, 11, y+5, col['belt']); c.rect(8, y+1, 9, y+4, col['top_s'])
+    elif o == 'vest':
+        c.rect(5, y, 11, y+5, W); c.rect(5, y, 6, y+5, col['top']); c.rect(10, y, 11, y+5, col['top']); c.rect(8, y+1, 9, y+4, W); c.p(9, y+5, SKIN)
+    elif o == 'uniform':
+        c.rect(5, y, 11, y+5, col['top']); c.rect(5, y+5, 11, y+5, (30, 30, 40)); c.rect(8, y+1, 9, y+4, col['top']); c.p(9, y+5, W)
+    elif o == 'clerk':
+        s1, s2, s3 = col['stripes']
+        c.rect(5, y, 11, y+5, W); c.rect(5, y+1, 11, y+1, s1); c.rect(5, y+2, 11, y+2, s2); c.rect(5, y+3, 11, y+3, s3); c.rect(5, y+4, 11, y+5, s1); c.rect(8, y+1, 9, y+4, W); c.p(9, y+5, SKIN)
     elif o == 'blouse_skirt':
         c.rect(5, y, 11, y+3, col['top']); c.rect(8, y+1, 9, y+3, col['top']); c.p(9, y+4, SKIN)
         c.rect(5, y+4, 11, y+4, col['skirt']); c.rect(4, y+5, 12, y+7, col['skirt'])
@@ -231,6 +279,15 @@ CHARS = {
   'hero_cape': dict(style='short', hair=(43,43,58), outfit='hoodie_cape', mask=(110,70,170), col=dict(top=(52,62,120), top_s=(38,46,92), pants=(40,40,56), shoe=(200,60,70), cape=(70,50,110), acc=(70,50,110))),
   'hero_vig':  dict(style='cowl', hair=(35,35,58), cowl=(35,35,58), outfit='vig', col=dict(top=(35,35,58), top_s=(28,28,46), pants=(35,35,58), shoe=(200,60,70), cape=(70,50,110), emblem=(255,210,60))),
   'hero_gold': dict(style='cowl', hair=(90,70,20), cowl=(120,95,30), outfit='vig', col=dict(top=(120,95,30), top_s=(90,70,20), pants=(90,70,20), shoe=(60,40,20), cape=(200,160,50), emblem=(255,240,150))),
+  # purchasable costumes
+  'cos_dark':    dict(style='cowl', hair=(30,30,36), cowl=(30,30,36), outfit='armor', col=dict(top=(44,44,52), top_s=(30,30,36), pants=(30,30,36), shoe=(20,20,26), cape=(16,16,22), emblem=(255,210,60), belt=(255,210,60))),
+  'cos_trainer': dict(style='short', hair=(43,43,58), cap=((220,40,50), (245,245,245)), outfit='vest', col=dict(top=(60,100,200), pants=(60,80,140), shoe=(220,40,50))),
+  'cos_police':  dict(style='short', hair=(43,43,58), cap=((40,50,90), (40,50,90)), badge=(255,210,60), outfit='uniform', col=dict(top=(40,50,90), top_s=(150,180,220), pants=(40,50,90), shoe=(20,20,26))),
+  'cos_clerk_stripe': dict(style='short', hair=(43,43,58), visor=(245,130,32), outfit='clerk', col=dict(stripes=((245,130,32),(0,140,69),(238,28,37)), pants=(58,58,74), shoe=(43,43,58))),
+  'cos_clerk_blue':   dict(style='short', hair=(43,43,58), visor=(0,104,183), outfit='clerk', col=dict(stripes=((0,104,183),(255,255,255),(0,104,183)), pants=(58,58,74), shoe=(43,43,58))),
+  'cos_clerk_green':  dict(style='short', hair=(43,43,58), visor=(0,160,64), outfit='clerk', col=dict(stripes=((0,160,64),(255,255,255),(0,104,183)), pants=(58,58,74), shoe=(43,43,58))),
+  'cos_clerk_red':    dict(style='short', hair=(43,43,58), visor=(220,40,50), outfit='clerk', col=dict(stripes=((220,40,50),(255,255,255),(220,40,50)), pants=(58,58,74), shoe=(43,43,58))),
+  'cos_clerk_yellow': dict(style='short', hair=(43,43,58), visor=(0,90,180), outfit='clerk', col=dict(stripes=((0,90,180),(255,215,0),(0,90,180)), pants=(58,58,74), shoe=(43,43,58))),
   # pervs
   'perv':  dict(style='slick', hair=(43,43,58), glasses=True, outfit='suit', acc='briefcase', col=dict(top=(42,42,53), tie=(200,50,50), pants=(42,42,53), shoe=(30,30,40), acc=(107,75,42))),
   'perv2': dict(style='slick', hair=(90,60,40), glasses=True, outfit='suit', acc='briefcase', col=dict(top=(90,90,110), tie=(60,120,220), pants=(90,90,110), shoe=(30,30,40), acc=(60,60,70))),

@@ -16,6 +16,7 @@ import { L, fmt, lang } from '../i18n';
 import { audioInit, music } from '../core/audio';
 import { loadProfile, applyProfile, saveProfile } from './profile';
 import { resetGoals, goals, bossName } from './goals';
+import { heroSprite } from './costume';
 import { sfx } from '../core/audio';
 
 export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
@@ -31,7 +32,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.streak = 0; G.pervSpawns = 0; resetGoals();
   if (!G.inv[G.equip]) { const k = cycleEquip(); if (k) G.equip = k; }
   G.costume = costumeTier(G.level, G.totalCatches);
-  G.player = mk('player', COSTUME_SPRITES[G.costume], cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
+  G.player = mk('player', heroSprite(), cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
   G.bonsai = mk('bonsai', 'bonsai', cur.start.x - 1, cur.start.y);
   if (!G.tutorial) for (let i = 0; i < cur.targets; i++) { const t = spawnNpc('target', pick(['target', 'shopper3'])); const f = randSpot(); t.tx = f.x; t.ty = f.y; t.goal = f; t.state = 'wander'; }
   audioInit(); music.play('store');

@@ -16,6 +16,24 @@ export const CATALOG: { key: ItemKey; price: number; kind: 'active' | 'passive' 
   { key: 'charm', price: 2000, kind: 'passive' },
 ];
 export const ITEM_KEYS: ItemKey[] = CATALOG.map((c) => c.key);
+
+/** Wardrobe: purely cosmetic, priced to be a long-term goal. Ordered most to least expensive. */
+export const COSMETICS: { id: string; price: number }[] = [
+  { id: 'dark', price: 50000 },
+  { id: 'trainer', price: 30000 },
+  { id: 'police', price: 20000 },
+  { id: 'clerk_stripe', price: 12000 },
+  { id: 'clerk_blue', price: 12000 },
+  { id: 'clerk_green', price: 12000 },
+  { id: 'clerk_red', price: 12000 },
+  { id: 'clerk_yellow', price: 12000 },
+];
+export function buyCosmetic(id: string): 'ok' | 'broke' | 'owned' {
+  const c = COSMETICS.find((x) => x.id === id)!;
+  if (G.wardrobe.includes(id)) return 'owned';
+  if (G.yen < c.price) return 'broke';
+  G.yen -= c.price; G.wardrobe.push(id); saveProfile(); return 'ok';
+}
 export const priceOf = (k: ItemKey): number => CATALOG.find((c) => c.key === k)!.price;
 
 export type ScoreRow = { name: string; catches: number; level: number; lang: string; ts: number };
