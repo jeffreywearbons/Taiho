@@ -33,7 +33,7 @@ export type Toast = { txt: string; t: number };
 export type Particle = { x: number; y: number; vx: number; vy: number; t: number; life: number; kind: string; c: string; s: number };
 export type Sign = { title: string; lines: [string, string][]; t: number };
 export type Mode = 'story' | 'time';
-export type Scene = 'title' | 'play' | 'pick' | 'shop' | 'end' | 'result' | 'offer';
+export type Scene = 'title' | 'play' | 'pick' | 'shop' | 'end' | 'result' | 'offer' | 'pause' | 'attr';
 export type Stats = { speed: number; detect: number; strength: number };
 export type ItemKey = 'ball' | 'net' | 'peel' | 'decoy' | 'stop' | 'cart' | 'senzu' | 'juice' | 'vita' | 'shield' | 'charm';
 export type Inv = Record<ItemKey, number>;
@@ -66,6 +66,8 @@ export interface Game {
   streak: number; bestStreak: number; pervSpawns: number;
   /** Highest level whose boss has already been caught (persisted) or spawned this session. */
   lastBossLevel: number; bossDone: number;
+  /** The player chose to spend a level-up point later (from the Attributes screen) instead of right away. */
+  pickLater: boolean;
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -88,7 +90,7 @@ export function newGame(): Game {
     yen: 0, inv: emptyInv(), floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
     spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, wardrobe: [], wearing: null, aura: null, trail: null, particles: [], trailT: 0, hp: 10, hurtT: 0, regenT: 0, koT: 0, offer: null, offerUsed: false, arena: false, arenaT: 0, arenaTiles: [],
-    streak: 0, bestStreak: 0, pervSpawns: 0, lastBossLevel: 0, bossDone: 0,
+    streak: 0, bestStreak: 0, pervSpawns: 0, lastBossLevel: 0, bossDone: 0, pickLater: false,
   };
 }
 

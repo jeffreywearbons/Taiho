@@ -34,9 +34,9 @@ function dismiss(): void {
 export function onceInMenu(f: () => void): void { if (dismissed) f(); else afterSplash.push(f); }
 
 /** Small sprite icons on the menu tiles, redrawn whenever the menu shows so the hero icon matches the worn costume. */
-function tileIcon(id: string, sprite: string): void {
+function tileIcon(id: string, sprite: string, dy = 0): void {
   const cv = $(id).querySelector('canvas') as HTMLCanvasElement; const c2 = cv.getContext('2d')!; c2.imageSmoothingEnabled = false;
-  const main = ctx; setContext(c2); c2.clearRect(0, 0, 16, 24); spr(sprite, 0, 0); setContext(main);
+  const main = ctx; setContext(c2); c2.clearRect(0, 0, 16, 24); spr(sprite, 0, dy); setContext(main);
 }
 export function renderMenu(): void {
   const open = unlockedMaps(); const m = MAPS[open - 1];
@@ -44,10 +44,11 @@ export function renderMenu(): void {
   tileIcon('b-rank', 'boss_down_0'); tileIcon('b-book', 'cos_dark_down_0'); tileIcon('b-wardrobe', 'cos_gi_down_0');
   tileIcon('b-mycard', `${G.wearing ? 'cos_' + G.wearing : COSTUME_SPRITES[costumeTier(G.level, G.totalCatches)]}_down_0`);
   tileIcon('b-cal', bonsaiSprite() + '_0'); tileIcon('b-pass', 'cos_trainer_down_0');
+  tileIcon('b-attr', 'hero_vig_down_0'); tileIcon('b-settings', 'tile_vending', 4);
 }
 export function wireMenu(): void {
   $('s-title').textContent = L.title; $('s-sub').textContent = L.sub; $('s-tap').textContent = L.tap_start;
-  $('b-settings').textContent = L.settings; $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close;
+  $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close;
   $('splash').addEventListener('pointerdown', dismiss);
   window.addEventListener('keydown', (e) => { if (!dismissed && ['Enter', 'Space', 'KeyZ', 'KeyX'].includes(e.code)) dismiss(); });
   $('d-a').addEventListener('pointerdown', () => { if (!dismissed) dismiss(); });

@@ -129,7 +129,7 @@ export function secondChance(p: Ent): void {
 }
 export function gainXp(n: number): void {
   G.xp += n;
-  while (G.xp >= xpNeed(G.level)) { G.xp -= xpNeed(G.level); G.level++; G.pendingLevel++; }
+  while (G.xp >= xpNeed(G.level)) { G.xp -= xpNeed(G.level); G.level++; G.pendingLevel++; G.pickLater = false; }
 }
 
 export function endChase(caught: boolean): void {

@@ -41,10 +41,11 @@
           <button id="b-mycard" class="tile"><canvas width="16" height="24"></canvas><span>MY CARD</span></button>
           <button id="b-cal" class="tile"><canvas width="16" height="24"></canvas><span>DAILY CHECK-IN</span></button>
           <button id="b-pass" class="tile"><canvas width="16" height="24"></canvas><span>SEASON PASS</span></button>
+          <button id="b-attr" class="tile"><canvas width="16" height="24"></canvas><span>ATTRIBUTES</span></button>
+          <button id="b-settings" class="tile"><canvas width="16" height="24"></canvas><span>SETTINGS</span></button>
         </div>
         <p id="maps-title" class="bt">Jump to</p>
         <div class="strip-wrap"><div id="maps" class="maps strip"></div></div>
-        <div class="menu foot"><button id="b-settings" class="ghost">SETTINGS</button></div>
       </div>
     </div>
     <div id="settings" class="overlay" hidden>
@@ -72,6 +73,30 @@
           <button id="p2"><b>Strength</b><span>Break boxes in a chase</span><i>-</i></button>
         </div>
         <p class="small keys">1 / 2 / 3 on keyboard</p>
+        <button id="b-pick-later" class="link">Decide later</button>
+      </div>
+    </div>
+    <div id="pause" class="overlay" hidden>
+      <div class="card">
+        <h2 id="pause-title">PAUSED</h2>
+        <p id="pause-sub" class="small"></p>
+        <div class="menu">
+          <button id="b-resume">RESUME</button>
+          <button id="b-p-attr">ATTRIBUTES</button>
+          <button id="b-p-shop">SHOP</button>
+          <button id="b-p-restart">RESTART FLOOR</button>
+          <button id="b-p-save">SAVE</button>
+          <button id="b-p-quit" class="ghost">QUIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+    <div id="attr" class="overlay" hidden>
+      <div class="card">
+        <h2 id="attr-title">Attributes</h2>
+        <p id="attr-points" class="yen"></p>
+        <div id="attr-list" class="picks"></div>
+        <p id="attr-next" class="small"></p>
+        <div class="menu"><button id="b-attr-close">CLOSE</button></div>
       </div>
     </div>
     <div id="shop" class="overlay" hidden>
@@ -203,7 +228,7 @@
       <button class="pad" id="d-right" aria-label="Right">▶</button>
       <button class="pad" id="d-down" aria-label="Down">▼</button>
     </div>
-    <div class="ab"><button class="pad" id="d-sel" aria-label="Select item">SEL</button><button class="pad" id="d-b" aria-label="B button">B</button><button class="pad" id="d-a" aria-label="A button">A</button></div>
+    <div class="ab"><div class="mini"><button class="pad" id="d-start" aria-label="Pause menu">START</button><button class="pad" id="d-sel" aria-label="Select item">SEL</button></div><button class="pad" id="d-b" aria-label="B button">B</button><button class="pad" id="d-a" aria-label="A button">A</button></div>
   </div>
 </div>
 <script type="module" src="./src/main.ts"></script>

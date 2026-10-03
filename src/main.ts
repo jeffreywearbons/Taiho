@@ -13,7 +13,7 @@ import { initKeyboard, bindPad, bindDpadSlide, pressA, type Dir } from './core/i
 import { setLang, detectLang, lang, L } from './i18n';
 import { TW } from './game/const';
 import { drawWorld, drawHud } from './ui/draw';
-import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe, openTimePick } from './ui/overlays';
+import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapPick, toggleMute, pressReset, renderProfileLine, openWardrobe, closeWardrobe, openTimePick, pickLater } from './ui/overlays';
 import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
@@ -21,6 +21,7 @@ import { openLink, wireLink } from './ui/link';
 import { openCalendar, wireCalendar } from './ui/calendar';
 import { wireBook } from './ui/book';
 import { wireMenu, renderMenu, onceInMenu } from './ui/menu';
+import { wirePause, openAttr } from './ui/pause';
 import { unlockedMaps } from './game/maps';
 import { openPass, wirePass } from './ui/pass';
 import { wireOffer } from './ui/offer';
@@ -63,6 +64,9 @@ function wire(): void {
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };
   for (let i = 0; i < 3; i++) $('p' + i).onclick = () => choosePick(i);
+  $('b-pick-later').onclick = () => pickLater();
+  $('b-attr').onclick = () => openAttr('title');
+  wirePause(() => startGame(G.mode, G.mapIndex));
   $('b-end').onclick = () => { $('end').hidden = true; nextFloor(); };
   $('b-shop-close').onclick = () => closeShop();
   $('b-submit').onclick = () => { void submitScore(); };

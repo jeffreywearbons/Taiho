@@ -25,7 +25,7 @@ export function applyStrings(): void {
   $('b-rank-close').textContent = L.close; $('b-submit').textContent = L.submit; $('b-again').textContent = L.again; $('b-back').textContent = L.back;
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
-  $('b-settings').textContent = L.settings; $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close; $('s-title').textContent = L.title; $('s-sub').textContent = L.sub; $('s-tap').textContent = L.tap_start;
+  $('b-settings').querySelector('span')!.textContent = L.settings; $('b-attr').querySelector('span')!.textContent = L.attr_btn; $('set-title').textContent = L.settings_title; $('b-set-close').textContent = L.close; $('s-title').textContent = L.title; $('s-sub').textContent = L.sub; $('s-tap').textContent = L.tap_start;
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
   $('b-wardrobe').querySelector('span')!.textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').querySelector('span')!.textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-cal').querySelector('span')!.textContent = L.cal_btn; $('b-pass').querySelector('span')!.textContent = L.pass_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
@@ -67,12 +67,20 @@ export function openPick(): void {
   $('pick-title').textContent = L.pick_title;
   const vals = [G.stats.speed, G.stats.detect, G.stats.strength];
   for (let i = 0; i < 3; i++) { const b = $('p' + i); b.querySelector('b')!.textContent = L.stat[i]; b.querySelector('span')!.textContent = L.statd[i]; b.querySelector('i')!.textContent = '+'.repeat(vals[i]) || '-'; }
+  $('b-pick-later').textContent = L.pick_later; $('b-pick-later').hidden = G.tutorial && !G.tut.done;
   $('pick').hidden = false; toast(L.levelup, 1500); sfx('level');
 }
 export function choosePick(i: number): void {
   if (G.scene !== 'pick') return;
   (['speed', 'detect', 'strength'] as const).forEach((k, j) => { if (j === i) G.stats[k]++; });
-  $('pick').hidden = true; G.scene = 'play'; clearPresses(); saveProfile();
+  $('pick').hidden = true; G.scene = 'play'; clearPresses(); saveProfile(); afterPick();
+}
+/** Keep the point for the Attributes screen (START menu). The pick stops nagging until the next level-up. */
+export function pickLater(): void {
+  if (G.scene !== 'pick') return;
+  G.pendingLevel++; G.pickLater = true; $('pick').hidden = true; G.scene = 'play'; clearPresses(); saveProfile();
+}
+function afterPick(): void {
   if (G.tutorial && !G.tut.done && G.tut.step === 9) tutBox('t9', finishTutorial);
   else if (api.enabled && !sessionToken()) { try { if (!localStorage.getItem('taiho_tlink')) { localStorage.setItem('taiho_tlink', '1'); showBox(L.tlink); } } catch { /* ignore */ } }
   checkCostume();

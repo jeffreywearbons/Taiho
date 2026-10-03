@@ -85,7 +85,7 @@ export function update(dt: number): void {
       G.stamp = null;
       if (G.tutorial && !G.tut.done && G.tut.step === 8) { G.tut.step = 9; showBox(L.t8); }
       else if (G.offer) openOffer();
-      else if (G.pendingLevel) openPick();
+      else if (G.pendingLevel && !G.pickLater) openPick();
     }
     return;
   }
@@ -111,5 +111,5 @@ export function update(dt: number): void {
   const B = G.bonsai, P = G.player, k = Math.min(1, dt / 140), side = P.flip ? 14 : -14;
   B.px += (P.px + side - B.px) * k; B.py += (P.py - 6 - B.py) * k; B.flip = !P.flip;
   updSpawner(dt); updTutorial();
-  if (G.pendingLevel && !G.chase && !G.freeze && G.scene === 'play') openPick();
+  if (G.pendingLevel && !G.pickLater && !G.chase && !G.freeze && G.scene === 'play') openPick();
 }
