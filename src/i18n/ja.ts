@@ -3,7 +3,11 @@ import type { Strings, Page, ShopItem } from './en';
 // Kana only. scripts/check-kana.mjs fails the build if a kanji sneaks in.
 const ja: Strings = {
   title: 'タイホ!!', sub: 'コンビニ ヒーロー', start: 'スタート', lang: 'ことば: にほんご', tut: 'チュートリアル: ', on: 'ON', off: 'OFF',
-  sound: 'おと: ', profile_line: 'Lv{l}   つうさん {c}にん タイホ   ¥{y}', reset: 'セーブを けす', reset_confirm: 'もういちど おすと ぜんぶ きえる',
+  sound: 'おと: ',
+  streak: 'れんぞく {n}  ×{m}', streak_lost: 'れんぞく とぎれた…', boss_wanted: 'おたずねもの: {n} が はいってきた!', boss_caught: 'ボス タイホ! ほうしゅう 3ばい!',
+  boss_names: ['あせだく おじさん', 'カバンの おとこ', 'メガネの ひと', 'サラリーマン ゼロ'],
+  goal_done: 'ミッション クリア! +¥{y}', daily: 'きょう', daily_done: 'きょうの ミッション たっせい! +¥{y}',
+  goals: { catch3: 'ヘンタイを {t}にん タイホ', fast: 'のこり12びょう いじょうで タイホ', hop3: '1かいの ついせきで ふくろ3かい ジャンプ', smash2: 'はこを {t}こ こわす', boss: 'ボスを タイホ', ball: 'ホカクボールで タイホ', streak3: '3れんぞく タイホ', arena: 'うらの つうろで タイホ', daily: 'きょう {t}にん タイホ' }, profile_line: 'Lv{l}   つうさん {c}にん タイホ   ¥{y}', reset: 'セーブを けす', reset_confirm: 'もういちど おすと ぜんぶ きえる',
   keys: 'やじるし / WASD で いどう。 Z, スペース, Enter = A。 X か Shift = B (なげる)。',
   hud_caught: 'タイホ', hud_lv: 'Lv', hud_timer: 'のこり', hud_time: 'のこり',
   notyet: 'まだだ。あかい マークを まて。', caught: 'タイホ!!', escaped: 'ニゲラレタ…', levelup: 'レベルアップ!',

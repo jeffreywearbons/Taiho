@@ -14,6 +14,8 @@ import { openPick, openEnd, openResult, $ } from '../ui/overlays';
 import { L, fmt, lang } from '../i18n';
 import { audioInit, music } from '../core/audio';
 import { loadProfile, applyProfile, saveProfile } from './profile';
+import { resetGoals, goals, bossName } from './goals';
+import { sfx } from '../core/audio';
 
 export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   loadLayout(Math.min(mapIndex, unlockedMaps() - 1)); refit();
@@ -23,8 +25,9 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.ents = []; G.obstacles = []; G.catches = 0; G.escapes = 0; G.pendingLevel = 0;
   G.elevOpen = false; G.chase = null; G.box = null; G.ball = null; G.arena = false;
   G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
-  applyProfile(loadProfile());
+  const prof = loadProfile(); applyProfile(prof); if (prof.daily) goals.daily = prof.daily;
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
+  G.streak = 0; G.pervSpawns = 0; resetGoals();
   G.costume = costumeTier(G.level, G.totalCatches);
   G.player = mk('player', COSTUME_SPRITES[G.costume], cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
   G.bonsai = mk('bonsai', 'bonsai', cur.start.x - 1, cur.start.y);
@@ -49,7 +52,13 @@ function updSpawner(dt: number): void {
   if (G.ents.length >= cur.maxNpc) return;
   if (n('target') < cur.targets) { spawnNpc('target', pick(['target', 'shopper3'])); return; }
   const wantPervs = Math.max(G.mode === 'time' ? 3 : 0, Math.round(P.pervs));
-  if (n('perv') < wantPervs && !(G.tutorial && !G.tut.done)) { const p = spawnNpc('perv', pick(['perv', 'perv2'])); p.dwell = rnd(45000, 90000); return; }
+  if (n('perv') < wantPervs && !(G.tutorial && !G.tut.done)) {
+    G.pervSpawns++;
+    const boss = G.pervSpawns % 10 === 0;
+    const p = spawnNpc('perv', boss ? 'boss' : pick(['perv', 'perv2'])); p.dwell = rnd(45000, 90000);
+    if (boss) { p.boss = true; p.bossId = Math.floor(G.pervSpawns / 10) - 1; toast(fmt(L.boss_wanted, { n: bossName(p.bossId) }), 3000); sfx('chase'); }
+    return;
+  }
   if (n('shopper') < 2) spawnNpc('shopper', pick(['shopper1', 'shopper2']));
 }
 

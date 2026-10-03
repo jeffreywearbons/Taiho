@@ -85,6 +85,8 @@ def head_front(c, ch, frame):
             c.rect(3, y+6, 12, y+9, m); c.rect(5, y+7, 6, y+8, W); c.rect(9, y+7, 10, y+8, W); c.p(5, y+7, E); c.p(10, y+7, E)
     if ch.get('blush'): c.p(4, y+9, SKIN_S); c.p(11, y+9, SKIN_S)
     c.rect(7, y+10, 8, y+10, SKIN_S)  # mouth
+    if ch.get('hat'):
+        h = ch['hat']; c.rect(4, y-1, 11, y+1, h); c.rect(5, y-2, 10, y-2, h); c.rect(2, y+2, 13, y+2, h); c.rect(5, y+1, 10, y+1, (60, 40, 40))
 
 def head_back(c, ch, frame):
     hair, style = ch['hair'], ch['style']
@@ -97,6 +99,8 @@ def head_back(c, ch, frame):
     if style == 'cowl':
         cw = ch['cowl']; c.rect(3, y, 12, y+11, cw); c.rect(5, y, 10, y, cw); c.p(4, y-1, cw); c.p(11, y-1, cw); c.p(4, y-2, cw); c.p(11, y-2, cw)
         c.rect(3, y+1, 3, y+1, None)
+    if ch.get('hat'):
+        h = ch['hat']; c.rect(4, y-1, 11, y+1, h); c.rect(5, y-2, 10, y-2, h); c.rect(2, y+2, 13, y+2, h)
 
 def head_side(c, ch, frame):
     """Facing right."""
@@ -118,6 +122,8 @@ def head_side(c, ch, frame):
         if ch.get('mask'): c.rect(8, y+6, 12, y+8, ch['mask']); c.rect(10, y+7, 11, y+8, W); c.p(11, y+7, E)
     c.p(13, y+9, SKIN)  # nose
     c.p(11, y+10, SKIN_S)
+    if ch.get('hat'):
+        h = ch['hat']; c.rect(5, y-1, 11, y+1, h); c.rect(6, y-2, 10, y-2, h); c.rect(3, y+2, 14, y+2, h)
 
 def body_front(c, ch, frame):
     o = ch['outfit']; col = ch['col']; bob = -1 if frame else 0; y = 13 + bob
@@ -228,6 +234,7 @@ CHARS = {
   # pervs
   'perv':  dict(style='slick', hair=(43,43,58), glasses=True, outfit='suit', acc='briefcase', col=dict(top=(42,42,53), tie=(200,50,50), pants=(42,42,53), shoe=(30,30,40), acc=(107,75,42))),
   'perv2': dict(style='slick', hair=(90,60,40), glasses=True, outfit='suit', acc='briefcase', col=dict(top=(90,90,110), tie=(60,120,220), pants=(90,90,110), shoe=(30,30,40), acc=(60,60,70))),
+  'boss':  dict(style='slick', hair=(43,43,58), glasses=True, hat=(50,40,60), outfit='suit', acc='briefcase', col=dict(top=(70,40,80), tie=(255,210,60), pants=(70,40,80), shoe=(30,30,40), acc=(30,30,40))),
   # targets
   'target':   dict(style='long', hair=(120,70,40), blush=True, outfit='blouse_skirt', col=dict(top=W, skirt=(200,60,70), pants=SKIN, shoe=(43,43,58))),
   'shopper3': dict(style='bob', hair=(43,43,58), blush=True, outfit='blouse_skirt', col=dict(top=(240,240,250), skirt=(60,120,220), pants=SKIN, shoe=(43,43,58))),

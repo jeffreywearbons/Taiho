@@ -59,7 +59,7 @@ export function setState(e: Ent, s: Ent['state']): void {
   if (s === 'nothing') e.timer = sc ? 1500 : rnd(2500, 6000) * pace;
   if (s === 'scoping') e.timer = sc ? 4000 : rnd(3000, 6000) * pace;
   if (s === 'setup') e.timer = sc ? 2500 : rnd(1500, 3000) * pace;
-  if (s === 'live') e.timer = sc ? 30000 : P.windowSec * 1000;
+  if (s === 'live') e.timer = sc ? 30000 : P.windowSec * 1000 * (e.boss ? 0.7 : 1);
   if (G.tutorial && sc) { if (s === 'scoping') tutBox('t4'); if (s === 'setup') tutBox('t5'); if (s === 'live') tutBox('t6'); }
 }
 

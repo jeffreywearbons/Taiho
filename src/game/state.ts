@@ -17,7 +17,7 @@ export interface Ent {
   target: Ent | null; jump: boolean; fx: number; fy: number;
   leaving: boolean; bailT: number; scripted: boolean; age: number; looking: boolean;
   chasing: boolean; dead: boolean; onElev: boolean;
-  dir: Facing;
+  dir: Facing; boss: boolean; bossId: number;
 }
 export type Facing = 'down' | 'up' | 'side';
 
@@ -25,7 +25,7 @@ export type ObstacleType = 'bag' | 'box' | 'crate';
 export type Obstacle = { x: number; y: number; type: ObstacleType };
 /** Strength needed to smash each obstacle; bags are hopped instead. */
 export const OBSTACLE_STR: Record<ObstacleType, number> = { bag: 0, box: 1, crate: 2 };
-export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean };
+export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean; hops: number; smashes: number; byBall: boolean };
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
 export type Toast = { txt: string; t: number };
@@ -46,6 +46,7 @@ export interface Game {
   spawnT: number; time: number; timeLeft: number; lastRun: { catches: number; level: number } | null;
   totalCatches: number; costume: number; mapIndex: number;
   arena: boolean; arenaT: number; arenaTiles: Pt[];
+  streak: number; bestStreak: number; pervSpawns: number;
 }
 
 export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
@@ -54,7 +55,7 @@ export function mk(kind: Kind, sprite: string, tx: number, ty: number): Ent {
     moving: false, from: { x: tx, y: ty }, to: { x: tx, y: ty }, t: 0, ms: 170,
     flip: false, frame: 0, animT: 0, path: [], goal: null, waitT: 0, idleT: 0,
     state: 'enter', st: 0, timer: 0, dwell: 0, target: null, jump: false, fx: 0, fy: 1,
-    leaving: false, bailT: 0, scripted: false, age: 0, looking: false, chasing: false, dead: false, onElev: false, dir: 'down',
+    leaving: false, bailT: 0, scripted: false, age: 0, looking: false, chasing: false, dead: false, onElev: false, dir: 'down', boss: false, bossId: 0,
   };
 }
 
@@ -67,6 +68,7 @@ export function newGame(): Game {
     yen: 0, inv: { ball: 0, juice: 0, vita: 0 }, floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
     spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, arena: false, arenaT: 0, arenaTiles: [],
+    streak: 0, bestStreak: 0, pervSpawns: 0,
   };
 }
 

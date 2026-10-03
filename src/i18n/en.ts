@@ -3,7 +3,11 @@ export type ShopItem = [name: string, desc: string, price: number];
 
 const en = {
   title: 'TAIHO!!', sub: 'Konbini Vigilante', start: 'START', lang: 'Language: English', tut: 'Tutorial: ', on: 'ON', off: 'OFF',
-  sound: 'Sound: ', profile_line: 'Lv{l}   {c} career catches   ¥{y}', reset: 'Reset save', reset_confirm: 'Tap again to erase everything',
+  sound: 'Sound: ',
+  streak: 'STREAK {n}  ×{m}', streak_lost: 'Streak lost...', boss_wanted: 'WANTED: {n} just walked in!', boss_caught: 'BOSS DOWN! Triple reward!',
+  boss_names: ['Mr. Sweaty', 'The Briefcase', 'Glasses Guy', 'Salaryman Zero'],
+  goal_done: 'Goal clear! +¥{y}', daily: 'DAILY', daily_done: 'Daily bounty done! +¥{y}',
+  goals: { catch3: 'Catch {t} pervs', fast: 'Catch one with 12s+ left', hop3: 'Hop 3 bags in one chase', smash2: 'Smash {t} boxes', boss: 'Catch a boss', ball: 'Catch one with a Capture Ball', streak3: '3 catches in a row', arena: 'Catch one in the back halls', daily: 'Catch {t} today' }, profile_line: 'Lv{l}   {c} career catches   ¥{y}', reset: 'Reset save', reset_confirm: 'Tap again to erase everything',
   keys: 'Arrows / WASD to move.  Z, Space, Enter = A.  X or Shift = B (throw).',
   hud_caught: 'CAUGHT', hud_lv: 'Lv', hud_timer: 'ESCAPE IN', hud_time: 'TIME',
   notyet: 'Not yet. Wait for the red mark.', caught: 'TAIHO!!', escaped: 'He got away...', levelup: 'LEVEL UP!',

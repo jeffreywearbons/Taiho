@@ -7,6 +7,7 @@ import { cam } from '../core/camera';
 import { ctx, spr, text, otext } from '../core/render';
 import { L, lang } from '../i18n';
 import { rint } from '../core/rng';
+import { goals, goalText, dailyText, streakMult } from '../game/goals';
 
 function iconVisible(e: Ent): 'full' | 'hint' | null {
   if (e.scripted || e.chasing) return 'full';
@@ -50,6 +51,7 @@ export function drawWorld(): void {
     const v = iconVisible(e);
     let ic: string | null = null;
     if (e.chasing) ic = 'icon_finishing'; else if (e.bailT > 0) ic = 'bang'; else if (PERV_ICON[e.state]) ic = PERV_ICON[e.state];
+    if (e.boss) otext('★', e.px + 14, e.py - 22, '#ffe066', 'center');
     if (ic === 'bang') otext('!', e.px + 8, e.py - 20, '#ffe066', 'center');
     else if (ic && v === 'full') {
       let by = Math.round(Math.sin(G.time / 180));
@@ -76,7 +78,11 @@ export function drawHud(): void {
   if (narrow) text(`B${G.inv.ball} J${G.inv.juice} V${G.inv.vita}`, 3, vh - 11, '#c8c8d2');
   if (G.mode === 'time') { const tl = Math.ceil(G.timeLeft / 1000); otext(`${L.hud_time} ${tl}`, vw / 2, 14, tl <= 10 ? '#ff5a5a' : '#fff', 'center'); }
   if (G.chase) { const s = (G.chase.t / 1000).toFixed(1); otext(`${L.hud_timer} ${s}`, vw / 2, G.mode === 'time' ? 26 : 14, G.chase.t < 5000 ? '#ff5a5a' : '#ffe066', 'center'); }
-  let ty = G.mode === 'time' ? 40 : 28;
+  // goals strip, left edge under the bar
+  const lines = G.mode === 'time' ? [] : [dailyText(), ...goals.active.slice(0, narrow ? 1 : 3).map(goalText)];
+  let gy = 14; for (const ln of lines) { otext(ln, 3, gy, '#c8c8d2'); gy += 11; }
+  if (G.streak >= 2) otext(`×${streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '')}  ${G.streak}`, vw - 3, 14, '#ffe066', 'right');
+  let ty = G.mode === 'time' ? 40 : Math.max(28, gy + 2);
   for (const t of G.toasts) { otext(t.txt, vw / 2, ty, '#fff', 'center'); ty += 12; }
   if (G.stamp) {
     const k = Math.min(1, G.stamp.t / 200);

@@ -4,7 +4,8 @@ import { held, consumeTap } from '../core/input';
 import { sfx } from '../core/audio';
 import { L, fmt } from '../i18n';
 import { ch, solidForPlayer, obstacleAt, entAt, stepTo, updMove, manh, toast, face } from './world';
-import { startChase, endChase } from './chase';
+import { startChase, endChase, gainXp } from './chase';
+import { report } from './goals';
 import { openShop } from '../ui/overlays';
 
 export function playerAction(): void {
@@ -15,11 +16,11 @@ export function playerAction(): void {
   if (o) {
     if (o.type === 'bag') {
       const lx = fx + P.fx, ly = fy + P.fy;
-      if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 260); P.jump = true; sfx('jump'); }
+      if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 260); P.jump = true; sfx('jump'); hopped(); }
       return;
     }
     const need = OBSTACLE_STR[o.type];
-    if (G.stats.strength >= need) { G.obstacles = G.obstacles.filter((x) => x !== o); toast(L.smash, 900); sfx('smash'); G.shake = 150; }
+    if (G.stats.strength >= need) { G.obstacles = G.obstacles.filter((x) => x !== o); toast(L.smash, 900); sfx('smash'); G.shake = 150; if (G.chase) G.chase.smashes++; report({ kind: 'smash' }, bank); }
     else { toast(fmt(L.heavy, { n: need }), 1500); sfx('notyet'); }
     return;
   }
@@ -28,6 +29,9 @@ export function playerAction(): void {
   const live = near.find((e) => e.state === 'live'); if (live) { startChase(live); return; }
   if (near.length) { toast(L.notyet, 1400); sfx('notyet'); }
 }
+
+const bank = (y: number, x: number): void => { G.yen += y; gainXp(x); };
+function hopped(): void { if (G.chase) { G.chase.hops++; report({ kind: 'hop', hopsThisChase: G.chase.hops }, bank); } }
 
 export function throwBall(): void {
   if (!G.chase) return;
@@ -41,7 +45,7 @@ export function updBall(dt: number): void {
   const tx = Math.floor((b.x + 4) / TW), ty = Math.floor((b.y + 4) / TW);
   const pv = c.perv;
   if (ch(tx, ty) !== '.' || b.d > 7 * TW) { G.ball = null; return; }
-  if (Math.abs(b.x + 4 - (pv.px + 8)) < 9 && Math.abs(b.y + 4 - (pv.py + 4)) < 12) { G.ball = null; toast(L.ball_hit, 1200); endChase(true); }
+  if (Math.abs(b.x + 4 - (pv.px + 8)) < 9 && Math.abs(b.y + 4 - (pv.py + 4)) < 12) { G.ball = null; toast(L.ball_hit, 1200); c.byBall = true; endChase(true); }
 }
 
 export function updPlayer(dt: number): void {
@@ -58,7 +62,7 @@ export function updPlayer(dt: number): void {
   const ob = obstacleAt(nx, ny);
   if (ob && ob.type === 'bag' && G.chase && G.chase.juice) {
     const lx = nx + dx, ly = ny + dy;
-    if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); return; }
+    if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); hopped(); return; }
   }
   if (!solidForPlayer(nx, ny) && !ob && !e) {
     stepTo(P, nx, ny, playerMs()); G.tut.moved++;
