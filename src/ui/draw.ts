@@ -56,6 +56,11 @@ export function drawWorld(): void {
     if (e.kind === 'player' && G.hurtT > 0 && Math.floor(G.time / 60) % 2) ctx.globalAlpha = 0.4;
     spr(frameName(e), e.px, e.py - 8 + yo, e.flip); ctx.globalAlpha = 1;
     if (e.kind === 'player' && G.koT > 0) otext('KO', e.px + 8, e.py - 24, '#ff5a5a', 'center');
+    if (e.kind === 'perv' && (e.chasing || e.state === 'finish') && e.moving) {
+      // speed lines trailing the runner
+      const back = e.flip ? 1 : -1; const sx = e.flip ? e.px + 16 : e.px - 1; ctx.fillStyle = 'rgba(26,26,46,0.55)';
+      for (let i = 0; i < 3; i++) { const len = 3 + ((Math.floor(G.time / 60) + i) % 3) * 2; ctx.fillRect(sx + (back > 0 ? 0 : -len), e.py + 2 + i * 4, len, 1); }
+    }
     if (e.stunT > 0) { const a = G.time / 120; for (let i = 0; i < 3; i++) { const ang = a + i * 2.1; otext('★', e.px + 8 + Math.cos(ang) * 7, e.py - 22 + Math.sin(ang) * 2, '#ffe066', 'center'); } }
     if (e.kind !== 'perv') continue;
     const v = iconVisible(e);
@@ -70,7 +75,7 @@ export function drawWorld(): void {
     } else if (ic && v === 'hint') spr('icon_hint', e.px + 4, e.py - 19);
   }
   for (const b of G.balls) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x - 1, b.y - 1, 10, 10); ctx.fillStyle = '#e63c3c'; ctx.fillRect(b.x, b.y, 8, 4); ctx.fillStyle = '#fff'; ctx.fillRect(b.x, b.y + 4, 8, 4); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(b.x, b.y + 3, 8, 1); ctx.fillRect(b.x + 3, b.y + 2, 2, 3); }
-  const B = G.bonsai; spr(bonsaiSprite() + '_0', B.px, B.py - 8 + Math.round(Math.sin(G.time / 250) * 1.5) - 4, B.flip);
+  const B = G.bonsai; spr(bonsaiSprite() + (Math.floor(G.time / 320) % 2 ? '_1' : '_0'), B.px, B.py - 8 + Math.round(Math.sin(G.time / 250) * 1.5) - 4, B.flip);
   ctx.restore();
 }
 

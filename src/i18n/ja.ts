@@ -44,6 +44,8 @@ const ja: Strings = {
     trail_fire: ['ピクセル ファイア', 'あしあとから ひのこが あがる。'],
   } as Record<string, [string, string]>,
   link_btn: 'セーブを リンク', link_title: 'セーブを リンク', link_offline: 'この ビルドでは オンライン きのうは オフ。', link_unlinked: 'この セーブは この たんまつ だけに ある。', link_linked: 'リンクずみ。つうさん {c}にんの きろくを バックアップ ちゅう。', link_code_title: 'ひきつぎ コード', link_code_help: 'ここで コードを とって、24じかん いないに もうひとつの たんまつで にゅうりょく。つよい セーブが のこる。', link_get_code: 'コードを とる', link_claim: 'リンク', link_code_made: 'コードが できた。もうひとつの たんまつで うちこんで。', link_claimed: 'リンク かんりょう! セーブが きょうゆう された。', link_bad_code: 'その コードは みつからないか、きげんぎれ。', link_failed: 'サーバーに つながらない。あとで もういちど。',
+  link_signout: 'この たんまつで サインアウト', link_signed_out: 'サインアウト した。この たんまつの セーブは のこる。',
+  tlink: [['b', 'いいね、レベルアップ。タイトルから セーブを\nリンクすれば スマホを かえても のこるよ。']] as Page[],
   cal_btn: 'まいにち チェックイン', cal_title: 'まいにち チェックイン', cal_sub: 'れんぞく {n}にち。1にち あけると リセット。', cal_day: '{n}にちめ', cal_pick: 'すきな コスチューム', cal_claim: 'きょうの ぶんを うけとる', cal_got: 'うけとった! また あした。', cal_choose: '7にちめ: コスチュームを えらんで', cal_picked: '{c} を てにいれた!',
   my_card: 'マイカード', player_card: 'プレイヤー カード', you: 'あなた', card_aura: 'オーラ', card_trail: 'トレイル', card_stats: 'Lv{l}  ·  つうさん {c}にん  ·  さいこう れんぞく {s}  ·  マップ {m}', card_run: 'この きろく: 90びょうで {c}にん', card_mine: 'ランキングの なまえを おすと その ひとの カードが みえる。',
   wd_sets: 'セット (かきん)', sets_hint: 'ちょくせつ かいきん。ジェムも ガチャも なし。セーブを リンクすれば かいもどせる。', sets_offline: 'この ビルドでは こうにゅう できない。', sets_opening: 'けっさいを ひらく…', sets_unavailable: 'いまは こうにゅう できない。', owned_set: 'もっている', restore: 'こうにゅうを ふくげん', restored: '{n}この セットを ふくげん した。',

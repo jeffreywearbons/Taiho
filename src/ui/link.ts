@@ -18,6 +18,7 @@ function refreshStatus(): void {
   if (!api.enabled) { $('link-status').textContent = L.link_offline; $('b-code-new').setAttribute('disabled', ''); $('b-code-claim').setAttribute('disabled', ''); return; }
   $('b-code-new').removeAttribute('disabled'); $('b-code-claim').removeAttribute('disabled');
   $('link-status').textContent = linked() ? fmt(L.link_linked, { c: G.totalCatches }) : L.link_unlinked;
+  $('b-signout').hidden = !linked(); $('b-signout').textContent = L.link_signout;
 }
 export function wireLink(): void {
   $('b-link-close').onclick = () => { $('link').hidden = true; renderProfileLine(); };
@@ -25,5 +26,5 @@ export function wireLink(): void {
   $('b-code-claim').onclick = async () => { const v = ($('code-in') as HTMLInputElement).value; if (!v.trim()) return; $('link-msg').textContent = '…'; const ok = await claimCode(v); $('link-msg').textContent = ok ? L.link_claimed : L.link_bad_code; if (ok) sfx('catch'); else sfx('notyet'); refreshStatus(); };
   $('b-apple').onclick = async () => { const ok = await nativeSignIn('apple'); $('link-msg').textContent = ok ? L.link_claimed : L.link_failed; refreshStatus(); };
   $('b-google').onclick = async () => { const ok = await nativeSignIn('google'); $('link-msg').textContent = ok ? L.link_claimed : L.link_failed; refreshStatus(); };
-  void signOut; // reserved for a future "sign out" control
+  $('b-signout').onclick = async () => { await signOut(); $('link-msg').textContent = L.link_signed_out; refreshStatus(); };
 }

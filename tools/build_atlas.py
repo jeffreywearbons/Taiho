@@ -17,7 +17,16 @@ chars = runpy.run_path(os.path.join(TOOLS, 'characters.py'), run_name='build')['
 def load(p): return Image.open(p).convert('RGBA')
 items = []
 for key, im in chars.items(): items.append((key, im))
-items.append(('bonsai_0', load(os.path.join(OUT, 'bonsai.png'))))
+def lift_leaves(im):
+    im2 = Image.new('RGBA', im.size, (0, 0, 0, 0)); src = im.load(); dst = im2.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            c = src[x, y]
+            if not c[3]: continue
+            dst[x, y - 1 if (y < 11 and y > 0) else y] = c
+    return im2
+bonsai = load(os.path.join(OUT, 'bonsai.png'))
+items.append(('bonsai_0', bonsai)); items.append(('bonsai_1', lift_leaves(bonsai)))
 items.append(('bonsai_portrait', load(os.path.join(OUT, 'bonsai_portrait.png'))))
 # Bonsai in yellow and brown while the trainer costume is worn
 def electric(im):
@@ -28,7 +37,7 @@ def electric(im):
             c = px[x, y]
             if c[3] and c[:3] in swap: px[x, y] = swap[c[:3]] + (255,)
     return im
-items.append(('bonsai_pika_0', electric(load(os.path.join(OUT, 'bonsai.png')))))
+items.append(('bonsai_pika_0', electric(bonsai))); items.append(('bonsai_pika_1', electric(lift_leaves(bonsai))))
 items.append(('bonsai_pika_portrait', electric(load(os.path.join(OUT, 'bonsai_portrait.png')))))
 for n in ('scoping', 'setting_up', 'in_progress', 'finishing', 'hint'):
     items.append(('icon_' + n, load(os.path.join(OUT, n + '.png'))))

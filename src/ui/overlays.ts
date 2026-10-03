@@ -5,7 +5,7 @@ import { clearPresses } from '../core/input';
 import { buy, leaderboard, CATALOG, COSMETICS, buyCosmetic, type ScoreRow } from '../game/economy';
 import { wear, wornOf, heroSprite } from '../game/costume';
 import { allSets, buySet, hasSet, restorePurchases } from '../game/purchases';
-import { api } from '../game/api';
+import { api, sessionToken } from '../game/api';
 import { unlockedMaps as unlocked } from '../game/maps';
 import { openCard } from './card';
 import type { Card } from '../game/economy';
@@ -65,6 +65,7 @@ export function choosePick(i: number): void {
   (['speed', 'detect', 'strength'] as const).forEach((k, j) => { if (j === i) G.stats[k]++; });
   $('pick').hidden = true; G.scene = 'play'; clearPresses(); saveProfile();
   if (G.tutorial && !G.tut.done && G.tut.step === 9) tutBox('t9', finishTutorial);
+  else if (api.enabled && !sessionToken()) { try { if (!localStorage.getItem('taiho_tlink')) { localStorage.setItem('taiho_tlink', '1'); showBox(L.tlink); } } catch { /* ignore */ } }
   checkCostume();
 }
 
