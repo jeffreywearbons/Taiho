@@ -60,6 +60,7 @@ button.pad.on { background: var(--line); }
 .maps button { font-family: var(--font-pixel); font-size: 13px; padding: 8px 10px; background: var(--paper); color: var(--panel); border: 2px solid var(--panel); cursor: pointer; }
 .maps button.locked { opacity: 0.45; cursor: default; }
 #card { z-index: 5; }
+.code { font-size: 26px; letter-spacing: 3px; color: var(--panel); margin: 8px 0; min-height: 30px; font-variant-numeric: tabular-nums; }
 .pcard { max-width: min(92vw, 360px); }
 #card-cv { width: 256px; height: 192px; max-width: 100%; image-rendering: pixelated; border: 3px solid var(--panel); background: #ecece8; margin: 6px auto; display: block; }
 .pcard h2 { margin: 6px 0 2px; }

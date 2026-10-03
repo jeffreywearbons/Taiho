@@ -1,4 +1,5 @@
-import { G, playerMs, OBSTACLE_STR } from './state';
+import { G, playerMs, OBSTACLE_STR, OBSTACLE_DMG, MAX_HP } from './state';
+import { haptic } from '../core/input';
 import { TW } from './const';
 import { held, consumeTap } from '../core/input';
 import { sfx } from '../core/audio';
@@ -33,6 +34,12 @@ export function playerAction(): void {
 }
 
 const bank = (y: number, x: number): void => { G.yen += y; gainXp(x); };
+/** Lose HP on an obstacle bump. A short grace period stops a held direction from draining the bar. */
+export function hurt(n: number): void {
+  G.hp = Math.max(0, G.hp - n); G.hurtT = 700; G.shake = 120; sfx('smash'); haptic(30);
+  if (G.hp <= 0) { G.koT = 2000; toast(L.ko, 2000); sfx('escape'); if (G.chase) endChase(false); }
+}
+export function heal(full = true, n = MAX_HP): void { G.hp = full ? MAX_HP : Math.min(MAX_HP, G.hp + n); }
 /** Price card for a shelf, fridge or fixture tile. Returns false when the tile has nothing to show. */
 export function showSign(x: number, y: number): boolean {
   const sec = L.sections[ch(x, y)]; if (!sec) return false;
@@ -42,8 +49,8 @@ function hopped(): void { if (G.chase) { G.chase.hops++; report({ kind: 'hop', h
 
 /** B during a chase fires whatever is equipped. Every active item is a one-use consumable. */
 export function useItem(): void {
-  if (!G.chase) return;
   const k = G.equip; const P = G.player;
+  if (!G.chase && k !== 'senzu') return;
   if (!G.inv[k]) { toast(L.no_item, 1500); sfx('notyet'); return; }
   const c = G.chase;
   switch (k) {
@@ -62,12 +69,15 @@ export function useItem(): void {
     case 'decoy': {
       const dx = P.tx + P.fx, dy = P.ty + P.fy;
       const spot = ch(dx, dy) === '.' && !obstacleAt(dx, dy) && !entAt(dx, dy) ? { x: dx, y: dy } : { x: P.tx, y: P.ty };
-      G.decoy = { x: spot.x, y: spot.y, t: 3000 }; c.reroll = 0; toast(L.decoy_set, 1500); sfx('blip'); break;
+      G.decoy = { x: spot.x, y: spot.y, t: 3000 }; if (c) c.reroll = 0; toast(L.decoy_set, 1500); sfx('blip'); break;
     }
     case 'stop':
-      c.frozen = 5000; toast(L.time_stop, 1800); sfx('level'); break;
+      if (c) c.frozen = 5000; toast(L.time_stop, 1800); sfx('level'); break;
     case 'cart':
       G.cartT = 4000; toast(L.cart_ride, 1500); sfx('chase'); break;
+    case 'senzu':
+      if (G.hp >= MAX_HP) { toast(L.hp_full, 1200); return; }
+      heal(); toast(L.senzu_used, 1500); sfx('level'); break;
     default: return;
   }
   G.inv[k]--;
@@ -100,6 +110,7 @@ export function updPlayer(dt: number): void {
     const lx = nx + dx, ly = ny + dy;
     if (!solidForPlayer(lx, ly) && !obstacleAt(lx, ly) && !entAt(lx, ly)) { stepTo(P, lx, ly, 220); P.jump = true; sfx('jump'); hopped(); return; }
   }
+  if (ob && G.hurtT <= 0) { hurt(OBSTACLE_DMG[ob.type]); return; }
   if (!solidForPlayer(nx, ny) && !ob && !e) {
     stepTo(P, nx, ny, playerMs()); G.tut.moved++;
     if (ch(nx, ny) === 'E' && G.elevOpen) P.onElev = true;

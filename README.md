@@ -38,6 +38,10 @@ Portrait first. On phones the viewport is a scrolling window of about 15 by 15 t
 
 Career progress (level, stats, yen, items, total catches, unlocked maps) persists on the device and syncs to the cloud when the API is configured. "Reset save" on the title screen erases it after a confirming tap.
 
+## Accounts
+
+Guest first: the game plays anonymously under a device id. "Link save" on the title offers a transfer code (web and app) and, inside the Capacitor app, Sign in with Apple / Google through a social-login plugin. The Worker verifies ID tokens against Apple's and Google's public keys (set `APPLE_AUDIENCES` and `GOOGLE_AUDIENCES` in `worker/wrangler.toml`), keys saves by account once linked, and merges with the rule "more career catches wins". Existing databases run `worker/migrate-002-accounts.sql`.
+
 ## Fonts and art
 
 PixelMplus 10 (M+ FONT LICENSE, see `src/assets/fonts/`), subset to kana and Latin. All sprites and tiles are original pixel art generated from `tools/`.

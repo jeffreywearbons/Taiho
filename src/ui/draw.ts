@@ -1,4 +1,4 @@
-import { G, detectR, xpNeed, frameName, type Ent } from '../game/state';
+import { G, detectR, xpNeed, frameName, MAX_HP, type Ent } from '../game/state';
 import { TW } from '../game/const';
 import { cur, dims, ARENA_TILES } from '../game/maps';
 import { ch, cheb } from '../game/world';
@@ -53,7 +53,9 @@ export function drawWorld(): void {
   for (const e of draw) {
     const yo = e.jump ? -8 * Math.sin(Math.PI * e.t) : 0;
     if (e.kind === 'player' && G.cartT > 0) { ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px - 1, e.py + 6, 18, 9); ctx.fillStyle = '#9c9ca8'; ctx.fillRect(e.px, e.py + 7, 16, 6); ctx.fillStyle = '#1a1a2e'; ctx.fillRect(e.px + 2, e.py + 14, 3, 2); ctx.fillRect(e.px + 11, e.py + 14, 3, 2); }
-    spr(frameName(e), e.px, e.py - 8 + yo, e.flip);
+    if (e.kind === 'player' && G.hurtT > 0 && Math.floor(G.time / 60) % 2) ctx.globalAlpha = 0.4;
+    spr(frameName(e), e.px, e.py - 8 + yo, e.flip); ctx.globalAlpha = 1;
+    if (e.kind === 'player' && G.koT > 0) otext('KO', e.px + 8, e.py - 24, '#ff5a5a', 'center');
     if (e.stunT > 0) { const a = G.time / 120; for (let i = 0; i < 3; i++) { const ang = a + i * 2.1; otext('★', e.px + 8 + Math.cos(ang) * 7, e.py - 22 + Math.sin(ang) * 2, '#ffe066', 'center'); } }
     if (e.kind !== 'perv') continue;
     const v = iconVisible(e);
@@ -77,6 +79,10 @@ export function drawHud(): void {
   ctx.fillStyle = 'rgba(26,26,46,0.85)'; ctx.fillRect(0, 0, vw, 12);
   text(`${L.hud_caught} ${G.catches}/${cur.gate}`, 3, 1, '#ffe066');
   if (G.elevOpen) text('▲', 62, 1, '#5de36a');
+  // health bar under the top bar, right side
+  { const bw = 42, bx = vw - 48, by = 13; ctx.fillStyle = '#1a1a2e'; ctx.fillRect(bx - 1, by - 1, bw + 2, 6); ctx.fillStyle = '#3a3a4a'; ctx.fillRect(bx, by, bw, 4);
+    const frac = G.hp / MAX_HP; ctx.fillStyle = frac > 0.5 ? '#5de36a' : frac > 0.25 ? '#ffe066' : '#ff5a5a'; ctx.fillRect(bx, by, Math.round(bw * frac), 4);
+    otext('♥', bx - 8, by - 3, '#ff5a5a'); }
   const narrow = vw < 300;
   text('¥' + G.yen, narrow ? 70 : 76, 1, '#fff');
   const eq = G.inv[G.equip] ? `B:${L.items[G.equip][0]} ×${G.inv[G.equip]}` : `B: -`;
@@ -90,7 +96,7 @@ export function drawHud(): void {
   // goals strip, left edge under the bar
   const lines = G.mode === 'time' ? [] : [dailyText(), ...goals.active.slice(0, narrow ? 1 : 3).map(goalText)];
   let gy = 14; for (const ln of lines) { otext(ln, 3, gy, '#c8c8d2'); gy += 11; }
-  if (G.streak >= 2) otext(`×${streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '')}  ${G.streak}`, vw - 3, 14, '#ffe066', 'right');
+  if (G.streak >= 2) otext(`×${streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '')}  ${G.streak}`, vw - 3, 22, '#ffe066', 'right');
   let ty = G.mode === 'time' ? 40 : Math.max(28, gy + 2);
   for (const t of G.toasts) { otext(t.txt, vw / 2, ty, '#fff', 'center'); ty += 12; }
   if (G.stamp) {

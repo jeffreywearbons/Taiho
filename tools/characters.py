@@ -67,6 +67,10 @@ def head_front(c, ch, frame):
     elif style == 'bob':
         c.rect(3, y+5, 12, y+5, hair); c.rect(3, y+6, 5, y+6, hair); c.rect(10, y+6, 12, y+6, hair)
         c.rect(2, y+5, 2, y+10, hair); c.rect(13, y+5, 13, y+10, hair); c.rect(3, y+9, 3, y+10, hair); c.rect(12, y+9, 12, y+10, hair)
+    elif style == 'spiky':
+        c.rect(3, y+5, 12, y+5, hair); c.rect(3, y+6, 4, y+6, hair); c.rect(7, y+6, 8, y+6, hair); c.rect(11, y+6, 12, y+6, hair)
+        for sx, sy in ((3, y-2), (6, y-3), (9, y-3), (12, y-2), (1, y+1), (14, y+1), (5, y-1), (10, y-1)): c.p(sx, sy, hair); c.p(sx, sy+1, hair)
+        c.rect(2, y+1, 2, y+4, hair); c.rect(13, y+1, 13, y+4, hair)
     elif style == 'cowl':
         # vigilante cowl: covers everything but the mouth and chin
         cw = ch['cowl']
@@ -97,6 +101,10 @@ def head_front(c, ch, frame):
         if ch.get('badge'): c.p(7, y+1, ch['badge']); c.p(8, y+1, ch['badge'])
     if ch.get('visor'):
         v = ch['visor']; c.rect(3, y+3, 12, y+4, v); c.rect(2, y+5, 13, y+5, v)
+    if ch.get('headband'):
+        hb = ch['headband']; c.rect(3, y+4, 12, y+5, hb); c.rect(6, y+4, 9, y+5, (200, 200, 210)); c.p(7, y+4, (120, 120, 130)); c.p(8, y+5, (120, 120, 130)); c.rect(13, y+5, 14, y+8, hb)
+    if ch.get('straw'):
+        st = ch['straw']; c.rect(4, y-1, 11, y+1, st); c.rect(5, y-2, 10, y-2, st); c.rect(0, y+2, 15, y+3, st); c.rect(4, y+1, 11, y+1, (200, 50, 50))
 
 def head_back(c, ch, frame):
     hair, style = ch['hair'], ch['style']
@@ -106,9 +114,15 @@ def head_back(c, ch, frame):
     if style == 'bob': c.rect(2, y+5, 13, y+11, hair)
     if style == 'short': c.rect(4, y+11, 11, y+11, SKIN)   # neck
     if style == 'slick': c.rect(4, y+10, 11, y+11, SKIN)
+    if style == 'spiky':
+        for sx, sy in ((3, y-2), (6, y-3), (9, y-3), (12, y-2), (1, y+1), (14, y+1), (5, y-1), (10, y-1)): c.p(sx, sy, hair); c.p(sx, sy+1, hair)
     if style == 'cowl':
         cw = ch['cowl']; c.rect(3, y, 12, y+11, cw); c.rect(5, y, 10, y, cw); c.p(4, y-1, cw); c.p(11, y-1, cw); c.p(4, y-2, cw); c.p(11, y-2, cw)
         c.rect(3, y+1, 3, y+1, None)
+    if ch.get('headband'):
+        hb = ch['headband']; c.rect(3, y+4, 12, y+5, hb); c.rect(7, y+6, 8, y+12, hb)
+    if ch.get('straw'):
+        st = ch['straw']; c.rect(4, y-1, 11, y+1, st); c.rect(5, y-2, 10, y-2, st); c.rect(0, y+2, 15, y+3, st); c.rect(4, y+1, 11, y+1, (200, 50, 50))
     if ch.get('hat'):
         h = ch['hat']; c.rect(4, y-1, 11, y+1, h); c.rect(5, y-2, 10, y-2, h); c.rect(2, y+2, 13, y+2, h)
 
@@ -123,6 +137,9 @@ def head_side(c, ch, frame):
     if style == 'long': c.rect(3, y+5, 5, y+14, hair); c.rect(4, y+10, 6, y+13, hair)
     if style == 'bob': c.rect(3, y+5, 5, y+10, hair); c.rect(4, y+10, 6, y+10, hair)
     if style == 'slick': c.rect(4, y+5, 5, y+8, hair)
+    if style == 'spiky':
+        for sx, sy in ((4, y-2), (7, y-3), (10, y-2), (2, y+1), (3, y-1), (13, y)): c.p(sx, sy, hair); c.p(sx, sy+1, hair)
+        c.rect(3, y+1, 4, y+4, hair)
     if style == 'cowl':
         cw = ch['cowl']; c.rect(4, y, 12, y+8, cw); c.rect(4, y+9, 7, y+10, cw); c.p(6, y-1, cw); c.p(6, y-2, cw); c.p(9, y-1, cw)
         c.rect(10, y+6, 11, y+7, W)
@@ -138,6 +155,10 @@ def head_side(c, ch, frame):
         cp, fr = ch['cap']; c.rect(5, y-1, 11, y+1, cp); c.rect(6, y-2, 10, y-2, cp); c.rect(4, y+2, 12, y+3, cp); c.rect(10, y+4, 15, y+4, cp)
     if ch.get('visor'):
         v = ch['visor']; c.rect(4, y+3, 12, y+4, v); c.rect(10, y+5, 15, y+5, v)
+    if ch.get('headband'):
+        hb = ch['headband']; c.rect(4, y+4, 12, y+5, hb); c.rect(9, y+4, 11, y+5, (200, 200, 210)); c.rect(3, y+5, 4, y+9, hb)
+    if ch.get('straw'):
+        st = ch['straw']; c.rect(5, y-1, 11, y+1, st); c.rect(6, y-2, 10, y-2, st); c.rect(1, y+2, 15, y+3, st); c.rect(5, y+1, 11, y+1, (200, 50, 50))
 
 def body_front(c, ch, frame):
     o = ch['outfit']; col = ch['col']; bob = -1 if frame else 0; y = 13 + bob
@@ -168,6 +189,15 @@ def body_front(c, ch, frame):
         s1, s2, s3 = col['stripes']
         c.rect(3, y, 12, y+5, W); c.rect(3, y+1, 12, y+1, s1); c.rect(3, y+2, 12, y+2, s2); c.rect(3, y+3, 12, y+3, s3); c.rect(3, y+4, 12, y+5, s1)
         c.rect(6, y+1, 9, y+5, W); c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
+    elif o == 'gi':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(6, y, 9, y+1, col['under']); c.rect(7, y+2, 8, y+2, col['under'])
+        c.rect(3, y+5, 12, y+5, col['under']); c.rect(2, y+1, 2, y+4, SKIN); c.rect(13, y+1, 13, y+4, SKIN); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
+    elif o == 'jumpsuit':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(3, y, 5, y+1, col['under']); c.rect(10, y, 12, y+1, col['under']); c.rect(7, y, 8, y+3, col['under'])
+        c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top']); c.p(2, y+5, SKIN); c.p(13, y+5, SKIN)
+    elif o == 'openshirt':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(6, y, 9, y+5, SKIN); c.p(7, y+3, col['scar']); c.p(8, y+3, col['scar'])
+        c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top']); c.rect(2, y+4, 2, y+5, SKIN); c.rect(13, y+4, 13, y+5, SKIN)
     elif o == 'blouse_skirt':
         c.rect(3, y, 12, y+3, col['top']); c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top'])
         c.p(2, y+4, SKIN); c.p(13, y+4, SKIN)
@@ -198,6 +228,12 @@ def body_back(c, ch, frame):
     elif o == 'clerk':
         s1, s2, s3 = col['stripes']
         c.rect(3, y, 12, y+5, W); c.rect(3, y+1, 12, y+1, s1); c.rect(3, y+2, 12, y+2, s2); c.rect(3, y+3, 12, y+3, s3); c.rect(3, y+4, 12, y+5, s1); c.rect(2, y+1, 2, y+4, W); c.rect(13, y+1, 13, y+4, W)
+    elif o in ('gi', 'jumpsuit'):
+        c.rect(3, y, 12, y+5, col['top']); c.rect(3, y+5, 12, y+5, col['under'])
+        if o == 'gi': c.rect(2, y+1, 2, y+4, SKIN); c.rect(13, y+1, 13, y+4, SKIN); c.rect(5, y+1, 10, y+3, col['under'])
+        else: c.rect(2, y+1, 2, y+4, col['top']); c.rect(13, y+1, 13, y+4, col['top']); c.rect(3, y, 12, y+1, col['under'])
+    elif o == 'openshirt':
+        c.rect(3, y, 12, y+5, col['top']); c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top']); c.rect(2, y+4, 2, y+5, SKIN); c.rect(13, y+4, 13, y+5, SKIN)
     elif o == 'blouse_skirt':
         c.rect(3, y, 12, y+3, col['top']); c.rect(2, y+1, 2, y+3, col['top']); c.rect(13, y+1, 13, y+3, col['top'])
         c.rect(4, y+4, 11, y+4, col['skirt']); c.rect(3, y+5, 12, y+7, col['skirt'])
@@ -225,6 +261,12 @@ def body_side(c, ch, frame):
     elif o == 'clerk':
         s1, s2, s3 = col['stripes']
         c.rect(5, y, 11, y+5, W); c.rect(5, y+1, 11, y+1, s1); c.rect(5, y+2, 11, y+2, s2); c.rect(5, y+3, 11, y+3, s3); c.rect(5, y+4, 11, y+5, s1); c.rect(8, y+1, 9, y+4, W); c.p(9, y+5, SKIN)
+    elif o == 'gi':
+        c.rect(5, y, 11, y+5, col['top']); c.rect(5, y+5, 11, y+5, col['under']); c.rect(10, y, 11, y+1, col['under']); c.rect(8, y+1, 9, y+4, SKIN); c.p(9, y+5, SKIN)
+    elif o == 'jumpsuit':
+        c.rect(5, y, 11, y+5, col['top']); c.rect(5, y, 11, y+1, col['under']); c.rect(8, y+1, 9, y+4, col['top']); c.p(9, y+5, SKIN)
+    elif o == 'openshirt':
+        c.rect(5, y, 11, y+5, col['top']); c.rect(9, y, 10, y+5, SKIN); c.rect(8, y+1, 9, y+3, col['top']); c.p(9, y+4, SKIN); c.p(9, y+5, SKIN)
     elif o == 'blouse_skirt':
         c.rect(5, y, 11, y+3, col['top']); c.rect(8, y+1, 9, y+3, col['top']); c.p(9, y+4, SKIN)
         c.rect(5, y+4, 11, y+4, col['skirt']); c.rect(4, y+5, 12, y+7, col['skirt'])
@@ -283,6 +325,9 @@ CHARS = {
   'cos_dark':    dict(style='cowl', hair=(30,30,36), cowl=(30,30,36), outfit='armor', col=dict(top=(44,44,52), top_s=(30,30,36), pants=(30,30,36), shoe=(20,20,26), cape=(16,16,22), emblem=(255,210,60), belt=(255,210,60))),
   'cos_trainer': dict(style='short', hair=(43,43,58), cap=((220,40,50), (245,245,245)), outfit='vest', col=dict(top=(60,100,200), pants=(60,80,140), shoe=(220,40,50))),
   'cos_police':  dict(style='short', hair=(43,43,58), cap=((40,50,90), (40,50,90)), badge=(255,210,60), outfit='uniform', col=dict(top=(40,50,90), top_s=(150,180,220), pants=(40,50,90), shoe=(20,20,26))),
+  'cos_gi':      dict(style='spiky', hair=(255,215,60), outfit='gi', col=dict(top=(245,120,30), under=(40,80,200), pants=(245,120,30), shoe=(40,80,200))),
+  'cos_ninja':   dict(style='spiky', hair=(255,215,60), headband=(40,80,200), outfit='jumpsuit', col=dict(top=(245,120,30), under=(40,80,200), pants=(245,120,30), shoe=(40,80,200))),
+  'cos_straw':   dict(style='short', hair=(30,30,36), straw=(240,200,80), outfit='openshirt', col=dict(top=(220,40,50), scar=(200,120,100), pants=(60,100,200), shoe=(120,80,50))),
   'cos_clerk_stripe': dict(style='short', hair=(43,43,58), visor=(245,130,32), outfit='clerk', col=dict(stripes=((245,130,32),(0,140,69),(238,28,37)), pants=(58,58,74), shoe=(43,43,58))),
   'cos_clerk_blue':   dict(style='short', hair=(43,43,58), visor=(0,104,183), outfit='clerk', col=dict(stripes=((0,104,183),(255,255,255),(0,104,183)), pants=(58,58,74), shoe=(43,43,58))),
   'cos_clerk_green':  dict(style='short', hair=(43,43,58), visor=(0,160,64), outfit='clerk', col=dict(stripes=((0,160,64),(255,255,255),(0,104,183)), pants=(58,58,74), shoe=(43,43,58))),

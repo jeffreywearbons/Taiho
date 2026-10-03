@@ -23,7 +23,7 @@ export function applyStrings(): void {
   $<HTMLInputElement>('name').placeholder = L.name_ph; $('b-shop-close').textContent = L.close;
   $('maps-title').textContent = L.maps_title; renderProfileLine();
   $('b-install').textContent = L.install; $('t-install-hint').textContent = L.install_ios;
-  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
+  $('b-wardrobe').textContent = L.wardrobe; $('b-shop-wd').textContent = L.wardrobe; $('b-mycard').textContent = L.my_card; $('b-link').textContent = L.link_btn; $('b-mute').textContent = L.sound + (isMuted() ? L.off : L.on);
   renderMapSelect();
 }
 let resetArmed = false;

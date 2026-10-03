@@ -26,6 +26,7 @@
           <button id="b-rank">RANKING</button>
           <button id="b-wardrobe">WARDROBE</button>
           <button id="b-mycard">MY CARD</button>
+          <button id="b-link">LINK SAVE</button>
           <button id="b-lang">Language: English</button>
           <button id="b-tut">Tutorial: ON</button>
           <button id="b-mute">Sound: ON</button>
@@ -68,6 +69,20 @@
         <p id="wd-msg" class="small"></p>
         <p id="wd-hint" class="small"></p>
         <div class="menu"><button id="b-wd-close">CLOSE</button></div>
+      </div>
+    </div>
+    <div id="link" class="overlay" hidden>
+      <div class="card">
+        <h2 id="link-title">Link your save</h2>
+        <p id="link-status" class="small"></p>
+        <div id="link-native" class="menu" hidden><button id="b-apple">Sign in with Apple</button><button id="b-google">Sign in with Google</button></div>
+        <h3 id="link-code-title" class="bt">Transfer code</h3>
+        <p id="link-code-help" class="small"></p>
+        <div class="menu"><button id="b-code-new">GET A CODE</button></div>
+        <p id="link-code" class="code"></p>
+        <div class="row"><input id="code-in" maxlength="9" placeholder="ABCD-EFGH" autocomplete="off" autocapitalize="characters"><button id="b-code-claim">LINK</button></div>
+        <p id="link-msg" class="small"></p>
+        <div class="menu"><button id="b-link-close">CLOSE</button></div>
       </div>
     </div>
     <div id="card" class="overlay" hidden>

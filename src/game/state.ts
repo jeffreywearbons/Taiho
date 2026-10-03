@@ -34,10 +34,13 @@ export type Sign = { title: string; lines: [string, string][]; t: number };
 export type Mode = 'story' | 'time';
 export type Scene = 'title' | 'play' | 'pick' | 'shop' | 'end' | 'result';
 export type Stats = { speed: number; detect: number; strength: number };
-export type ItemKey = 'ball' | 'net' | 'peel' | 'decoy' | 'stop' | 'cart' | 'juice' | 'vita' | 'shield' | 'charm';
+export type ItemKey = 'ball' | 'net' | 'peel' | 'decoy' | 'stop' | 'cart' | 'senzu' | 'juice' | 'vita' | 'shield' | 'charm';
 export type Inv = Record<ItemKey, number>;
-export const emptyInv = (): Inv => ({ ball: 0, net: 0, peel: 0, decoy: 0, stop: 0, cart: 0, juice: 0, vita: 0, shield: 0, charm: 0 });
-export const ACTIVE_ITEMS: ItemKey[] = ['ball', 'net', 'peel', 'decoy', 'stop', 'cart'];
+export const emptyInv = (): Inv => ({ ball: 0, net: 0, peel: 0, decoy: 0, stop: 0, cart: 0, senzu: 0, juice: 0, vita: 0, shield: 0, charm: 0 });
+export const ACTIVE_ITEMS: ItemKey[] = ['ball', 'net', 'peel', 'decoy', 'stop', 'cart', 'senzu'];
+export const MAX_HP = 10;
+/** HP lost when the hero bumps into an obstacle instead of hopping or smashing it. */
+export const OBSTACLE_DMG: Record<ObstacleType, number> = { bag: 1, box: 2, crate: 3 };
 export type Peel = { x: number; y: number };
 export type Decoy = { x: number; y: number; t: number };
 export type Tut = { step: number; moved: number; done: boolean; perv: Ent | null; shown: Set<string>; s3?: boolean };
@@ -56,6 +59,7 @@ export interface Game {
   /** Purchased cosmetic ids and the one being worn (null = earned look). */
   wardrobe: string[]; wearing: string | null; aura: string | null; trail: string | null;
   particles: Particle[]; trailT: number;
+  hp: number; hurtT: number; regenT: number; koT: number;
   arena: boolean; arenaT: number; arenaTiles: Pt[];
   streak: number; bestStreak: number; pervSpawns: number;
   /** Highest level whose boss has already been caught (persisted) or spawned this session. */
@@ -81,7 +85,7 @@ export function newGame(): Game {
     catches: 0, escapes: 0, level: 1, xp: 0, pendingLevel: 0, stats: { speed: 0, detect: 0, strength: 0 },
     yen: 0, inv: emptyInv(), floor: 1, elevOpen: false,
     tutorial: true, tut: { step: 0, moved: 0, done: false, perv: null, shown: new Set() }, freeze: 0, stamp: null, shake: 0,
-    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, wardrobe: [], wearing: null, aura: null, trail: null, particles: [], trailT: 0, arena: false, arenaT: 0, arenaTiles: [],
+    spawnT: 2000, time: 0, timeLeft: 0, lastRun: null, totalCatches: 0, costume: 0, mapIndex: 0, wardrobe: [], wearing: null, aura: null, trail: null, particles: [], trailT: 0, hp: 10, hurtT: 0, regenT: 0, koT: 0, arena: false, arenaT: 0, arenaTiles: [],
     streak: 0, bestStreak: 0, pervSpawns: 0, lastBossLevel: 0, bossDone: 0,
   };
 }

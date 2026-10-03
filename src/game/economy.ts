@@ -10,6 +10,7 @@ export const CATALOG: { key: ItemKey; price: number; kind: 'active' | 'passive' 
   { key: 'decoy', price: 1800, kind: 'active' },
   { key: 'stop', price: 2000, kind: 'active' },
   { key: 'cart', price: 2500, kind: 'active' },
+  { key: 'senzu', price: 2500, kind: 'active' },
   { key: 'juice', price: 1200, kind: 'passive' },
   { key: 'vita', price: 800, kind: 'passive' },
   { key: 'shield', price: 1500, kind: 'passive' },
@@ -22,6 +23,9 @@ export type CosmeticKind = 'costume' | 'aura' | 'trail';
 export const COSMETICS: { id: string; price: number; kind: CosmeticKind }[] = [
   { id: 'dark', price: 50000, kind: 'costume' },
   { id: 'trainer', price: 30000, kind: 'costume' },
+  { id: 'gi', price: 30000, kind: 'costume' },
+  { id: 'ninja', price: 30000, kind: 'costume' },
+  { id: 'straw', price: 30000, kind: 'costume' },
   { id: 'police', price: 20000, kind: 'costume' },
   { id: 'clerk_stripe', price: 12000, kind: 'costume' },
   { id: 'clerk_blue', price: 12000, kind: 'costume' },

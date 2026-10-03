@@ -8,7 +8,8 @@ import { consumeA, consumeB, consumeSel, clearPresses } from '../core/input';
 import { loadLayout, spawnNpc, updMove, randSpot, toast } from './world';
 import { updNpc } from './ai';
 import { updChase } from './chase';
-import { updPlayer, playerAction, useItem, updBalls } from './player';
+import { updPlayer, playerAction, useItem, updBalls, heal } from './player';
+import { MAX_HP } from './state';
 import { cycleEquip } from './economy';
 import { updTutorial, advanceBox, showBox } from './tutorial';
 import { openPick, openEnd, openResult, $ } from '../ui/overlays';
@@ -30,7 +31,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
   const prof = loadProfile(); applyProfile(prof); if (prof.daily) goals.daily = prof.daily; G.lastBossLevel = prof.bossDone ?? 0;
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
-  G.streak = 0; G.pervSpawns = 0; resetGoals();
+  G.streak = 0; G.pervSpawns = 0; resetGoals(); G.hp = MAX_HP; G.hurtT = 0; G.koT = 0;
   if (!G.inv[G.equip]) { const k = cycleEquip(); if (k) G.equip = k; }
   G.costume = costumeTier(G.level, G.totalCatches);
   G.player = mk('player', heroSprite(), cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
@@ -44,7 +45,7 @@ export function nextFloor(): void {
   loadLayout(next); refit();
   G.catches = 0; G.elevOpen = false; G.ents = []; G.obstacles = []; G.chase = null; G.balls = []; G.peels = []; G.decoy = null; G.arena = false; G.floor++;
   const P = G.player; P.tx = cur.start.x; P.ty = cur.start.y; P.px = P.tx * TW; P.py = P.ty * TW; P.moving = false; P.onElev = false;
-  G.bonsai.px = P.px - 14; G.bonsai.py = P.py; saveProfile();
+  G.bonsai.px = P.px - 14; G.bonsai.py = P.py; saveProfile(); heal();
   G.scene = 'play'; toast(fmt(L.floor_toast, { n: G.floor, m: cur.name[lang] }), 2000);
 }
 
@@ -74,6 +75,9 @@ export function update(dt: number): void {
   if (G.shake > 0) G.shake -= dt;
   if (G.arena) G.arenaT += dt;
   if (G.sign) { G.sign.t -= dt; if (G.sign.t <= 0) G.sign = null; }
+  if (G.hurtT > 0) G.hurtT -= dt;
+  if (G.koT > 0) { G.koT -= dt; if (G.koT <= 0) heal(); clearPresses(); return; }
+  if (!G.chase && G.hp < MAX_HP) { G.regenT += dt; if (G.regenT > 4000) { G.regenT = 0; G.hp++; } }
   if (G.freeze > 0) {
     clearPresses(); G.freeze -= dt; if (G.stamp) G.stamp.t += dt;
     if (G.freeze <= 0) {

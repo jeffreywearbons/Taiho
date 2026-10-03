@@ -17,6 +17,7 @@ import { $, applyStrings, choosePick, closeShop, openBoard, submitScore, setMapP
 import { loadProfile, applyProfile } from './game/profile';
 import { syncProfile } from './game/profile';
 import { openCard, closeCard } from './ui/card';
+import { openLink, wireLink } from './ui/link';
 import { myCard } from './ui/overlays';
 
 const cv = $<HTMLCanvasElement>('cv');
@@ -45,6 +46,8 @@ function wire(): void {
   $('b-wd-close').onclick = () => closeWardrobe();
   $('b-mycard').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); let nm = ''; try { nm = localStorage.getItem('taiho_name') || ''; } catch { /* ignore */ } openCard(nm || L.you, myCard()); };
   $('b-card-close').onclick = () => closeCard();
+  $('b-link').onclick = () => { if (G.scene === 'title') applyProfile(loadProfile()); openLink(); };
+  wireLink();
   $('b-reset').onclick = () => pressReset();
   $('b-back').addEventListener('click', renderProfileLine);
   $('b-tut').onclick = () => { G.tutorial = !G.tutorial; $('b-tut').dataset.on = G.tutorial ? '1' : '0'; applyStrings(); };

@@ -9,3 +9,6 @@ database_id = "REPLACE_WITH_YOUR_D1_ID"
 
 [vars]
 ALLOWED_ORIGIN = "*"
+# Sign in with Apple: your app's bundle id (and the Services ID for web). Google: OAuth client ids. Comma-separated.
+APPLE_AUDIENCES = ""
+GOOGLE_AUDIENCES = ""

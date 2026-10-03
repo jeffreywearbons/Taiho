@@ -26,7 +26,7 @@ let pushTimer: number | null = null;
 export function saveProfile(): void {
   const p = snapshot();
   try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* ignore */ }
-  if (api.enabled) { if (pushTimer !== null) clearTimeout(pushTimer); pushTimer = window.setTimeout(() => { void api.putSave(p); }, 1500); }
+  if (api.enabled) { if (pushTimer !== null) clearTimeout(pushTimer); pushTimer = window.setTimeout(async () => { const r = await api.putSave<Profile>(p); if (r && r.kept === 'existing' && r.data && r.data.v === 1 && (r.data.totalCatches ?? 0) > G.totalCatches) { applyProfile({ ...blank(), ...r.data }); try { localStorage.setItem(KEY, JSON.stringify(r.data)); } catch { /* ignore */ } } }, 1500); }
 }
 export function resetProfile(): void { try { localStorage.removeItem(KEY); localStorage.removeItem('taiho_total'); localStorage.removeItem('taiho_unlocked'); } catch { /* ignore */ } }
 
@@ -35,7 +35,8 @@ export async function syncProfile(): Promise<Profile> {
   const local = loadProfile();
   if (!api.enabled) return local;
   const remote = await api.getSave<Profile>();
-  if (remote && remote.data && remote.data.v === 1 && (remote.ts || 0) > (local.ts || 0)) {
+  // merge rule: more career catches wins, then the newer save
+  if (remote && remote.data && remote.data.v === 1 && ((remote.data.totalCatches ?? 0) > (local.totalCatches ?? 0) || ((remote.data.totalCatches ?? 0) === (local.totalCatches ?? 0) && (remote.ts || 0) > (local.ts || 0)))) {
     try { localStorage.setItem(KEY, JSON.stringify(remote.data)); } catch { /* ignore */ }
     return { ...blank(), ...remote.data };
   }
