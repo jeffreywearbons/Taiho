@@ -28,7 +28,7 @@ Portrait first. On phones the viewport is a scrolling window of about 15 by 15 t
 ## Ship it
 
 - **CI**: `.github/workflows/ci.yml` runs the kana check, tests and build on every push and pull request.
-- **Web**: two workflows publish `dist/` on every push. `web-cloudflare.yml` deploys to Cloudflare Pages (`https://taiho.pages.dev`, works with a private repo; needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets). `deploy.yml` deploys to GitHub Pages (`https://<user>.github.io/<repo>/`; the repo must be public on a free plan, then Settings → Pages → Source → "GitHub Actions"). To point the game at the API, add a repository variable `VITE_API_URL`.
+- **Web**: two workflows publish `dist/` on every push. `web-cloudflare.yml` deploys to Cloudflare Pages (`https://taiho-dmd.pages.dev`, works with a private repo; needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets). `deploy.yml` deploys to GitHub Pages (`https://<user>.github.io/<repo>/`; the repo must be public on a free plan, then Settings → Pages → Source → "GitHub Actions"). To point the game at the API, add a repository variable `VITE_API_URL`.
 - **Phones, no store**: the site is a PWA. Android and desktop Chrome show an "Install app" button on the title; iPhone users add it from Safari's Share menu. It runs fullscreen and offline.
 - **App stores**: Capacitor is configured (`capacitor.config.ts`, app id `com.wearbons.taiho`). On a machine with Android Studio or Xcode: `npm run cap:add:android` or `npm run cap:add:ios` once, then `npm run cap:android` / `npm run cap:ios` to build, sync and open the native project.
 
