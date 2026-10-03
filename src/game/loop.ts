@@ -13,6 +13,7 @@ import { MAX_HP } from './state';
 import { cycleEquip } from './economy';
 import { updTutorial, advanceBox, showBox } from './tutorial';
 import { openPick, openEnd, openResult, $ } from '../ui/overlays';
+import { openOffer } from '../ui/offer';
 import { L, fmt, lang } from '../i18n';
 import { audioInit, music } from '../core/audio';
 import { loadProfile, applyProfile, saveProfile } from './profile';
@@ -31,7 +32,7 @@ export function startGame(mode: 'story' | 'time', mapIndex = 0): void {
   G.floor = 1; G.toasts = []; G.freeze = 0; G.stamp = null;
   const prof = loadProfile(); applyProfile(prof); if (prof.daily) goals.daily = prof.daily; G.lastBossLevel = prof.bossDone ?? 0;
   G.tut = { step: 0, moved: 0, done: !G.tutorial, perv: null, shown: new Set() };
-  G.streak = 0; G.pervSpawns = 0; resetGoals(); G.hp = MAX_HP; G.hurtT = 0; G.koT = 0;
+  G.streak = 0; G.pervSpawns = 0; resetGoals(); G.hp = MAX_HP; G.hurtT = 0; G.koT = 0; G.offer = null; G.offerUsed = false;
   if (!G.inv[G.equip]) { const k = cycleEquip(); if (k) G.equip = k; }
   G.costume = costumeTier(G.level, G.totalCatches);
   G.player = mk('player', heroSprite(), cur.start.x, cur.start.y); G.player.fy = -1; G.player.dir = 'up';
@@ -83,6 +84,7 @@ export function update(dt: number): void {
     if (G.freeze <= 0) {
       G.stamp = null;
       if (G.tutorial && !G.tut.done && G.tut.step === 8) { G.tut.step = 9; showBox(L.t8); }
+      else if (G.offer) openOffer();
       else if (G.pendingLevel) openPick();
     }
     return;
@@ -92,6 +94,7 @@ export function update(dt: number): void {
     G.timeLeft -= dt;
     if (G.timeLeft <= 0) { G.timeLeft = 0; if (G.chase) { const p = G.chase.perv; G.chase = null; G.obstacles = []; G.balls = []; G.peels = []; G.decoy = null; p.dead = true; music.play('store'); } openResult(); return; }
   }
+  if (G.offer && !G.freeze && !G.box) { openOffer(); return; }
   if (G.player.onElev) { G.player.onElev = false; openEnd(); return; }
   if (consumeSel()) { const k = cycleEquip(); if (k) { toast(fmt(L.equip, { i: L.items[k][0] }), 900); sfx('blip'); } else toast(L.no_item, 1200); }
   if (consumeB()) useItem();

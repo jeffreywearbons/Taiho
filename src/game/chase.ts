@@ -3,6 +3,8 @@ import { checkCostume } from './costume';
 import { saveProfile } from './profile';
 import { report, streakMult } from './goals';
 import { addSeasonPoints, SEASON } from './season';
+import { adsAvailable } from './ads';
+import { openOffer } from '../ui/offer';
 import { CHASE_MS } from './const';
 import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
@@ -105,6 +107,13 @@ function closeArena(p: Ent, caught: boolean): void {
   if (!caught && inArena(p)) { p.dead = true; }
 }
 
+/** Second chance: the perv is dragged back next to the hero and the chase restarts with a short clock. */
+export function secondChance(p: Ent): void {
+  G.offerUsed = true; p.dead = false; p.leaving = false; p.path = []; p.moving = false;
+  const P = G.player; p.tx = P.tx + (P.fx || 1); p.ty = P.ty; if (ch(p.tx, p.ty) !== '.') { p.tx = P.tx; p.ty = P.ty - 1; } p.px = p.tx * 16; p.py = p.ty * 16;
+  if (!G.ents.includes(p)) G.ents.push(p);
+  setState(p, 'live'); startChase(p); if (G.chase) G.chase.t = 12000;
+}
 export function gainXp(n: number): void {
   G.xp += n;
   while (G.xp >= xpNeed(G.level)) { G.xp -= xpNeed(G.level); G.level++; G.pendingLevel++; }
@@ -128,6 +137,7 @@ export function endChase(caught: boolean): void {
     if (c.charm) toast(L.charm_paid, 1500);
     if (G.streak >= 2) toast(fmt(L.streak, { n: G.streak, m: streakMult(G.streak).toFixed(2).replace(/\.?0+$/, '') }), 1800);
     addSeasonPoints(p.boss ? SEASON.bossPoints : SEASON.catchPoints);
+    if (p.boss && adsAvailable()) { G.offer = { kind: 'double_boss', yen, xp: Math.round((100 + secs * 5) * mult) }; }
     if (p.boss) { toast(L.boss_caught, 2200); G.bossDone = Math.max(G.bossDone, p.bossId * 5 + 5); G.lastBossLevel = G.bossDone; }
     report({ kind: 'catch', data: { secsLeft: secs, boss: p.boss, byBall: c.byBall, hops: c.hops, inArena, streak: G.streak } }, (y, x) => { G.yen += y; gainXp(x); });
     if (G.catches === cur.gate && !G.elevOpen && G.mode === 'story') { G.elevOpen = true; unlockMap(G.mapIndex + 1); toast(L.elev, 2500); sfx('level'); }
@@ -139,5 +149,6 @@ export function endChase(caught: boolean): void {
     if (G.inv.shield > 0 && G.streak >= 1) { G.inv.shield--; toast(L.shield_used, 1800); }
     else { if (G.streak >= 2) toast(L.streak_lost, 1600); G.streak = 0; }
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');
+    if (adsAvailable() && !G.offerUsed && G.hp > 0 && !p.dead) { G.offer = { kind: 'second_chance', perv: p }; }
   }
 }
