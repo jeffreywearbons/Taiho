@@ -3,6 +3,7 @@ import { TW } from '../game/const';
 import { cur, dims, ARENA_TILES } from '../game/maps';
 import { ch, cheb } from '../game/world';
 import { PERV_ICON } from '../game/ai';
+import { adaptive } from '../game/adapt';
 import { cam } from '../core/camera';
 import { ctx, spr, text, otext } from '../core/render';
 import { L, lang } from '../i18n';
@@ -67,6 +68,8 @@ export function drawWorld(): void {
     let ic: string | null = null;
     if (e.chasing) ic = 'icon_finishing'; else if (e.bailT > 0) ic = 'bang'; else if (PERV_ICON[e.state]) ic = PERV_ICON[e.state];
     if (e.boss) otext('★', e.px + 14, e.py - 22, '#ffe066', 'center');
+    if (e.chasing && G.chase?.strat) otext(L.strats[G.chase.strat], e.px + 8, e.py - 30, '#7fe0ff', 'center');
+    else if (!e.chasing && adaptive() && e.state !== 'finish') { ctx.fillStyle = '#7fe0ff'; ctx.fillRect(e.px + 4, e.py - 2, 8, 1); }
     if (ic === 'bang') otext('!', e.px + 8, e.py - 20, '#ffe066', 'center');
     else if (ic && v === 'full') {
       let by = Math.round(Math.sin(G.time / 180));

@@ -5,7 +5,8 @@ import { api } from './api';
 import { goals, type Daily } from './goals';
 import { login, type LoginState } from './login';
 import { season, type SeasonState } from './season';
-export interface Profile { v: 1; level: number; xp: number; stats: Stats; yen: number; inv: Inv; totalCatches: number; ts: number; daily?: Daily; bossDone?: number; wardrobe?: string[]; wearing?: string | null; aura?: string | null; trail?: string | null; bestStreak?: number; login?: LoginState; season?: SeasonState }
+import { adapt, blankAdapt, type AdaptState } from './adapt';
+export interface Profile { v: 1; level: number; xp: number; stats: Stats; yen: number; inv: Inv; totalCatches: number; ts: number; daily?: Daily; bossDone?: number; wardrobe?: string[]; wearing?: string | null; aura?: string | null; trail?: string | null; bestStreak?: number; login?: LoginState; season?: SeasonState; adapt?: AdaptState }
 
 const KEY = 'taiho_profile';
 export const blank = (): Profile => ({ v: 1, level: 1, xp: 0, stats: { speed: 0, detect: 0, strength: 0 }, yen: 0, inv: emptyInv(), totalCatches: 0, ts: 0 });
@@ -20,9 +21,10 @@ export function loadProfile(): Profile {
 }
 export function applyProfile(p: Profile): void {
   G.level = p.level; G.xp = p.xp; G.stats = { ...p.stats }; G.yen = p.yen; G.inv = { ...emptyInv(), ...p.inv }; G.totalCatches = p.totalCatches; G.bossDone = p.bossDone ?? 0; G.wardrobe = [...(p.wardrobe ?? [])]; G.wearing = p.wearing ?? null; G.aura = p.aura ?? null; G.trail = p.trail ?? null; G.bestStreak = p.bestStreak ?? 0; if (p.login) login.state = { ...p.login }; if (p.season) season.state = { ...p.season, free: [...(p.season.free ?? [])], prem: [...(p.season.prem ?? [])] };
+  adapt.state = p.adapt && p.adapt.v === 1 ? { ...blankAdapt(), ...p.adapt, heat: [...p.adapt.heat], items: { ...p.adapt.items }, bandit: { ...blankAdapt().bandit, ...p.adapt.bandit } } : blankAdapt();
 }
 export function snapshot(): Profile {
-  return { v: 1, level: G.level, xp: G.xp, stats: { ...G.stats }, yen: G.yen, inv: { ...G.inv }, totalCatches: G.totalCatches, ts: Date.now(), daily: { ...goals.daily }, bossDone: G.bossDone, wardrobe: [...G.wardrobe], wearing: G.wearing, aura: G.aura, trail: G.trail, bestStreak: G.bestStreak, login: { ...login.state }, season: { ...season.state, free: [...season.state.free], prem: [...season.state.prem] } };
+  return { v: 1, level: G.level, xp: G.xp, stats: { ...G.stats }, yen: G.yen, inv: { ...G.inv }, totalCatches: G.totalCatches, ts: Date.now(), daily: { ...goals.daily }, bossDone: G.bossDone, wardrobe: [...G.wardrobe], wearing: G.wearing, aura: G.aura, trail: G.trail, bestStreak: G.bestStreak, login: { ...login.state }, season: { ...season.state, free: [...season.state.free], prem: [...season.state.prem] }, adapt: { ...adapt.state, heat: [...adapt.state.heat], items: { ...adapt.state.items }, bandit: { ...adapt.state.bandit } } };
 }
 let pushTimer: number | null = null;
 export function saveProfile(): void {

@@ -42,6 +42,10 @@ Career progress (level, stats, yen, items, total catches, unlocked maps) persist
 
 Ten floors: Konbini, Boutique, Department Store, Electronics Store, Shopping Mall, then Mega Mall 1F-5F. Maps 4 and up are assembled by `src/game/mall.ts`: a fixture strip with the elevator, shop rooms behind glass partitions with two-wide openings, back halls that open during chases, and separate IN / OUT doors. Each room places its own shop's fixtures, so a mall floor is a konbini corner next to a boutique next to an electronics shop. The mega malls are built from a seed per floor (deterministic, bigger each floor, shops drawn from the catalogue). Tipped vending machines appear from map 4 and need Strength 3.
 
+## Level 100+: pervs that study you
+
+From level 100 every chase picks an evasion style (`src/game/adapt.ts`): RUNNER, ZIGZAG, DODGER (steers clear of the zones you usually catch in), HALL RAT (runs for the back halls), JUKER (breaks to your blind side) or WARY (sees through decoys, avoids peels and obstacles). Each catch feeds a small profile in the save: a 4x4 heatmap of catch spots, the side you close from, and the items you finish with. The style is chosen by Thompson sampling over how often each one has escaped, everything decays over ~25 chases so changing your habits works, and the pervs never get faster than the level-100 curve. The style is shown above the runner during the chase.
+
 ## Rewarded ads (optional)
 
 Two placements only, never forced: a second chance after an escape and doubling a boss reward. On the web no provider exists and the offers never appear. In the app, install `@capacitor-community/admob`, create two rewarded ad units, and build with `VITE_AD_SECOND_CHANCE` and `VITE_AD_DOUBLE_BOSS` set to their ids.

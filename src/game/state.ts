@@ -1,6 +1,7 @@
 import { type Pt, type Spot } from './const';
 import { KONBINI } from './maps';
 import type { PervParams } from './difficulty';
+import type { Strategy } from './adapt';
 import type { Page } from '../i18n/en';
 
 export type Kind = 'player' | 'shopper' | 'target' | 'perv' | 'bonsai';
@@ -25,7 +26,7 @@ export type ObstacleType = 'bag' | 'box' | 'crate' | 'vending';
 export type Obstacle = { x: number; y: number; type: ObstacleType };
 /** Strength needed to smash each obstacle; bags are hopped instead. */
 export const OBSTACLE_STR: Record<ObstacleType, number> = { bag: 0, box: 1, crate: 2, vending: 3 };
-export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean; charm: boolean; frozen: number; hops: number; smashes: number; byBall: boolean };
+export type Chase = { perv: Ent; t: number; reroll: number; obsT: number; P: PervParams; juice: boolean; vita: boolean; charm: boolean; frozen: number; hops: number; smashes: number; byBall: boolean; strat: Strategy | null; used: string[] };
 export type Ball = { x: number; y: number; dx: number; dy: number; d: number };
 export type TextBox = { pages: Page[]; i: number; shown: number; onDone?: () => void };
 export type Toast = { txt: string; t: number };

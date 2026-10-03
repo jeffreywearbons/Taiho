@@ -52,7 +52,7 @@ export function useItem(): void {
   const k = G.equip; const P = G.player;
   if (!G.chase && k !== 'senzu') return;
   if (!G.inv[k]) { toast(L.no_item, 1500); sfx('notyet'); return; }
-  const c = G.chase;
+  const c = G.chase; if (c) c.used.push(k);
   switch (k) {
     case 'ball':
       if (G.balls.length) return;

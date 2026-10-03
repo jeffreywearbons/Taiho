@@ -8,6 +8,7 @@ import { openOffer } from '../ui/offer';
 import { CHASE_MS } from './const';
 import { cur, dims, unlockMap } from './maps';
 import { pervParams } from './difficulty';
+import { adaptive, chooseStrategy, recordCatch, recordOutcome, heatAt, approach, leansOn } from './adapt';
 import { random, pick } from '../core/rng';
 import { ch, entAt, obstacleAt, updMove, stepTo, toast, manh, chaseFloor, chaseTiles } from './world';
 import { ARENA_TILES } from './maps';
@@ -23,13 +24,17 @@ export function startChase(p: Ent): void {
   const P = pervParams(G.level);
   p.chasing = true; p.path = []; p.state = 'chase';
   if (p.boss) { P.speed += 0.1; P.rerollSec *= 0.6; }
-  const chase = { perv: p, t: CHASE_MS, reroll: 0, obsT: 0, P, juice: false, vita: false, charm: false, frozen: 0, hops: 0, smashes: 0, byBall: false };
+  // level 100+: a studied evasion style, never extra speed
+  const strat = adaptive() && !p.scripted ? chooseStrategy() : null;
+  if (strat === 'zigzag') { P.rerollSec *= 0.5; P.feint = Math.min(0.7, P.feint + 0.2); }
+  const chase = { perv: p, t: CHASE_MS, reroll: 0, obsT: 0, P, juice: false, vita: false, charm: false, frozen: 0, hops: 0, smashes: 0, byBall: false, strat, used: [] as string[] };
   G.chase = chase; G.balls = []; G.peels = []; G.decoy = null; G.cartT = 0; p.stunT = 0;
   if (G.inv.juice > 0) { G.inv.juice--; chase.juice = true; toast(L.used_juice, 1500); }
   if (G.inv.vita > 0) { G.inv.vita--; chase.vita = true; toast(L.used_vita, 1500); }
   if (G.inv.charm > 0) { G.inv.charm--; chase.charm = true; toast(L.used_charm, 1500); }
   if (cur.arena) { G.arena = true; G.arenaT = 0; toast(L.arena_open, 2000); }
   if (G.tutorial && p.scripted) tutBox('t7');
+  if (strat) toast(fmt(L.adapt_tell, { s: L.strats[strat] }), 2200);
   sfx('chase'); music.play('chase');
 }
 
@@ -46,6 +51,7 @@ export function updChase(dt: number): void {
     if (G.player.tx === x && G.player.ty === y) return false;
     const o = obstacleAt(x, y); if (o && o.type !== 'bag') return false;
     if (entAt(x, y, p)) return false;
+    if (c.strat === 'wary' && G.peels.some((q) => q.x === x && q.y === y)) return false;
     return true;
   };
   if (!p.moving) {
@@ -54,14 +60,21 @@ export function updChase(dt: number): void {
       const dm = distMap(G.player.tx, G.player.ty, walk);
       let goal = null as { x: number; y: number } | null;
       const tiles = chaseTiles();
-      if (G.decoy) { goal = { x: G.decoy.x, y: G.decoy.y }; c.reroll = G.decoy.t; }
+      // a wary perv sees through decoys more often the more the player leans on them
+      const fooled = !G.decoy || !(c.strat === 'wary' && random() < Math.min(0.8, 0.4 + leansOn('decoy') * 0.1));
+      if (G.decoy && fooled) { goal = { x: G.decoy.x, y: G.decoy.y }; c.reroll = G.decoy.t; }
       else if (random() < c.P.feint) goal = pickOne(tiles);
       else {
-        let best = -1;
+        let best = -1; const ap = approach(); const P = G.player;
         for (const f of tiles) {
           const d = dm[f.y * dims.w + f.x]; if (d < 0) continue;
           const dp = Math.abs(f.x - p.tx) + Math.abs(f.y - p.ty);
-          const score = d - 0.35 * dp + random() * 2;
+          let score = d - 0.35 * dp + random() * 2;
+          // studied styles bend the choice: away from the hot zones, into the halls, to the hero's blind side, clear of obstacles
+          if (c.strat === 'avoid') score += 4 * (1 - heatAt(f.x, f.y));
+          else if (c.strat === 'hall' && G.arena && ARENA_TILES.includes(ch(f.x, f.y))) score += 4;
+          else if (c.strat === 'juke') score -= 2 * (Math.sign(f.x - P.tx) * ap.ax + Math.sign(f.y - P.ty) * ap.ay);
+          else if (c.strat === 'wary' && G.obstacles.some((o) => Math.abs(o.x - f.x) + Math.abs(o.y - f.y) <= 1)) score -= 3;
           if (score > best) { best = score; goal = f; }
         }
       }
@@ -124,6 +137,7 @@ export function endChase(caught: boolean): void {
   const p = c.perv;
   G.chase = null; G.obstacles = []; G.balls = []; G.peels = []; G.decoy = null; G.cartT = 0; p.stunT = 0; music.play('store');
   const inArena = ARENA_TILES.includes(ch(G.player.tx, G.player.ty));
+  if (adaptive() && !p.scripted) { if (caught) recordCatch(G.player, p, c.used, c.byBall); if (c.strat) recordOutcome(c.strat, caught); }
   if (G.arena) closeArena(p, caught);
   if (caught) {
     p.dead = true; G.catches++; G.totalCatches++;
@@ -149,6 +163,7 @@ export function endChase(caught: boolean): void {
     if (G.inv.shield > 0 && G.streak >= 1) { G.inv.shield--; toast(L.shield_used, 1800); }
     else { if (G.streak >= 2) toast(L.streak_lost, 1600); G.streak = 0; }
     p.chasing = false; p.path = []; p.ms = 170; p.leaving = true; setState(p, 'finish');
+    if (c.strat) saveProfile();
     if (adsAvailable() && !G.offerUsed && G.hp > 0 && !p.dead) { G.offer = { kind: 'second_chance', perv: p }; }
   }
 }
